@@ -162,14 +162,7 @@ Engineering Test: DA
 
       * On Hera: ``config.DA.retro.hera.sh``
 
-      .. code-block:: console
-
-         rocotoboot -w FV3LAM_wflow.xml -d FV3LAM_wflow.db -v 10 -c 202207200600 -t get_extrn_lbcs
-         rocotoboot -w FV3LAM_wflow.xml -d FV3LAM_wflow.db -v 10 -c 202207201200 -t get_extrn_lbcs
-         rocotoboot -w FV3LAM_wflow.xml -d FV3LAM_wflow.db -v 10 -c 202207201800 -t get_extrn_lbcs
-         rocotoboot -w FV3LAM_wflow.xml -d FV3LAM_wflow.db -v 10 -c 202207201500 -t get_extrn_ics
-
-      Once the above tasks are complete, launch the ``prep_cyc_spinup`` task:
+      Once the ``make_ics`` task for ``15z`` and ``make_lbcs`` tasks for ``06z``, ``12z``, and ``18z`` are complete, launch the ``prep_cyc_spinup`` task for ``03z`` manually:
 
       .. code-block:: console
 
