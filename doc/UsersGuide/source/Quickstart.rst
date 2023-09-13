@@ -67,7 +67,7 @@ Engineering Test: Non-DA
       .. code-block:: console
 
          cd ush
-         cp sample_configs/non-DA_eng/config.nonDA.community.<machine>.sh config.sh
+         cp sample_configs/non-DA_eng/config.nonDA.<machine>.sh config.sh
       
       where ``<machine>`` is ``hera``, ``jet``, or ``orion``. Note that you may need to change ``ACCOUNT`` in the configuration file ``config.sh``.
 
@@ -81,7 +81,7 @@ Engineering Test: Non-DA
 
       .. code-block:: console
 
-         cd ../../expt_dirs/test_nonDA_community
+         cd ../../expt_dirs/test_nonDA
          ./launch_FV3LAM_wflow.sh
 
       .. note::
