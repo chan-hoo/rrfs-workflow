@@ -29,7 +29,7 @@ Building RRFS workflow
 
       .. code-block:: console
 
-         cd rrfs-workflow/sorC          
+         cd rrfs-workflow/sorc
          ./manage_externals/checkout_externals
          ./app_build.sh --platform=<machine>
 
