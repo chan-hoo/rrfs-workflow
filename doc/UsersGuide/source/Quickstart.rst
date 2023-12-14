@@ -28,6 +28,8 @@ Building RRFS workflow
       This is equal to the following two commands:
 
       .. code-block:: console
+
+         cd rrfs-workflow/sorC          
          ./manage_externals/checkout_externals
          ./app_build.sh --platform=<machine>
 
