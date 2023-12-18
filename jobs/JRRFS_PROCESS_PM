@@ -7,6 +7,8 @@
 #
 #-----------------------------------------------------------------------
 #
+date
+export PS4='+ $SECONDS + '
 #
 #-----------------------------------------------------------------------
 #
@@ -15,10 +17,7 @@
 #-----------------------------------------------------------------------
 #
 . ${GLOBAL_VAR_DEFNS_FP}
-. $USHDIR/source_util_funcs.sh
-
-date
-export PS4='+ $SECONDS + '
+. ${HOMErrfs_default}/ush/source_util_funcs.sh
 #
 #-----------------------------------------------------------------------
 #
@@ -99,7 +98,7 @@ mkdir -p "${COMOUT}"
 export pgmout="${workdir}/OUTPUT.$$"
 env
 
-$SCRIPTSDIR/exrrfs_process_pm.sh \
+$SCRIPTSrrfs/exrrfs_process_pm.sh \
   CYCLE_DIR="${CYCLE_DIR}"
 export err=$?; err_chk
 

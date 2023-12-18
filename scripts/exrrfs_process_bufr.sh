@@ -8,7 +8,7 @@
 #-----------------------------------------------------------------------
 #
 . ${GLOBAL_VAR_DEFNS_FP}
-. $USHdir/source_util_funcs.sh
+. $USHrrfs/source_util_funcs.sh
 #
 #-----------------------------------------------------------------------
 #
@@ -233,7 +233,7 @@ export pgm="process_Lightning.exe"
 . prep_step
 
 if [[ "$run_lightning" == true ]]; then
-  $APRUN ${EXECdir}/$pgm >>$pgmout 2>errfile
+  $APRUN ${EXECrrfs}/$pgm >>$pgmout 2>errfile
   export err=$?; err_chk
   mv errfile errfile_lightning
 
@@ -299,7 +299,7 @@ EOF
 export pgm="process_larccld.exe"
 . prep_step
 if [[ "$run_cloud" == true ]]; then
-  $APRUN ${EXECdir}/$pgm >>pgmout 2>errfile
+  $APRUN ${EXECrrfs}/$pgm >>pgmout 2>errfile
   export err=$?; err_chk
   mv errfile errfile_larccld
 
@@ -353,7 +353,7 @@ EOF
 export pgm="process_metarcld.exe"
 . prep_step
 if [[ "$run_metar" == true ]]; then
-  $APRUN ${EXECdir}/$pgm >>$pgmout 2>errfile
+  $APRUN ${EXECrrfs}/$pgm >>$pgmout 2>errfile
   export err=$?; err_chk
   mv errfile errfile_metarcld
 

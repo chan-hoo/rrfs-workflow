@@ -8,7 +8,7 @@
 #-----------------------------------------------------------------------
 #
 . ${GLOBAL_VAR_DEFNS_FP}
-. $USHdir/source_util_funcs.sh
+. ${USHrrfs_default}/source_util_funcs.sh
 #
 #-----------------------------------------------------------------------
 #
@@ -74,34 +74,14 @@ jjob_fp="$2"
 #
 #-----------------------------------------------------------------------
 #
-# For NCO mode we need to define job and jobid
-#
-#-----------------------------------------------------------------------
-#
-set +u
-if [ ! -z ${SLURM_JOB_ID} ]; then
-    export job=${SLURM_JOB_NAME}
-    export pid=${pid:-${SLURM_JOB_ID}}
-elif [ ! -z ${PBS_JOBID} ]; then
-    export job=${PBS_JOBNAME}
-    export pid=${pid:-${PBS_JOBID}}
-else
-    export job=${task_name}
-    export pid=${pid:-$$}
-fi
-export jobid=${job}.${pid}
-set -u
-#
-#-----------------------------------------------------------------------
-#
 # Loading ufs-srweather-app build module files
 #
 #-----------------------------------------------------------------------
 #
-default_modules_dir="$HOMErrfs/modulefiles"
+default_modules_dir="${HOMErrfs_default}/modulefiles"
 machine=$(echo_lowercase $MACHINE)
 if [ "${WORKFLOW_MANAGER}" != "ecflow" ]; then
-  source "${USHdir}/etc/lmod-setup.sh" ${machine}
+  source "${USHrrfs_default}/etc/lmod-setup.sh" ${machine}
 fi
 module use "${default_modules_dir}"
 
@@ -132,9 +112,9 @@ fi
 #
 # The full path to a module file for a given task is
 #
-#   $HOMEdir/modulefiles/$machine/${task_name}.local
+#   $HOMErrfs/modulefiles/$machine/${task_name}.local
 #
-# where HOMEdir is the base directory of the workflow, machine is the
+# where HOMErrfs is the base directory of the workflow, machine is the
 # name of the machine that we're running on (in lowercase), and task_-
 # name is the name of the current task (an input to this script).
 #
@@ -158,7 +138,7 @@ Call to \"module use\" command failed."
 # source version file (run) only if it is specified in versions directory
 if [ "${machine}" = "wcoss2" ]; then
   RUN_VER_FN="run.ver"
-  VERSION_FILE="${HOMErrfs}/versions/${RUN_VER_FN}"
+  VERSION_FILE="${HOMErrfs_default}/versions/${RUN_VER_FN}"
   if [ -f ${VERSION_FILE} ]; then
     . ${VERSION_FILE}
   fi

@@ -17,7 +17,7 @@
 #-----------------------------------------------------------------------
 #
 . ${GLOBAL_VAR_DEFNS_FP}
-. $USHdir/source_util_funcs.sh
+. $USHrrfs/source_util_funcs.sh
 
 date
 export PS4='+ $SECONDS + '
@@ -78,9 +78,9 @@ ffg_latest="${FFG_DIR}/latest.FFG"
 #
 #-----------------------------------------------------------------------
 #
-python -u $SCRIPTSdir/exrrfs_enspost.py \
+python -u $SCRIPTSrrfs/exrrfs_enspost.py \
   "${FIX_UPP}/enspost" \
-  "${USHdir}" \
+  "${USHrrfs}" \
   "${ens_dir}" \
   "${rrfs_dir}" \
   "${enspost_dir}" \

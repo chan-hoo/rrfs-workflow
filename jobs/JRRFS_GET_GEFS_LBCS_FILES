@@ -16,7 +16,7 @@
 #-----------------------------------------------------------------------
 #
 . ${GLOBAL_VAR_DEFNS_FP}
-. $USHdir/source_util_funcs.sh
+. $USHrrfs/source_util_funcs.sh
 
 date
 export PS4='+ $SECONDS + '
@@ -28,7 +28,7 @@ export PS4='+ $SECONDS + '
 #
 #-----------------------------------------------------------------------
 #
-. $USHdir/get_extrn_mdl_file_dir_info.sh
+. $USHrrfs/get_extrn_mdl_file_dir_info.sh
 #
 #-----------------------------------------------------------------------
 #
@@ -164,7 +164,7 @@ extrn_mdl_fns_in_arcv_str="( "$( printf "\"%s\" " "${extrn_mdl_fns_in_arcv[@]}" 
 export pgmout="${extrn_mdl_staging_dir}/OUTPUT.$$"
 env
 
-$SCRIPTSdir/exrrfs_get_gefs_lbcs_files.sh \
+$SCRIPTSrrfs/exrrfs_get_gefs_lbcs_files.sh \
   ics_or_lbcs="${ICS_OR_LBCS}" \
   use_user_staged_extrn_files="${USE_USER_STAGED_EXTRN_FILES}" \
   extrn_mdl_cdate="${extrn_mdl_cdate}" \

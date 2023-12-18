@@ -38,12 +38,12 @@ machine=${1,,}
 # Get home directory
 scrfunc_fp=$( readlink -f "${BASH_SOURCE[0]}" )
 scrfunc_dir=$( dirname "${scrfunc_fp}" )
-HOMEdir=$( dirname "${scrfunc_dir}" )
+HOMErrfs=$( dirname "${scrfunc_dir}" )
 
 # source version file (run) only if it is specified in versions directory
 if [ "${machine}" = "wcoss2" ]; then
   RUN_VER_FN="run.ver"
-  VERSION_FILE="${HOMEdir}/versions/${RUN_VER_FN}"
+  VERSION_FILE="${HOMErrfs}/versions/${RUN_VER_FN}"
   if [ -f ${VERSION_FILE} ]; then
     . ${VERSION_FILE}
   fi
@@ -51,8 +51,8 @@ fi
 
 # Source modulefile for this machine
 WFLOW_MOD_FN="wflow_${machine}"
-source "${HOMEdir}/ush/etc/lmod-setup.sh" ${machine}
-module use "${HOMEdir}/modulefiles"
+source "${HOMErrfs}/ush/etc/lmod-setup.sh" ${machine}
+module use "${HOMErrfs}/modulefiles"
 module load "${WFLOW_MOD_FN}" > /dev/null 2>&1 || { echo "ERROR:
 Loading of platform-specific module file (WFLOW_MOD_FN) for the workflow 
 task failed:

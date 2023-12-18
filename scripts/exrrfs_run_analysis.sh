@@ -8,7 +8,7 @@
 #-----------------------------------------------------------------------
 #
 . ${GLOBAL_VAR_DEFNS_FP}
-. $USHdir/source_util_funcs.sh
+. $USHrrfs/source_util_funcs.sh
 #
 #-----------------------------------------------------------------------
 #
@@ -957,9 +957,9 @@ EOF
 #-----------------------------------------------------------------------
 #
 if [[ ${gsi_type} == "ANALYSIS" && ${anav_type} == "AERO" ]]; then
-  gsi_exec="${EXECdir}/gsi.x.sd"
+  gsi_exec="${EXECrrfs}/gsi.x.sd"
 else
-  gsi_exec="${EXECdir}/gsi.x"
+  gsi_exec="${EXECrrfs}/gsi.x"
 fi
 cp ${gsi_exec} ${analworkdir}/gsi.x
 

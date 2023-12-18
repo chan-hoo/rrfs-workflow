@@ -8,7 +8,7 @@
 #-----------------------------------------------------------------------
 #
 . ${GLOBAL_VAR_DEFNS_FP}
-. $USHdir/source_util_funcs.sh
+. $USHrrfs/source_util_funcs.sh
 #
 #-----------------------------------------------------------------------
 #
@@ -210,7 +210,7 @@ export pgm="process_Lightning.exe"
 . prep_step
 
 if [[ "$run_lightning" == true ]]; then
-  $APRUN ${EXECdir}/$pgm < namelist.lightning >>$pgmout 2>errfile
+  $APRUN ${EXECrrfs}/$pgm < namelist.lightning >>$pgmout 2>errfile
   export err=$?; err_chk
 
   cp LightningInFV3LAM.dat ${COMOUT}/rrfs.t${HH}z.LightningInFV3LAM_NLDN.bin

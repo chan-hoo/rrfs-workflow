@@ -8,7 +8,7 @@
 #-----------------------------------------------------------------------
 #
 . ${GLOBAL_VAR_DEFNS_FP}
-. $USHdir/source_util_funcs.sh
+. $USHrrfs/source_util_funcs.sh
 #
 #-----------------------------------------------------------------------
 #
@@ -591,7 +591,7 @@ settings="
 # Call the python script to create the namelist file.
 #
 nml_fn="fort.41"
-${USHdir}/set_namelist.py -q -u "$settings" -o ${nml_fn} || \
+${USHrrfs}/set_namelist.py -q -u "$settings" -o ${nml_fn} || \
   err_exit "\
 Call to python script set_namelist.py to set the variables in the namelist
 file read in by the ${exec_fn} executable failed.  Parameters passed to
@@ -611,7 +611,7 @@ $settings"
 export pgm="chgres_cube"
 . prep_step
 
-${APRUN} ${EXECdir}/$pgm >>$pgmout 2>errfile
+${APRUN} ${EXECrrfs}/$pgm >>$pgmout 2>errfile
 export err=$?; err_chk
 #
 #-----------------------------------------------------------------------
@@ -667,8 +667,8 @@ if [ $DO_ENS_BLENDING = "TRUE" ] &&
    export MPICH_OFI_STARTUP_CONNECT=1
 
    # Python/F2Py scripts
-   cp $SCRIPTSdir/exrrfs_blending_fv3.py .
-   cp $SCRIPTSdir/exrrfs_chgres_cold2fv3.py .
+   cp $SCRIPTSrrfs/exrrfs_blending_fv3.py .
+   cp $SCRIPTSrrfs/exrrfs_chgres_cold2fv3.py .
 
    # F2Py shared object files
    ln -sf $LIB64dir/raymond.so .

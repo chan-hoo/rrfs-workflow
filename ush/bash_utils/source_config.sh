@@ -6,7 +6,7 @@
 #
 
 function config_to_str() {
-  $USHdir/config_utils.py -o $1 -c $2 "${@:3}"
+  $USHrrfs/config_utils.py -o $1 -c $2 "${@:3}"
 }
 
 #

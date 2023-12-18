@@ -36,7 +36,7 @@ local func_name="${FUNCNAME[0]}"
 #
 #-----------------------------------------------------------------------
 #
-USHdir="${scrfunc_dir}"
+USHrrfs="${scrfunc_dir}"
 #
 #-----------------------------------------------------------------------
 #
@@ -44,8 +44,8 @@ USHdir="${scrfunc_dir}"
 #
 #-----------------------------------------------------------------------
 #
-. $USHdir/source_util_funcs.sh
-. $USHdir/set_FV3nml_sfc_climo_filenames.sh
+. $USHrrfs/source_util_funcs.sh
+. $USHrrfs/set_FV3nml_sfc_climo_filenames.sh
 #
 #-----------------------------------------------------------------------
 #
@@ -106,16 +106,16 @@ fi
 #
 #-----------------------------------------------------------------------
 #
-{ save_shell_opts; set -u -x; } > /dev/null 2>&1
+{ save_shell_opts; set -u +x; } > /dev/null 2>&1
 #
 #-----------------------------------------------------------------------
 # check whether the .agent link is initialized
 # if not, run Init.sh (otherwise, the workflow generation will fail)
 #-----------------------------------------------------------------------
 #
-if [[ ! -L ${USHdir}/../fix/.agent || ! -e ${USHdir}/../fix/.agent ]] \
-  && [ -e ${USHdir}/Init.sh ]; then
-    ${USHdir}/Init.sh
+if [[ ! -L ${USHrrfs}/../fix/.agent || ! -e ${USHrrfs}/../fix/.agent ]] \
+  && [ -e ${USHrrfs}/Init.sh ]; then
+    ${USHrrfs}/Init.sh
 fi
 #
 #-----------------------------------------------------------------------
@@ -129,7 +129,7 @@ fi
 #
 #-----------------------------------------------------------------------
 #
-. $USHdir/setup.sh
+. $USHrrfs/setup.sh
 #
 #-----------------------------------------------------------------------
 #
@@ -410,9 +410,6 @@ settings="\
 #
 # Directories and files.
 #
-  'jobsdir': $JOBSdir
-  'log_basedir': ${LOG_BASEDIR:-}
-  'cycle_basedir': ${CYCLE_BASEDIR:-}
   'ensctrl_cycle_basedir': ${ENSCTRL_CYCLE_BASEDIR:-}
   'nwges_basedir': ${NWGES_BASEDIR:-}
   'ensctrl_nwges_basedir': ${ENSCTRL_NWGES_BASEDIR:-}
@@ -573,8 +570,8 @@ $settings"
 # script to generate the experiment's actual XML file from this template
 # file.
 #
-template_xml_fp="${PARMdir}/${WFLOW_XML_TMPL_FN}"
-$USHdir/fill_jinja_template.py -q \
+template_xml_fp="${PARMrrfs}/${WFLOW_XML_TMPL_FN}"
+$USHrrfs/fill_jinja_template.py -q \
                                -u "${settings}" \
                                -t ${template_xml_fp} \
                                -o ${WFLOW_XML_FP} || \
@@ -987,7 +984,7 @@ settings="$settings
 # For generating the namelist for the fire weather grid, do not use a yaml file.
 #
 if [ "${PREDEF_GRID_NAME}" = "RRFS_FIREWX_1.5km" ]; then
-$USHdir/set_namelist.py -q \
+$USHrrfs/set_namelist.py -q \
                         -n ${FV3_NML_BASE_SUITE_FP} \
                         -u "$settings" \
                         -o ${FV3_NML_FP} || \
@@ -1003,7 +1000,7 @@ failed.  Parameters passed to this script are:
 $settings"
 
 else
-$USHdir/set_namelist.py -q \
+$USHrrfs/set_namelist.py -q \
                         -n ${FV3_NML_BASE_SUITE_FP} \
                         -c ${FV3_NML_YAML_CONFIG_FP} ${CCPP_PHYS_SUITE} \
                         -u "$settings" \
@@ -1070,7 +1067,7 @@ if [[ "${DO_DACYCLE}" = "TRUE" || "${DO_ENKFUPDATE}" = "TRUE" ]]; then
 #    'fh_dfi_radar': [${FH_DFI_RADAR[@]}],
 #  }"
  
- $USHdir/set_namelist.py -q \
+ $USHrrfs/set_namelist.py -q \
                          -n ${FV3_NML_FP} \
                          -u "$settings" \
                          -o ${FV3_NML_RESTART_FP} || \
@@ -1194,7 +1191,7 @@ $settings"
 if [ "${DO_ENSEMBLE}" = TRUE ] && ([ "${DO_SPP}" = TRUE ] || [ "${DO_SPPT}" = TRUE ] || [ "${DO_SHUM}" = TRUE ] \
   || [ "${DO_SKEB}" = TRUE ] || [ "${DO_LSM_SPP}" =  TRUE ]); then
 
-  $USHdir/set_namelist.py -q \
+  $USHrrfs/set_namelist.py -q \
                           -n  ${FV3_NML_FP}  \
                           -u "$settings" \
                           -o ${FV3_NML_STOCH_FP} || \
@@ -1212,7 +1209,7 @@ if [ "${DO_ENSEMBLE}" = TRUE ] && ([ "${DO_SPP}" = TRUE ] || [ "${DO_SPPT}" = TR
 #-----------------------------------------------------------------------
 #
 if [[ "${DO_DACYCLE}" = "TRUE" || "${DO_ENKFUPDATE}" = "TRUE" ]]; then
-  $USHdir/set_namelist.py -q \
+  $USHrrfs/set_namelist.py -q \
                           -n  ${FV3_NML_RESTART_FP}  \
                           -u "$settings" \
                           -o ${FV3_NML_RESTART_STOCH_FP} || \
@@ -1230,7 +1227,7 @@ if [[ "${DO_DACYCLE}" = "TRUE" || "${DO_ENKFUPDATE}" = "TRUE" ]]; then
  if [ "${DO_ENSFCST_MULPHY}" = "TRUE" ]; then
    for i in {1..5}
    do
-     $USHdir/set_namelist.py -q \
+     $USHrrfs/set_namelist.py -q \
                              -n  ${FV3_NML_RESTART_STOCH_FP}  \
                              -c ${FV3_NML_YAML_CONFIG_FP}_ensphy rrfsens_phy${i}  \
                              -o ${FV3_NML_RESTART_STOCH_FP}_ensphy${i}
@@ -1250,7 +1247,7 @@ fi
 #
 #-----------------------------------------------------------------------
 #
-cp $USHdir/${EXPT_CONFIG_FN} $EXPTDIR
+cp $USHrrfs/${EXPT_CONFIG_FN} $EXPTDIR
 #
 #-----------------------------------------------------------------------
 #
@@ -1327,7 +1324,7 @@ SHELL=/bin/bash -l
 Done.
 "
 #
-echo -e "../fix/.agent points to " $(readlink -f ${HOMErrfs}/fix/.agent) "\n"
+echo -e "../fix/.agent points to " $(readlink -f ${HOMErrfs_default}/fix/.agent) "\n"
 
 #
 # If necessary, run the NOMADS script to source external model data.
@@ -1336,7 +1333,7 @@ if [ "${NOMADS}" = "TRUE" ]; then
   echo "Getting NOMADS online data"
   echo "NOMADS_file_type=" $NOMADS_file_type
   cd $EXPTDIR
-  $USHdir/NOMADS_get_extrn_mdl_files.sh $DATE_FIRST_CYCL $CYCL_HRS $NOMADS_file_type $FCST_LEN_HRS $LBC_SPEC_INTVL_HRS
+  $USHrrfs/NOMADS_get_extrn_mdl_files.sh $DATE_FIRST_CYCL $CYCL_HRS $NOMADS_file_type $FCST_LEN_HRS $LBC_SPEC_INTVL_HRS
 fi
 #
 #-----------------------------------------------------------------------
@@ -1379,21 +1376,21 @@ scrfunc_dir=$( dirname "${scrfunc_fp}" )
 #
 #-----------------------------------------------------------------------
 #
-USHdir="${scrfunc_dir}"
+USHrrfs="${scrfunc_dir}"
 #
 # Set the name of and full path to the temporary file in which we will
 # save some experiment/workflow variables.  The need for this temporary
 # file is explained below.
 #
 tmp_fn="tmp"
-tmp_fp="$USHdir/${tmp_fn}"
+tmp_fp="$USHrrfs/${tmp_fn}"
 rm -f "${tmp_fp}"
 #
 # Set the name of and full path to the log file in which the output from
 # the experiment/workflow generation function will be saved.
 #
 log_fn="log.generate_FV3LAM_wflow"
-log_fp="$USHdir/${log_fn}"
+log_fp="$USHrrfs/${log_fn}"
 rm -f "${log_fp}"
 #
 # Call the generate_FV3LAM_wflow function defined above to generate the

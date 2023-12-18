@@ -14,7 +14,7 @@
 #-----------------------------------------------------------------------
 #
 . ${GLOBAL_VAR_DEFNS_FP}
-. $USHdir/source_util_funcs.sh
+. $USHrrfs/source_util_funcs.sh
 
 date
 export PS4='+ $SECONDS + '
@@ -104,7 +104,7 @@ mkdir -p "${COMOUT}"
 export pgmout="${workdir}/OUTPUT.$$"
 env
 
-$SCRIPTSdir/exrrfs_nonvarcldanl.sh \
+$SCRIPTSrrfs/exrrfs_nonvarcldanl.sh \
              cycle_dir="${CYCLE_DIR}" \
              cycle_type="${CYCLE_TYPE}" \
              mem_type="${MEM_TYPE}" \

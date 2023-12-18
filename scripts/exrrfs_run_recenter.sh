@@ -8,7 +8,7 @@
 #-----------------------------------------------------------------------
 #
 . ${GLOBAL_VAR_DEFNS_FP}
-. $USHdir/source_util_funcs.sh
+. $USHrrfs/source_util_funcs.sh
 #
 #-----------------------------------------------------------------------
 #
@@ -206,7 +206,7 @@ EOF
 echo pwd is `pwd`
 export pgm="ens_mean_recenter_P2DIO.exe"
 
-${APRUN} ${EXECdir}/$pgm < namelist.ens >>$pgmout 2>errfile
+${APRUN} ${EXECrrfs}/$pgm < namelist.ens >>$pgmout 2>errfile
 export err=$?; err_chk
 #
 #-----------------------------------------------------------------------

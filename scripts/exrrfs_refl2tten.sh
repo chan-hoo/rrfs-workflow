@@ -8,7 +8,7 @@
 #-----------------------------------------------------------------------
 #
 . ${GLOBAL_VAR_DEFNS_FP}
-. $USHdir/source_util_funcs.sh
+. $USHrrfs/source_util_funcs.sh
 #
 #-----------------------------------------------------------------------
 #
@@ -261,7 +261,7 @@ EOF
 export pgm="ref2tten.exe"
 . prep_step
 
-$APRUN ${EXECdir}/$pgm >>$pgmout 2>errfile
+$APRUN ${EXECrrfs}/$pgm >>$pgmout 2>errfile
 export err=$?; err_chk
 #
 #-----------------------------------------------------------------------

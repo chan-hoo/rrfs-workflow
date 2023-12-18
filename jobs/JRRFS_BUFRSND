@@ -34,7 +34,7 @@
 #-----------------------------------------------------------------------
 #
 . ${GLOBAL_VAR_DEFNS_FP}
-. $USHdir/source_util_funcs.sh
+. $USHrrfs/source_util_funcs.sh
 
 date
 export PS4='+ $SECONDS + '
@@ -142,7 +142,7 @@ fhr=01
 export pgmout="${bufrsnd_dir}/OUTPUT.$$"
 env
 
-$SCRIPTSdir/exrrfs_bufrsnd.sh \
+$SCRIPTSrrfs/exrrfs_bufrsnd.sh \
   cdate="${CDATE}" \
   run_dir="${run_dir}" \
   nwges_dir="${nwges_dir}" \

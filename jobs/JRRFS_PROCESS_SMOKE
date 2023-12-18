@@ -13,7 +13,7 @@
 #-----------------------------------------------------------------------
 #
 . ${GLOBAL_VAR_DEFNS_FP}
-. $USHdir/source_util_funcs.sh
+. $USHrrfs/source_util_funcs.sh
 
 date
 export PS4='+ $SECONDS + '
@@ -91,7 +91,7 @@ mkdir -p "${rave_nwges_dir}"
 export pgmout="${workdir}/OUTPUT.$$"
 env
 
-python -u ${SCRIPTSdir}/exrrfs_process_smoke.py \
+python -u ${SCRIPTSrrfs}/exrrfs_process_smoke.py \
   "${FIX_SMOKE_DUST}/${PREDEF_GRID_NAME}" \
   "${FIRE_RAVE_DIR}" \
   "${workdir}" \

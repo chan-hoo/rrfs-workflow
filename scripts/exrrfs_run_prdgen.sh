@@ -8,7 +8,7 @@
 #-----------------------------------------------------------------------
 #
 . ${GLOBAL_VAR_DEFNS_FP}
-. $USHdir/source_util_funcs.sh
+. $USHrrfs/source_util_funcs.sh
 #
 #-----------------------------------------------------------------------
 #
@@ -237,7 +237,7 @@ if [ "${DO_PARALLEL_PRDGEN}" = "TRUE" ]; then
     export DATA=$postprd_dir
     DATAprdgen=$DATA/prdgen_${fhr}
     mkdir $DATAprdgen
-    USHrrfs=$USHdir/prdgen
+    USHrrfs=$USHrrfs/prdgen
 
     wgrib2 ${COMOUT}/rrfs.t${cyc}z.prslev.f${fhr}.grib2 >& $DATAprdgen/prslevf${fhr}.txt
 

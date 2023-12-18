@@ -17,7 +17,7 @@
 #-----------------------------------------------------------------------
 #
 . ${GLOBAL_VAR_DEFNS_FP}
-. $USHdir/source_util_funcs.sh
+. $USHrrfs/source_util_funcs.sh
 
 date
 export PS4='+ $SECONDS + '
@@ -118,7 +118,7 @@ cd "${fhr_dir}"
 export pgmout="${fhr_dir}/OUTPUT.$$"
 env
 
-$SCRIPTSdir/exrrfs_run_post.sh \
+$SCRIPTSrrfs/exrrfs_run_post.sh \
   cdate="${CDATE}" \
   fhr="${fhr}" \
   tmmark="${TMMARK}" \

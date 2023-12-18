@@ -15,7 +15,7 @@
 #-----------------------------------------------------------------------
 #
 . ${GLOBAL_VAR_DEFNS_FP}
-. $USHdir/source_util_funcs.sh
+. $USHrrfs/source_util_funcs.sh
 
 date
 export PS4='+ $SECONDS + '
@@ -86,7 +86,7 @@ cd ${enkfworkdir}
 export pgmout="${enkfworkdir}/OUTPUT.$$"
 env
 
-$SCRIPTSdir/exrrfs_run_enkf.sh \
+$SCRIPTSrrfs/exrrfs_run_enkf.sh \
              cycle_dir="${CYCLE_DIR}" \
              NWGES_DIR="${NWGES_DIR}" \
              ob_type="${OB_TYPE}"

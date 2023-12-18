@@ -1,9 +1,9 @@
 #!/bin/sh
 mydir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-ushdir="$(dirname "$mydir")"
-basedir="$(dirname "$ushdir")"
+ushrrfs="$(dirname "$mydir")"
+basedir="$(dirname "$ushrrfs")"
 agentdir="$basedir/fix/.agent"
-source $ushdir/fix_rrfs_locations.sh
+source $ushrrfs/fix_rrfs_locations.sh
 mkdir -p $basedir/fix
 
 filetype=$(file $agentdir)

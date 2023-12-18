@@ -8,7 +8,7 @@
 #-----------------------------------------------------------------------
 #
 . ${GLOBAL_VAR_DEFNS_FP}
-. $USHdir/source_util_funcs.sh
+. $USHrrfs/source_util_funcs.sh
 
 date
 export PS4='+ $SECONDS + '
@@ -84,7 +84,7 @@ cd $workdir
 export pgmout="${workdir}/OUTPUT.$$"
 env
 
-$SCRIPTSdir/exrrfs_make_ics.sh
+$SCRIPTSrrfs/exrrfs_make_ics.sh
 export err=$?; err_chk
 
 if [ -e "$pgmout" ]; then

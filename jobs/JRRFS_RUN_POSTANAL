@@ -15,7 +15,7 @@
 #-----------------------------------------------------------------------
 #
 . ${GLOBAL_VAR_DEFNS_FP}
-. $USHdir/source_util_funcs.sh
+. $USHrrfs/source_util_funcs.sh
 
 date
 export PS4='+ $SECONDS + '
@@ -118,7 +118,7 @@ mkdir -p "${COMOUT}"
 export pgmout="${analworkdir}/OUTPUT.$$"
 env
 
-$SCRIPTSdir/exrrfs_run_postanal.sh \
+$SCRIPTSrrfs/exrrfs_run_postanal.sh \
              cycle_dir="${CYCLE_DIR}" \
              gsi_type="${GSI_TYPE}" \
              mem_type="${MEM_TYPE}" \

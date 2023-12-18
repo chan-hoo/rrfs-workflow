@@ -19,8 +19,8 @@ from scipy.signal import fftconvolve
 # fix files
 staticdir = sys.argv[1]
 # USH dir
-ushdir = sys.argv[2]
-sys.path.append(ushdir)
+ushrrfs = sys.argv[2]
+sys.path.append(ushrrfs)
 from enspost_config import *
 # RRFS-E cycle directory
 rrfse_dir = sys.argv[3]

@@ -18,7 +18,7 @@
 #-----------------------------------------------------------------------
 #
 . ${GLOBAL_VAR_DEFNS_FP}
-. $USHdir/source_util_funcs.sh
+. $USHrrfs/source_util_funcs.sh
 
 date
 export PS4='+ $SECONDS + '
@@ -96,7 +96,7 @@ cd ${run_dir}
 export pgmout="${run_dir}/OUTPUT.$$"
 env
 
-$SCRIPTSdir/exrrfs_run_fcst.sh \
+$SCRIPTSrrfs/exrrfs_run_fcst.sh \
   cdate="${CDATE}" \
   cycle_type="${CYCLE_TYPE}" \
   cycle_subtype="${CYCLE_SUBTYPE}" \

@@ -7,8 +7,8 @@
 #-----------------------------------------------------------------------
 #
 . ${GLOBAL_VAR_DEFNS_FP}
-. $USHdir/source_util_funcs.sh
-. $USHdir/set_FV3nml_ens_stoch_seeds.sh
+. $USHrrfs/source_util_funcs.sh
+. $USHrrfs/set_FV3nml_ens_stoch_seeds.sh
 #
 #-----------------------------------------------------------------------
 #
@@ -487,7 +487,7 @@ if [ "${STOCH}" = "TRUE" ]; then
     ensmem_indx_sgl=$(echo "${ensmem_indx}" | awk '{print $1+0}')
     cp ${FV3_NML_RESTART_STOCH_FP}_ensphy${ensmem_indx_sgl} ${run_dir}/${FV3_NML_FN}_base 
     rm -fr ${run_dir}/field_table
-    cp ${PARMdir}/field_table.rrfsens_phy${ensmem_indx} ${run_dir}/field_table
+    cp ${PARMrrfs}/field_table.rrfsens_phy${ensmem_indx} ${run_dir}/field_table
   else
     cp ${run_dir}/${FV3_NML_FN} ${run_dir}/${FV3_NML_FN}_base
   fi
@@ -509,7 +509,7 @@ fi
 #
 #-----------------------------------------------------------------------
 #
-$USHdir/create_model_configure_file.py \
+$USHrrfs/create_model_configure_file.py \
   --path-to-defns ${GLOBAL_VAR_DEFNS_FP} \
   --cdate "${cdate}" \
   --cycle_type "${cycle_type}" \
@@ -532,7 +532,7 @@ fi
 #
 #-----------------------------------------------------------------------
 #
-$USHdir/create_diag_table_file.py \
+$USHrrfs/create_diag_table_file.py \
   --path-to-defns ${GLOBAL_VAR_DEFNS_FP} \
   --run-dir ${run_dir}
 export err=$?
@@ -545,7 +545,7 @@ fi
 # copy over diag_table for multiphysics ensemble
 if [ "${STOCH}" = "TRUE" ] && [ ${BKTYPE} -eq 0 ] && [ ${DO_ENSFCST_MULPHY} = "TRUE" ]; then
   rm -fr ${run_dir}/diag_table
-  cp ${PARMdir}/diag_table.rrfsens_phy${ensmem_indx} ${run_dir}/diag_table
+  cp ${PARMrrfs}/diag_table.rrfsens_phy${ensmem_indx} ${run_dir}/diag_table
 fi
 
 #
@@ -556,7 +556,7 @@ fi
 #
 #-----------------------------------------------------------------------
 #
-$USHdir/create_ufs_configure_file.py \
+$USHrrfs/create_ufs_configure_file.py \
   --path-to-defns ${GLOBAL_VAR_DEFNS_FP} \
   --run-dir ${run_dir} 
 export err=$?

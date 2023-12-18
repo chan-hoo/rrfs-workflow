@@ -16,7 +16,7 @@
 #-----------------------------------------------------------------------
 #
 . ${GLOBAL_VAR_DEFNS_FP}
-. $USHdir/source_util_funcs.sh
+. $USHrrfs/source_util_funcs.sh
 
 date
 export PS4='+ $SECONDS + '
@@ -86,7 +86,7 @@ cd "${nwges_dir}/DA_OUTPUT"
 export pgmout="${nwges_dir}/DA_OUTPUT/OUTPUT.$$"
 env
 
-$SCRIPTSdir/exrrfs_save_da_output.sh \
+$SCRIPTSrrfs/exrrfs_save_da_output.sh \
   cdate="${CDATE}" \
   run_dir="${run_dir}" \
   nwges_dir="${nwges_dir}"

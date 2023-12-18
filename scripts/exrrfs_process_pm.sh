@@ -8,7 +8,7 @@
 #-----------------------------------------------------------------------
 #
 . ${GLOBAL_VAR_DEFNS_FP}
-. $USHDIR/source_util_funcs.sh
+. $USHrrfs/source_util_funcs.sh
 #
 #-----------------------------------------------------------------------
 #
@@ -203,7 +203,7 @@ export pgm="process_pm.exe"
 . prep_step
 
 if [[ "$run_pm" == true ]]; then
-  $APRUN ${EXECdir}/$pgm >>$pgmout 2>errfile
+  $APRUN ${EXECrrfs}/$pgm >>$pgmout 2>errfile
   export err=$?; err_chk
 fi
 #

@@ -6,8 +6,8 @@ DATASIZE="5" #limit of binary data file size, unit kb, 5kb
 TEXTTYPE="text"
 #
 mydir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-ushdir="$(dirname "$mydir")"
-basedir="$(dirname "$ushdir")"
+ushrrfs="$(dirname "$mydir")"
+basedir="$(dirname "$ushrrfs")"
 tmpdir=$basedir/.git/tmp
 mkdir -p "$tmpdir"
 #
