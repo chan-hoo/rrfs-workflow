@@ -3,13 +3,11 @@ ACCOUNT="account"
 HPSS_ACCOUNT="account"
 EXPT_SUBDIR="test_nonDA_grib2"
 
-envir="test"
-NET="test"
+envir_default="test"
+NET_default="test"
 TAG="c0v00"
-MODEL="test"
-RUN="test"
+RUN_default="test"
 
-STMP="/lfs4/BMC/nrtrr/NCO_dirs/stmp/test_nonDA_grib2"
 PTMP="/lfs4/BMC/nrtrr/NCO_dirs/ptmp/test_nonDA_grib2"
 
 VERBOSE="TRUE"

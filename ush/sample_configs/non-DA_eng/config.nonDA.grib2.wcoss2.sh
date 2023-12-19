@@ -3,13 +3,11 @@ ACCOUNT="RRFS-DEV"
 HPSS_ACCOUNT="RRFS-DEV"
 EXPT_SUBDIR="test_nonDA_grib2"
 
-envir="test"
-NET="test"
+envir_default="test"
+NET_default="test"
 TAG="c0v00"
-MODEL="test"
-RUN="test"
+RUN_default="test"
 
-STMP="/lfs/h2/emc/stmp/${USER}/test_nonDA_grib2"
 PTMP="/lfs/h2/emc/ptmp/${USER}/test_nonDA_grib2"
 
 VERBOSE="TRUE"

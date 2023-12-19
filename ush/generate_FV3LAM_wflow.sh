@@ -186,6 +186,24 @@ settings="\
   'partition_post': ${PARTITION_POST}
   'queue_post': ${QUEUE_POST}
 #
+# NCO environment variables.
+#
+  'envir_default': ${envir_default}
+  'net_default': ${NET_default}
+  'run_default': ${RUN_default}
+  'model_ver_default': ${model_ver_default}
+  'homerrfs_default': ${HOMErrfs_default}
+  'ptmp': ${PTMP}
+  'dbnroot_default': ${DBNROOT_default}
+  'keepdata_default': ${KEEPDATA_default}
+  'sendcom_default': ${SENDCOM_default}
+  'sendecf_default': ${SENDECF_default}
+  'senddbn_default': ${SENDDBN_default}
+  'senddbn_ntc_default': ${SENDDBN_NTC_default}
+  'sendweb_default': ${SENDWEB_default}
+  'mailto_default': ${MAILTO_default}
+  'mailcc_default': ${MAILCC_default}
+#
 # Workflow task names.
 #
   'make_grid_tn': ${MAKE_GRID_TN}
@@ -223,8 +241,6 @@ settings="\
   'save_restart': ${SAVE_RESTART_TN}
   'save_da_output': ${SAVE_DA_OUTPUT_TN}
   'tag': ${TAG}
-  'net': ${NET}
-  'run': ${RUN}
   'jedi_envar_ioda': ${JEDI_ENVAR_IODA_TN}
 #
 # Number of nodes to use for each task.
@@ -570,7 +586,7 @@ $settings"
 # script to generate the experiment's actual XML file from this template
 # file.
 #
-template_xml_fp="${PARMrrfs}/${WFLOW_XML_TMPL_FN}"
+template_xml_fp="${HOMErrfs_default}/parm/${WFLOW_XML_TMPL_FN}"
 $USHrrfs/fill_jinja_template.py -q \
                                -u "${settings}" \
                                -t ${template_xml_fp} \

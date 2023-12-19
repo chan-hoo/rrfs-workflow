@@ -267,6 +267,8 @@ SENDECF_default="FALSE"
 SENDDBN_default="FALSE"
 SENDDBN_NTC_default=""
 SENDWEB_default="FALSE"
+MAILTO_default=""
+MAILCC_default=""
 #
 #-----------------------------------------------------------------------
 #
@@ -325,7 +327,6 @@ SENDWEB_default="FALSE"
 #  FIRE_RRFS_update_hour
 #-----------------------------------------------------------------------
 #
-COMINgfs="/base/path/of/directory/containing/gfs/input/files"
 FIXLAM_NCO_BASEDIR=""
 ENSCTRL_STMP="/base/path/of/directory/containing/model/input/and/raw/output/files"
 RRFSE_NWGES_BASEDIR="/base/path/of/directory/containing/model/restart/files"
@@ -341,7 +342,6 @@ ARCHIVEDIR="/5year/BMC/wrfruc/rrfs_dev1"
 NCARG_ROOT="/apps/ncl/6.5.0-CentOS6.10_64bit_nodap_gnu447"
 NCL_HOME="/home/rtrr/RRFS/graphics"
 NCL_REGION="conus"
-MODEL="NO MODEL CHOSEN"
 
 OBSPATH="/public/data/grids/rap/obs"
 OBSPATH_NSSLMOSIAC="/public/data/radar/mrms"

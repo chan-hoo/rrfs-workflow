@@ -3,13 +3,11 @@ ACCOUNT="fv3-cam"
 HPSS_ACCOUNT="fv3-cam"
 EXPT_SUBDIR="test_nonDA_netcdf"
 
-envir="test"
-NET="test"
+envir_default="test"
+NET_default="test"
 TAG="c0v00"
-MODEL="test"
-RUN="test"
+RUN_default="test"
 
-STMP="/work/noaa/fv3-cam/${USER}/test_nonDA_netcdf"
 PTMP="/work/noaa/fv3-cam/${USER}/test_nonDA_netcdf"
 
 VERBOSE="TRUE"

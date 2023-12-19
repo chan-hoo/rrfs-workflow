@@ -1255,9 +1255,9 @@ dot_ccpp_phys_suite_or_null=".${CCPP_PHYS_SUITE}"
 
 DATA_TABLE_TMPL_FN="${DATA_TABLE_FN}"
 if [ "${USE_CLM}" = "TRUE" ]; then
-DIAG_TABLE_TMPL_FN="${DIAG_TABLE_FN}${dot_ccpp_phys_suite_or_null}_clm"
+  DIAG_TABLE_TMPL_FN="${DIAG_TABLE_FN}${dot_ccpp_phys_suite_or_null}_clm"
 else
-DIAG_TABLE_TMPL_FN="${DIAG_TABLE_FN}${dot_ccpp_phys_suite_or_null}"
+  DIAG_TABLE_TMPL_FN="${DIAG_TABLE_FN}${dot_ccpp_phys_suite_or_null}"
 fi
 FIELD_TABLE_TMPL_FN="${FIELD_TABLE_FN}${dot_ccpp_phys_suite_or_null}"
 MODEL_CONFIG_TMPL_FN="${MODEL_CONFIG_FN}"
@@ -1445,7 +1445,7 @@ fi
 #
 #-----------------------------------------------------------------------
 #
-FV3_EXEC_FP="${EXECrrfs}/${FV3_EXEC_FN}"
+FV3_EXEC_FP="${HOMErrfs_default}/exec/${FV3_EXEC_FN}"
 #
 #-----------------------------------------------------------------------
 #
@@ -2130,6 +2130,8 @@ sed -i -r -e "s|$regexp|\1\n\n${str_to_insert}\n|g" ${GLOBAL_VAR_DEFNS_FP}
 #
 # Loop through the lines in line_list.
 #
+print_info_msg "Checking var_name ... Please wait ..."
+
 while read crnt_line; do
 #
 # Try to obtain the name of the variable being set on the current line.
@@ -2149,9 +2151,7 @@ while read crnt_line; do
 # rent line in line_list.
 #
   if [ ! -z $var_name ]; then
-
-    print_info_msg "$VERBOSE" "
-var_name = \"${var_name}\""
+#    print_info_msg "$VERBOSE" "var_name = \"${var_name}\""
 #
 # If the variable specified in var_name is set in the current environ-
 # ment (to either an empty or non-empty string), get its value and in-
@@ -2304,9 +2304,6 @@ CRONTAB_LINE="${CRONTAB_LINE}"
 #
 HOMErrfs_default="${HOMErrfs_default}"
 USHrrfs_default="${USHrrfs_default}"
-PARMrrfs_default="${PARMrrfs_default}"
-EXECrrfs_default="${EXECrrfs_default}"
-SORCrrfs_default="${SORCrrfs_default}"
 MODULES_DIR="${MODULES_DIR}"
 LIB64dir="$LIB64dir"
 FIXam="$FIXam"
@@ -2324,7 +2321,6 @@ ARCHIVEDIR="${ARCHIVEDIR}"
 NCARG_ROOT="${NCARG_ROOT}"
 NCL_HOME="${NCL_HOME}"
 NCL_REGION="${NCL_REGION}"
-MODEL="${MODEL}"
 
 EXPTDIR="$EXPTDIR"
 GRID_DIR="${GRID_DIR}"

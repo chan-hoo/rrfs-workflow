@@ -78,7 +78,7 @@ Workflow task names.
 <!ENTITY RUN_PM_TN            "run_proc_pm">
 
 <!ENTITY TAG                  "{{ tag }}">
-<!ENTITY NET                  "{{ net }}">
+<!ENTITY NET                  "{{ net_default }}">
 
 <!--
 Flags that specify whether to run the preprocessing tasks.

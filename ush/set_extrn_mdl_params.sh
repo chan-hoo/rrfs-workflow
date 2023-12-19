@@ -43,11 +43,7 @@ local func_name="${FUNCNAME[0]}"
 #
 #-----------------------------------------------------------------------
 #
-if [ ! -z ${COMINgfs} ]; then
-
-  EXTRN_MDL_SYSBASEDIR_ICS="${EXTRN_MDL_SYSBASEDIR_ICS:-$COMINgfs}"
-
-else
+if [ -z ${COMINgfs+x} ]; then
 
   case ${EXTRN_MDL_NAME_ICS} in
 
@@ -164,6 +160,8 @@ else
 
   esac
 
+else
+  EXTRN_MDL_SYSBASEDIR_ICS="${COMINgfs}"
 fi
 #
 #  for retro, the external boundary could come from other location.
@@ -234,11 +232,7 @@ fi
 #
 #-----------------------------------------------------------------------
 #
-if [ ! -z ${COMINgfs} ]; then
-
-  EXTRN_MDL_SYSBASEDIR_LBCS="$COMINgfs"
-
-else
+if [ -z ${COMINgfs+x} ]; then
 
   case ${EXTRN_MDL_NAME_LBCS} in
 
@@ -339,8 +333,9 @@ else
 
   esac
 
+else
+  EXTRN_MDL_SYSBASEDIR_LBCS="$COMINgfs"
 fi
-
 
 if [[ "${DO_RETRO}" == "TRUE" && ! -z "${EXTRN_MDL_SOURCE_BASEDIR_LBCS}" ]]; then
       EXTRN_MDL_SYSBASEDIR_LBCS="${EXTRN_MDL_SOURCE_BASEDIR_LBCS}"

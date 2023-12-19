@@ -19,9 +19,6 @@ export PS4='+ $SECONDS + '
 #-----------------------------------------------------------------------
 #
 . ${GLOBAL_VAR_DEFNS_FP}
-
-export HOMErrfs="${HOMErrfs:-${HOMErrfs_default}}"
-
 . ${HOMErrfs}/ush/source_util_funcs.sh
 #
 #-----------------------------------------------------------------------
@@ -88,38 +85,15 @@ fi
 export job="${job:-${job_default}}"
 export jobid="${jobid:-${jobid_default}}"
 
-# Run setpdy to initialize PDYm and PDYp variables
-export cycle="${cycle:-t${cyc}z}"
-setpdy.sh
-. ./PDY
-export CDATE=${PDY}${cyc}
-
 # Set environment variables
-export envir="${envir:-${envir_default}}"
 export NET="${NET:-${NET_default}}"
 export RUN="${RUN:-${RUN_default}}"
-export model_ver="${model_ver:-${model_ver_default}}"
-
-export OPSROOT="${OPSROOT:-${PTMP}/${envir}}"
-export DATAROOT="${DATAROOT:-${OPSROOT}/tmp}"
-export COMROOT="${COMROOT:-${OPSROOT}/com}"
-export DCOMROOT="${DCOMROOT:-${OPSROOT}/dcom}"
-export LOGDIR="${LOGDIR:-${COMROOT}/output/logs}"
-
-export DBNROOT="${DBNROOT:-${DBNROOT_default}}"
-export KEEPDATA="${KEEPDATA:-${KEEPDATA_default}}"
-export MAILTO="${MAILTO:-${maillist_to}}"
-export MAILCC="${MAILCC:-${maillist_cc}}"
-export SENDCOM="${SENDCOM:-${SENDCOM_default}}"
-export SENDECF="${SENDECF:-${SENDECF_default}}"
-export SENDDBN="${SENDDBN:-${SENDDBN_default}}"
-export SENDDBN_NTC="${SENDDBN_NTC:-${SENDDBN_NTC_default}}"
-export SENDWEB="${SENDWEB:-${SENDWEB_default}}"
 
 export USHrrfs="${USHrrfs:-${HOMErrfs}/ush}"
 export EXECrrfs="${EXECrrfs:-${HOMErrfs}/exec}"
 export PARMrrfs="${PARMrrfs:-${HOMErrfs}/parm}"
 export SCRIPTSrrfs="${SCRIPTSrrfs:-${HOMErrfs}/scripts}"
+export LOGDIR="${COMROOT}/output/logs"
 #
 #-----------------------------------------------------------------------
 #
@@ -138,10 +112,8 @@ cd $DATA
 #-----------------------------------------------------------------------
 #
 [[ "$WORKFLOW_MANAGER" = "rocoto" ]] && export COMROOT=$COMROOT
-
 export COMIN="${COMIN:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})}"
 export COMOUT="${COMOUT:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})}"
-export COMOUT_BASEDIR="${COMOUT_BASEDIR:-$(compath.py -o ${NET}/${model_ver})}"
 export COMOUTwmo="${COMOUTwmo:-${COMOUT}/wmo}"
 
 mkdir -p ${COMIN}
@@ -150,6 +122,11 @@ mkdir -p ${COMOUTwmo}
 
 export COMINgfs="${COMINgfs:-$(compath.py ${envir}/gfs/${gfs_ver})}"
 export COMINgefs="${COMINgefs:-$(compath.py ${envir}/gefs/${gefs_ver})}"
+
+# Run setpdy to initialize PDYm and PDYp variables
+export cycle="${cycle:-t${cyc}z}"
+setpdy.sh
+. ./PDY
 #
 #-----------------------------------------------------------------------
 #
