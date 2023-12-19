@@ -964,7 +964,7 @@ LBC_SPEC_FCST_LONG_HRS=($( seq 0 ${LBC_SPEC_INTVL_HRS} \
 #-----------------------------------------------------------------------
 #
 if [ ! -z "${PREDEF_GRID_NAME}" ]; then
-  . $USHrrfs/set_predef_grid_params.sh
+  . ${USHrrfs_default}/set_predef_grid_params.sh
 fi
 #
 #-----------------------------------------------------------------------
@@ -1263,14 +1263,14 @@ FIELD_TABLE_TMPL_FN="${FIELD_TABLE_FN}${dot_ccpp_phys_suite_or_null}"
 MODEL_CONFIG_TMPL_FN="${MODEL_CONFIG_FN}"
 UFS_CONFIG_TMPL_FN="${UFS_CONFIG_FN}"
 
-DATA_TABLE_TMPL_FP="${PARMrrfs}/${DATA_TABLE_TMPL_FN}"
-DIAG_TABLE_TMPL_FP="${PARMrrfs}/${DIAG_TABLE_TMPL_FN}"
-FIELD_TABLE_TMPL_FP="${PARMrrfs}/${FIELD_TABLE_TMPL_FN}"
-FV3_NML_BASE_SUITE_FP="${PARMrrfs}/${FV3_NML_BASE_SUITE_FN}"
-FV3_NML_YAML_CONFIG_FP="${PARMrrfs}/${FV3_NML_YAML_CONFIG_FN}"
+DATA_TABLE_TMPL_FP="${PARMrrfs_default}/${DATA_TABLE_TMPL_FN}"
+DIAG_TABLE_TMPL_FP="${PARMrrfs_default}/${DIAG_TABLE_TMPL_FN}"
+FIELD_TABLE_TMPL_FP="${PARMrrfs_default}/${FIELD_TABLE_TMPL_FN}"
+FV3_NML_BASE_SUITE_FP="${PARMrrfs_default}/${FV3_NML_BASE_SUITE_FN}"
+FV3_NML_YAML_CONFIG_FP="${PARMrrfs_default}/${FV3_NML_YAML_CONFIG_FN}"
 FV3_NML_BASE_ENS_FP="${EXPTDIR}/${FV3_NML_BASE_ENS_FN}"
-MODEL_CONFIG_TMPL_FP="${PARMrrfs}/${MODEL_CONFIG_TMPL_FN}"
-UFS_CONFIG_TMPL_FP="${PARMrrfs}/${UFS_CONFIG_TMPL_FN}"
+MODEL_CONFIG_TMPL_FP="${PARMrrfs_default}/${MODEL_CONFIG_TMPL_FN}"
+UFS_CONFIG_TMPL_FP="${PARMrrfs_default}/${UFS_CONFIG_TMPL_FN}"
 #
 #-----------------------------------------------------------------------
 #

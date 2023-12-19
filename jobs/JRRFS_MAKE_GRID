@@ -90,10 +90,8 @@ export jobid="${jobid:-${jobid_default}}"
 
 # Run setpdy to initialize PDYm and PDYp variables
 export cycle="${cycle:-t${cyc}z}"
-if [ ! -z $(command -v setpdy.sh) ]; then
-  COMROOT=$COMROOT setpdy.sh
-  . ./PDY
-fi
+setpdy.sh
+. ./PDY
 export CDATE=${PDY}${cyc}
 
 # Set environment variables
@@ -106,6 +104,7 @@ export OPSROOT="${OPSROOT:-${PTMP}/${envir}}"
 export DATAROOT="${DATAROOT:-${OPSROOT}/tmp}"
 export COMROOT="${COMROOT:-${OPSROOT}/com}"
 export DCOMROOT="${DCOMROOT:-${OPSROOT}/dcom}"
+export LOGDIR="${LOGDIR:-${COMROOT}/output/logs}"
 
 export DBNROOT="${DBNROOT:-${DBNROOT_default}}"
 export KEEPDATA="${KEEPDATA:-${KEEPDATA_default}}"
@@ -151,6 +150,21 @@ mkdir -p ${COMOUTwmo}
 
 export COMINgfs="${COMINgfs:-$(compath.py ${envir}/gfs/${gfs_ver})}"
 export COMINgefs="${COMINgefs:-$(compath.py ${envir}/gefs/${gefs_ver})}"
+#
+#-----------------------------------------------------------------------
+#
+# Create symlinks to log files in the experiment directory for convenience
+#
+#-----------------------------------------------------------------------
+#
+if [ "${WORKFLOW_MANAGER}" = "rocoto" ]; then
+  __EXPTLOG=${EXPTDIR}/log
+  mkdir -p ${__EXPTLOG}
+  for i in ${LOGDIR}/*_${CDATE}.log; do
+    __LOGB=$(basename $i _${CDATE}.log)
+    ln -sf $i ${__EXPTLOG}/${__LOGB}.log
+  done
+fi
 #
 #-----------------------------------------------------------------------
 #
@@ -201,7 +215,7 @@ fi
 #
 #-----------------------------------------------------------------------
 #
-touch "${LOG_BASEDIR}/make_grid_task_complete.txt"
+touch "${LOGDIR}/make_grid_task_complete.txt"
 #
 #-----------------------------------------------------------------------
 #
