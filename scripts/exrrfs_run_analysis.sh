@@ -1123,11 +1123,15 @@ if [ "${DO_GSIDIAG_OFFLINE}" = "FALSE" ]; then
       if [ ${mem_type} == "MEAN" ]; then  
         cp ./satbias_out ${satbias_dir}_ensmean/rrfs.${spinup_or_prod_rrfs}.${YYYYMMDDHH}_satbias
         cp ./satbias_pc.out ${satbias_dir}_ensmean/rrfs.${spinup_or_prod_rrfs}.${YYYYMMDDHH}_satbias_pc
+        cp ./satbias_out ${COMOUT}_ensmean/rrfs.${spinup_or_prod_rrfs}.${YYYYMMDDHH}_satbias
+        cp ./satbias_pc.out ${COMOUT}_ensmean/rrfs.${spinup_or_prod_rrfs}.${YYYYMMDDHH}_satbias_pc
       fi	 
     else
       # For EnVar DA  
       cp ./satbias_out ${satbias_dir}/rrfs.${spinup_or_prod_rrfs}.${YYYYMMDDHH}_satbias
       cp ./satbias_pc.out ${satbias_dir}/rrfs.${spinup_or_prod_rrfs}.${YYYYMMDDHH}_satbias_pc
+      cp ./satbias_out ${COMOUT}/rrfs.${spinup_or_prod_rrfs}.${YYYYMMDDHH}_satbias
+      cp ./satbias_pc.out ${COMOUT}/rrfs.${spinup_or_prod_rrfs}.${YYYYMMDDHH}_satbias_pc
     fi
   fi
 fi # run diag inline (with GSI)
