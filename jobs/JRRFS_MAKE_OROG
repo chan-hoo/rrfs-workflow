@@ -5,11 +5,10 @@ export PS4='+ $SECONDS + '
 #
 #-----------------------------------------------------------------------
 #
-# Source the variable definitions file and the bash utility functions.
+# Source the bash utility functions.
 #
 #-----------------------------------------------------------------------
 #
-. ${GLOBAL_VAR_DEFNS_FP}
 . ${HOMErrfs}/ush/source_util_funcs.sh
 #
 #-----------------------------------------------------------------------
@@ -54,6 +53,7 @@ This is the J-job script for the task that generates orography files.
 #-----------------------------------------------------------------------
 #
 # Define job and jobid by default for rocoto
+WORKFLOW_MANAGER="${WORKFLOW_MANAGER:-rocoto}"
 if [ "${WORKFLOW_MANAGER}" = "rocoto" ]; then
   # Flag for shared working directory
   flag_shared_working_dir="FALSE"
@@ -64,7 +64,7 @@ if [ "${WORKFLOW_MANAGER}" = "rocoto" ]; then
     job_default=${PBS_JOBNAME}
     pid_default=${PBS_JOBID}
   else
-    job_default=${task_name}
+    job_default="task"
     pid_default=$$
   fi
   if [ "${flag_shared_working_dir}" = "TRUE" ]; then
@@ -124,7 +124,6 @@ setpdy.sh
 #
 #-----------------------------------------------------------------------
 #
-check_for_preexist_dir_file "${OROG_DIR}" "${PREEXISTING_DIR_METHOD}"
 mkdir -p "${OROG_DIR}"
 
 export raw_dir="${DATA}/raw_topo"

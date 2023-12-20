@@ -203,6 +203,11 @@ settings="\
   'sendweb_default': ${SENDWEB_default}
   'mailto_default': ${MAILTO_default}
   'mailcc_default': ${MAILCC_default}
+  'workflow_manager': ${WORKFLOW_MANAGER}
+  'sched': ${SCHED}
+  'grid_dir': ${GRID_DIR}
+  'orog_dir': ${OROG_DIR}
+  'sfc_climo_dir': ${SFC_CLIMO_DIR}
 #
 # Workflow task names.
 #

@@ -1,17 +1,16 @@
 #!/bin/bash
 
-#
-#-----------------------------------------------------------------------
-#
-# Source the variable definitions file and the bash utility functions.
-#
-#-----------------------------------------------------------------------
-#
-. ${GLOBAL_VAR_DEFNS_FP}
-. $USHrrfs/source_util_funcs.sh
-
 date
 export PS4='+ $SECONDS + '
+#
+#-----------------------------------------------------------------------
+#
+# Source the bash utility functions.
+#
+#-----------------------------------------------------------------------
+#
+. ${HOMErrfs}/ush/source_util_funcs.sh
+
 #
 #-----------------------------------------------------------------------
 #
@@ -52,28 +51,73 @@ hour zero).
 #
 #-----------------------------------------------------------------------
 #
-# Set the name of and create the directory in which the output from this
-# script will be placed (if it doesn't already exist).
+# Set the NCO standard environment variables (Table 1, pp.4)
 #
 #-----------------------------------------------------------------------
 #
-export lbcs_dir="${CYCLE_DIR}${SLASH_ENSMEM_SUBDIR}/lbcs"
-mkdir -p "${lbcs_dir}"
-#
-#-----------------------------------------------------------------------
-#
-# Set the name of and create the directory in which the output from this
-# script will be saved for a long time (if it doesn't already exist).
-# Usually lbcs_dir under tmpnwprd should be purged fairly soon after cycle done
-#
-#-----------------------------------------------------------------------
-#
-export lbcs_nwges_dir="${NWGES_DIR}${SLASH_ENSMEM_SUBDIR}/lbcs"
-mkdir -p "${lbcs_nwges_dir}"
+# Define job and jobid by default for rocoto
+WORKFLOW_MANAGER="${WORKFLOW_MANAGER:-rocoto}"
+if [ "${WORKFLOW_MANAGER}" = "rocoto" ]; then
+  # Flag for shared working directory
+  flag_shared_working_dir="FALSE"
+  if [ "${SCHED}" = "slurm" ]; then
+    job_default=${SLURM_JOB_NAME}
+    pid_default=${SLURM_JOB_ID}
+  elif [ "${SCHED}" = "pbspro" ]; then
+    job_default=${PBS_JOBNAME}
+    pid_default=${PBS_JOBID}
+  else
+    job_default="task"
+    pid_default=$$
+  fi
+  if [ "${flag_shared_working_dir}" = "TRUE" ]; then
+    jobid_default="${job_default}.${PDY}${cyc}"
+  else
+    jobid_default="${job_default}.${pid_default}"
+  fi
+fi
+export job="${job:-${job_default}}"
+export jobid="${jobid:-${jobid_default}}"
 
-export workdir="${lbcs_dir}/tmp_LBCS_${bcgrp}"
-mkdir -p "$workdir"
-cd $workdir
+# Set environment variables
+export NET="${NET:-${NET_default}}"
+export RUN="${RUN:-${RUN_default}}"
+
+export USHrrfs="${HOMErrfs}/ush"
+export EXECrrfs="${HOMErrfs}/exec"
+export PARMrrfs="${HOMErrfs}/parm"
+export SCRIPTSrrfs="${HOMErrfs}/scripts"
+export LOGDIR="${COMROOT}/output/logs"
+#
+#-----------------------------------------------------------------------
+#
+# Create a temp working directory (DATA) and cd into it.
+#
+#-----------------------------------------------------------------------
+#
+export DATA=${DATAROOT}/${jobid}
+mkdir -p $DATA
+cd $DATA
+#
+#-----------------------------------------------------------------------
+#
+# Set COM type definitions.
+#
+#-----------------------------------------------------------------------
+#
+[[ "$WORKFLOW_MANAGER" = "rocoto" ]] && export COMROOT=$COMROOT
+export COMIN="$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})"
+export COMOUT="$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})"
+export COMOUTwmo="${COMOUT}/wmo"
+
+mkdir -p ${COMIN}
+mkdir -p ${COMOUT}
+mkdir -p ${COMOUTwmo}
+
+# Run setpdy to initialize PDYm and PDYp variables
+export cycle="${cycle:-t${cyc}z}"
+setpdy.sh
+. ./PDY
 #
 #-----------------------------------------------------------------------
 #
@@ -81,7 +125,7 @@ cd $workdir
 #
 #-----------------------------------------------------------------------
 #
-export pgmout="${workdir}/OUTPUT.$$"
+export pgmout="${DATA}/OUTPUT.$$"
 env
 
 $SCRIPTSrrfs/exrrfs_make_lbcs.sh \
@@ -91,6 +135,16 @@ export err=$?; err_chk
 
 if [ -e "$pgmout" ]; then
   cat $pgmout
+fi
+#
+#-----------------------------------------------------------------------
+#
+# Whether or not working directory DATA should be kept.
+#
+#-----------------------------------------------------------------------
+#
+if [ "${KEEPDATA}" = "NO" ]; then
+  rm -rf ${DATA}
 fi
 #
 #-----------------------------------------------------------------------
