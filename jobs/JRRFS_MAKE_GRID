@@ -89,10 +89,10 @@ export jobid="${jobid:-${jobid_default}}"
 export NET="${NET:-${NET_default}}"
 export RUN="${RUN:-${RUN_default}}"
 
-export USHrrfs="${USHrrfs:-${HOMErrfs}/ush}"
-export EXECrrfs="${EXECrrfs:-${HOMErrfs}/exec}"
-export PARMrrfs="${PARMrrfs:-${HOMErrfs}/parm}"
-export SCRIPTSrrfs="${SCRIPTSrrfs:-${HOMErrfs}/scripts}"
+export USHrrfs="${HOMErrfs}/ush"
+export EXECrrfs="${HOMErrfs}/exec"
+export PARMrrfs="${HOMErrfs}/parm"
+export SCRIPTSrrfs="${HOMErrfs}/scripts"
 export LOGDIR="${COMROOT}/output/logs"
 #
 #-----------------------------------------------------------------------
@@ -112,36 +112,18 @@ cd $DATA
 #-----------------------------------------------------------------------
 #
 [[ "$WORKFLOW_MANAGER" = "rocoto" ]] && export COMROOT=$COMROOT
-export COMIN="${COMIN:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})}"
-export COMOUT="${COMOUT:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})}"
-export COMOUTwmo="${COMOUTwmo:-${COMOUT}/wmo}"
+export COMIN="$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})"
+export COMOUT="$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})"
+export COMOUTwmo="${COMOUT}/wmo"
 
 mkdir -p ${COMIN}
 mkdir -p ${COMOUT}
 mkdir -p ${COMOUTwmo}
 
-export COMINgfs="${COMINgfs:-$(compath.py ${envir}/gfs/${gfs_ver})}"
-export COMINgefs="${COMINgefs:-$(compath.py ${envir}/gefs/${gefs_ver})}"
-
 # Run setpdy to initialize PDYm and PDYp variables
 export cycle="${cycle:-t${cyc}z}"
 setpdy.sh
 . ./PDY
-#
-#-----------------------------------------------------------------------
-#
-# Create symlinks to log files in the experiment directory for convenience
-#
-#-----------------------------------------------------------------------
-#
-if [ "${WORKFLOW_MANAGER}" = "rocoto" ]; then
-  __EXPTLOG=${EXPTDIR}/log
-  mkdir -p ${__EXPTLOG}
-  for i in ${LOGDIR}/*_${CDATE}.log; do
-    __LOGB=$(basename $i _${CDATE}.log)
-    ln -sf $i ${__EXPTLOG}/${__LOGB}.log
-  done
-fi
 #
 #-----------------------------------------------------------------------
 #
@@ -193,6 +175,16 @@ fi
 #-----------------------------------------------------------------------
 #
 touch "${LOGDIR}/make_grid_task_complete.txt"
+#
+#-----------------------------------------------------------------------
+#
+# Whether or not working directory DATA should be kept.
+#
+#-----------------------------------------------------------------------
+#
+if [ "${KEEPDATA}" = "NO" ]; then
+  rm -rf ${DATA}
+fi
 #
 #-----------------------------------------------------------------------
 #

@@ -163,9 +163,9 @@ print_info_msg "Starting orography file generation..."
 export pgm="orog"
 . prep_step
 
-$APRUN ${EXECrrfs}/$pgm < "${input_redirect_fn}" >>$pgmout 2>${tmp_dir}/errfile
+$APRUN ${EXECrrfs}/$pgm < "${input_redirect_fn}" >>$pgmout 2>errfile
 export err=$?; err_chk
-mv ${tmp_dir}/errfile ${tmp_dir}/errfile_orog
+mv errfile ${DATA}/errfile_orog
 
 cd ${OROG_DIR}
 #
@@ -220,9 +220,9 @@ EOF
   export pgm="orog_gsl"
   . prep_step
 
-  ${APRUN} ${EXECrrfs}/$pgm < "${input_redirect_fn}" >>$pgmout 2>${tmp_dir}/errfile
+  ${APRUN} ${EXECrrfs}/$pgm < "${input_redirect_fn}" >>$pgmout 2>errfile
   export err=$?; err_chk
-  mv ${tmp_dir}/errfile ${tmp_dir}/errfile_orog_gsl
+  mv errfile ${DATA}/errfile_orog_gsl
 
   mv "${CRES}${DOT_OR_USCORE}oro_data_ss.tile${TILE_RGNL}.halo${NH0}.nc" \
      "${CRES}${DOT_OR_USCORE}oro_data_ls.tile${TILE_RGNL}.halo${NH0}.nc" \
@@ -353,9 +353,9 @@ print_info_msg "Starting filtering of orography..."
 export pgm="filter_topo"
 . prep_step
 
-$APRUN ${EXECrrfs}/$pgm >>$pgmout 2>${tmp_dir}/errfile
+$APRUN ${EXECrrfs}/$pgm >>$pgmout 2>errfile
 export err=$?; err_chk
-mv ${tmp_dir}/errfile ${tmp_dir}/errfile_filter_topo
+mv errfile ${DATA}/errfile_filter_topo
 #
 # For clarity, rename the filtered orography file in filter_dir
 # such that its new name contains the halo size.
@@ -410,9 +410,9 @@ for halo_num in "${halo_num_list[@]}"; do
 
   . prep_step
 
-  $APRUN ${EXECrrfs}/$pgm < ${nml_fn} >>$pgmout 2>${tmp_dir}/errfile
+  $APRUN ${EXECrrfs}/$pgm < ${nml_fn} >>$pgmout 2>errfile
   export err=$?; err_chk
-  mv ${tmp_dir}/errfile ${tmp_dir}/errfile_shave_${halo_num}
+  mv errfile ${DATA}/errfile_shave_${halo_num}
   mv ${shaved_fp} ${OROG_DIR}
 done
 
