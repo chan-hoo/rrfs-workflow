@@ -86,7 +86,7 @@ esac
 #
 #-----------------------------------------------------------------------
 #
-extrn_mdl_staging_dir="${COMOUT}${SLASH_ENSMEM_SUBDIR}/${EXTRN_MDL_NAME_LBCS}/for_LBCS"
+extrn_mdl_staging_dir="${COMIN}${SLASH_ENSMEM_SUBDIR}/${EXTRN_MDL_NAME_LBCS}/for_LBCS"
 extrn_mdl_var_defns_fp="${extrn_mdl_staging_dir}/${EXTRN_MDL_LBCS_VAR_DEFNS_FN}"
 . ${extrn_mdl_var_defns_fp}
 #
@@ -490,9 +490,8 @@ $settings"
   lbc_spec_fhrs=( "${EXTRN_MDL_LBC_SPEC_FHRS[$i]}" ) 
   fcst_hhh=$(( ${lbc_spec_fhrs} - ${EXTRN_MDL_LBCS_OFFSET_HRS} ))
   fcst_hhh_FV3LAM=`printf %3.3i $fcst_hhh`
-  mv gfs.bndy.nc ${lbcs_dir}/gfs_bndy.tile7.${fcst_hhh_FV3LAM}.nc
-# copy results to nwges for longe time disk storage.
-  cp ${lbcs_dir}/gfs_bndy.tile7.${fcst_hhh_FV3LAM}.nc ${lbcs_nwges_dir}/.
+  mv gfs.bndy.nc gfs_bndy.tile7.${fcst_hhh_FV3LAM}.nc
+  cp gfs_bndy.tile7.${fcst_hhh_FV3LAM}.nc ${COMOUT_lbcs}/.
 
   fi
 done

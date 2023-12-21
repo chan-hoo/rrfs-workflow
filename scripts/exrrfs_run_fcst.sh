@@ -48,34 +48,6 @@ specified cycle.
 #
 #-----------------------------------------------------------------------
 #
-# Specify the set of valid argument names for this script/function.  
-# Then process the arguments provided to this script/function (which 
-# should consist of a set of name-value pairs of the form arg1="value1",
-# etc).
-#
-#-----------------------------------------------------------------------
-#
-valid_args=( \
-"cdate" \
-"cycle_type" \
-"cycle_subtype" \
-"ensmem_indx" \
-"slash_ensmem_subdir" \
-)
-process_args valid_args "$@"
-#
-#-----------------------------------------------------------------------
-#
-# For debugging purposes, print out values of arguments passed to this
-# script.  Note that these will be printed out only if VERBOSE is set to
-# TRUE.
-#
-#-----------------------------------------------------------------------
-#
-print_input_args valid_args
-#
-#-----------------------------------------------------------------------
-#
 # Set environments
 #
 #-----------------------------------------------------------------------
@@ -145,8 +117,7 @@ Creating links in the INPUT subdirectory of the current run directory to
 the grid and (filtered) orography files ..."
 
 # Create links to fix files in the FIXLAM directory.
-
-cd ${run_dir}/INPUT
+cd ${DATA}/INPUT
 
 relative_or_null=""
 
@@ -270,18 +241,18 @@ fi
 #
 print_info_msg "$VERBOSE" "
 Creating links with names that FV3 looks for in the INPUT subdirectory
-of the current run directory (run_dir), where
-  run_dir = \"${run_dir}\"
+of the current working directory (DATA), where
+  DATA = \"${DATA}\"
 ..."
 
 BKTYPE=1    # cold start using INPUT
-if [ -r ${run_dir}/INPUT/coupler.res ] ; then
+if [ -r ${DATA}/INPUT/coupler.res ] ; then
   BKTYPE=0  # cycling using RESTART
 fi
 print_info_msg "$VERBOSE" "
 The forecast has BKTYPE $BKTYPE (1:cold start ; 0 cycling)"
 
-cd ${run_dir}/INPUT
+#cd ${DATA}/INPUT
 
 relative_or_null=""
 
@@ -289,7 +260,7 @@ n_iolayouty=$(($IO_LAYOUT_Y-1))
 list_iolayout=$(seq 0 $n_iolayouty)
 
 if [ "${DO_NON_DA_RUN}" = "TRUE" ]; then
-  target="${CYCLE_DIR}${SLASH_ENSMEM_SUBDIR}/ics/gfs_data.tile${TILE_RGNL}.halo${NH0}.nc"
+  target="${COMIN}${SLASH_ENSMEM_SUBDIR}/ics/gfs_data.tile${TILE_RGNL}.halo${NH0}.nc"
 else
   if [ ${BKTYPE} -eq 1 ]; then
     target="gfs_data.tile${TILE_RGNL}.halo${NH0}.nc"
@@ -321,20 +292,20 @@ else
 fi
 
 if [ "${DO_NON_DA_RUN}" = "TRUE" ]; then
-  target="${CYCLE_DIR}${SLASH_ENSMEM_SUBDIR}/ics/sfc_data.tile${TILE_RGNL}.halo${NH0}.nc"
+  target="${COMIN}${SLASH_ENSMEM_SUBDIR}/ics/sfc_data.tile${TILE_RGNL}.halo${NH0}.nc"
   symlink="sfc_data.nc"
   ln -sf ${relative_or_null} $target $symlink
 
-  target="${CYCLE_DIR}${SLASH_ENSMEM_SUBDIR}/ics/gfs_ctrl.nc"
+  target="${COMIN}${SLASH_ENSMEM_SUBDIR}/ics/gfs_ctrl.nc"
   symlink="gfs_ctrl.nc"
   ln -sf ${relative_or_null} $target $symlink
 
-  target="${CYCLE_DIR}${SLASH_ENSMEM_SUBDIR}/ics/gfs_bndy.tile${TILE_RGNL}.000.nc"
+  target="${COMIN}${SLASH_ENSMEM_SUBDIR}/ics/gfs_bndy.tile${TILE_RGNL}.000.nc"
   symlink="gfs_bndy.tile${TILE_RGNL}.000.nc"
   ln -sf ${relative_or_null} $target $symlink
 
   for fhr in $(seq -f "%03g" ${LBC_SPEC_INTVL_HRS} ${LBC_SPEC_INTVL_HRS} ${FCST_LEN_HRS}); do
-    target="${CYCLE_DIR}${SLASH_ENSMEM_SUBDIR}/lbcs/gfs_bndy.tile${TILE_RGNL}.${fhr}.nc"
+    target="${COMIN}${SLASH_ENSMEM_SUBDIR}/lbcs/gfs_bndy.tile${TILE_RGNL}.${fhr}.nc"
     symlink="gfs_bndy.tile${TILE_RGNL}.${fhr}.nc"
     ln -sf ${relative_or_null} $target $symlink
   done
@@ -361,20 +332,20 @@ else
 fi
 
 if [ "${DO_SMOKE_DUST}" = "TRUE" ]; then
-  ln -snf  ${FIX_SMOKE_DUST}/${PREDEF_GRID_NAME}/dust12m_data.nc  ${run_dir}/INPUT/dust12m_data.nc
-  ln -snf  ${FIX_SMOKE_DUST}/${PREDEF_GRID_NAME}/emi_data.nc      ${run_dir}/INPUT/emi_data.nc
-  yyyymmddhh=${cdate:0:10}
+  ln -snf  ${FIX_SMOKE_DUST}/${PREDEF_GRID_NAME}/dust12m_data.nc ${DATA}/INPUT/dust12m_data.nc
+  ln -snf  ${FIX_SMOKE_DUST}/${PREDEF_GRID_NAME}/emi_data.nc ${DATA}/INPUT/emi_data.nc
+  yyyymmddhh=${CDATE:0:10}
   echo ${yyyymmddhh}
-  if [ ${cycle_type} = "spinup" ]; then
-    smokefile=${NWGES_BASEDIR}/RAVE_INTP/SMOKE_RRFS_data_${yyyymmddhh}00_spinup.nc
+  if [ "${CYCLE_TYPE}" = "spinup" ]; then
+    smokefile=${COMOUT_BASEDIR}/RAVE_INTP/SMOKE_RRFS_data_${yyyymmddhh}00_spinup.nc
   else
-    smokefile=${NWGES_BASEDIR}/RAVE_INTP/SMOKE_RRFS_data_${yyyymmddhh}00.nc
+    smokefile=${COMOUT_BASEDIR}/RAVE_INTP/SMOKE_RRFS_data_${yyyymmddhh}00.nc
   fi
   echo "try to use smoke file=",${smokefile}
   if [ -f ${smokefile} ]; then
-    ln -snf ${smokefile} ${run_dir}/INPUT/SMOKE_RRFS_data.nc
+    ln -snf ${smokefile} ${DATA}/INPUT/SMOKE_RRFS_data.nc
   else
-    ln -snf ${FIX_SMOKE_DUST}/${PREDEF_GRID_NAME}/dummy_24hr_smoke.nc ${run_dir}/INPUT/SMOKE_RRFS_data.nc
+    ln -snf ${FIX_SMOKE_DUST}/${PREDEF_GRID_NAME}/dummy_24hr_smoke.nc ${DATA}/INPUT/SMOKE_RRFS_data.nc
     echo "WARNING: Smoke file is not available, use dummy_24hr_smoke.nc instead"
   fi
 fi
@@ -389,13 +360,13 @@ fi
 #
 #-----------------------------------------------------------------------
 #
-cd ${run_dir}
+cd ${DATA}
 
 print_info_msg "$VERBOSE" "
-Creating links in the current run directory (run_dir) to fixed (i.e.
+Creating links in the current working directory (DATA) to fixed (i.e.
 static) files in the FIXam directory:
   FIXam = \"${FIXam}\"
-  run_dir = \"${run_dir}\""
+  DATA = \"${DATA}\""
 
 relative_or_null=""
 
@@ -404,12 +375,10 @@ num_symlinks=${#CYCLEDIR_LINKS_TO_FIXam_FILES_MAPPING[@]}
 for (( i=0; i<${num_symlinks}; i++ )); do
 
   mapping="${CYCLEDIR_LINKS_TO_FIXam_FILES_MAPPING[$i]}"
-  symlink=$( printf "%s\n" "$mapping" | \
-             sed -n -r -e "s/${regex_search}/\1/p" )
-  target=$( printf "%s\n" "$mapping" | \
-            sed -n -r -e "s/${regex_search}/\2/p" )
+  symlink=$( printf "%s\n" "$mapping" | sed -n -r -e "s/${regex_search}/\1/p" )
+  target=$( printf "%s\n" "$mapping" | sed -n -r -e "s/${regex_search}/\2/p" )
 
-  symlink="${run_dir}/$symlink"
+  symlink="${DATA}/$symlink"
   target="$FIXam/$target"
   if [ -f "${target}" ]; then
     ln -sf ${relative_or_null} $target $symlink
@@ -421,8 +390,8 @@ for (( i=0; i<${num_symlinks}; i++ )); do
 
 done
 
-ln -sf ${relative_or_null} ${FIXam}/optics_??.dat ${run_dir}
-ln -sf ${relative_or_null} ${FIXam}/aeroclim.m??.nc ${run_dir}
+ln -sf ${relative_or_null} ${FIXam}/optics_??.dat ${DATA}
+ln -sf ${relative_or_null} ${FIXam}/aeroclim.m??.nc ${DATA}
 #
 #-----------------------------------------------------------------------
 #
@@ -432,7 +401,6 @@ ln -sf ${relative_or_null} ${FIXam}/aeroclim.m??.nc ${run_dir}
 #
 #-----------------------------------------------------------------------
 #
-cd ${run_dir}
 rm -f time_stamp.out
 #
 #-----------------------------------------------------------------------
@@ -449,16 +417,16 @@ input files in the main experiment directory..."
 
 relative_or_null=""
 
-ln -sf ${relative_or_null} ${DATA_TABLE_FP} ${run_dir}
-ln -sf ${relative_or_null} ${FIELD_TABLE_FP} ${run_dir}
-ln -sf ${relative_or_null} ${UFS_YAML_FP} ${run_dir}
+ln -sf ${relative_or_null} ${DATA_TABLE_FP} ${DATA}
+ln -sf ${relative_or_null} ${FIELD_TABLE_FP} ${DATA}
+ln -sf ${relative_or_null} ${UFS_YAML_FP} ${DATA}
 
 #
 # Determine if running stochastic physics for the specified cycles in CYCL_HRS_STOCH
 #
 STOCH="FALSE"
-if [ "${DO_ENSEMBLE}" = TRUE ] && ([ "${DO_SPP}" = TRUE ] || [ "${DO_SPPT}" = TRUE ] || [ "${DO_SHUM}" = TRUE ] \
-  || [ "${DO_SKEB}" = TRUE ] || [ "${DO_LSM_SPP}" =  TRUE ]); then
+if [ "${DO_ENSEMBLE}" = "TRUE" ] && ([ "${DO_SPP}" = "TRUE" ] || [ "${DO_SPPT}" = "TRUE" ] || [ "${DO_SHUM}" = "TRUE" ] \
+  || [ "${DO_SKEB}" = "TRUE" ] || [ "${DO_LSM_SPP}" = "TRUE" ]); then
    for cyc_start in "${CYCL_HRS_STOCH[@]}"; do
      if [ ${HH} -eq ${cyc_start} ]; then 
        STOCH="TRUE"
@@ -469,41 +437,41 @@ fi
 if [ ${BKTYPE} -eq 0 ]; then
   # cycling, using namelist for cycling forecast
   if [ "${STOCH}" = "TRUE" ]; then
-    cp ${FV3_NML_RESTART_STOCH_FP} ${run_dir}/${FV3_NML_FN}
+    cp ${FV3_NML_RESTART_STOCH_FP} ${DATA}/${FV3_NML_FN}
    else
-    cp ${FV3_NML_RESTART_FP} ${run_dir}/${FV3_NML_FN}
+    cp ${FV3_NML_RESTART_FP} ${DATA}/${FV3_NML_FN}
   fi
 else
   if [ -f "INPUT/cycle_surface.done" ]; then
   # namelist for cold start with surface cycle
-    cp ${FV3_NML_CYCSFC_FP} ${run_dir}/${FV3_NML_FN}
+    cp ${FV3_NML_CYCSFC_FP} ${DATA}/${FV3_NML_FN}
   else
   # cold start, using namelist for cold start
     if [ "${STOCH}" = "TRUE" ]; then
-      cp ${FV3_NML_STOCH_FP} ${run_dir}/${FV3_NML_FN}
+      cp ${FV3_NML_STOCH_FP} ${DATA}/${FV3_NML_FN}
      else
-      cp ${FV3_NML_FP} ${run_dir}/${FV3_NML_FN}
+      cp ${FV3_NML_FP} ${DATA}/${FV3_NML_FN}
     fi
   fi
 fi
 
 if [ "${STOCH}" = "TRUE" ]; then
   if [ ${BKTYPE} -eq 0 ] && [ ${DO_ENSFCST_MULPHY} = "TRUE" ]; then
-    ensmem_indx_sgl=$(echo "${ensmem_indx}" | awk '{print $1+0}')
+    ensmem_indx_sgl=$(echo "${ENSMEM_INDX}" | awk '{print $1+0}')
     cp ${FV3_NML_RESTART_STOCH_FP}_ensphy${ensmem_indx_sgl} ${run_dir}/${FV3_NML_FN}_base 
-    rm -fr ${run_dir}/field_table
-    cp ${PARMrrfs}/field_table.rrfsens_phy${ensmem_indx} ${run_dir}/field_table
+    rm -fr ${DATA}/field_table
+    cp ${PARMrrfs}/field_table.rrfsens_phy${ENSMEM_INDX} ${DATA}/field_table
   else
-    cp ${run_dir}/${FV3_NML_FN} ${run_dir}/${FV3_NML_FN}_base
+    cp ${DATA}/${FV3_NML_FN} ${DATA}/${FV3_NML_FN}_base
   fi
-  set_FV3nml_ens_stoch_seeds cdate="$cdate"
+  set_FV3nml_ens_stoch_seeds cdate="$CDATE"
   export err=$?
   if [ $err -ne 0 ]; then
     err_exit "\
  Call to function to create the ensemble-based namelist for the current 
- cycle's (cdate) run directory (run_dir) failed: 
-   cdate = \"${cdate}\"
-   run_dir = \"${run_dir}\""
+ cycle's (CDATE) working directory (DATA) failed: 
+   CDATE = \"${CDATE}\"
+   DATA = \"${DATA}\""
   fi
 fi
 #
@@ -516,18 +484,18 @@ fi
 #
 $USHrrfs/create_model_configure_file.py \
   --path-to-defns ${GLOBAL_VAR_DEFNS_FP} \
-  --cdate "${cdate}" \
-  --cycle_type "${cycle_type}" \
-  --cycle_subtype "${cycle_subtype}" \
-  --run-dir "${run_dir}" \
+  --cdate "${CDATE}" \
+  --cycle_type "${CYCLE_TYPE}" \
+  --cycle_subtype "${CYCLE_SUBTYPE}" \
+  --run-dir "${DATA}" \
   --fhrot "${FHROT}" \
   --nthreads "${OMP_NUM_THREADS}" \
   --restart_hrs="${RESTART_HRS}"
 export err=$?
 if [ $err -ne 0 ]; then
   err_exit "Call to function to create the model_configure file for
-the current cycle's (cdate) run directory (DATA) failed:
-  DATA = \"${run_dir}\""
+the current cycle's (CDATE) run directory (DATA) failed:
+  DATA = \"${DATA}\""
 fi
 #
 #-----------------------------------------------------------------------
@@ -539,18 +507,18 @@ fi
 #
 $USHrrfs/create_diag_table_file.py \
   --path-to-defns ${GLOBAL_VAR_DEFNS_FP} \
-  --run-dir ${run_dir}
+  --run-dir ${DATA}
 export err=$?
 if [ $err -ne 0 ]; then
   err_exit "Call to function to create the diag_table file for
-the current cycle's (cdate) run directory (DATA) failed:
-  DATA = \"${run_dir}\""
+the current cycle's working directory (DATA) failed:
+  DATA = \"${DATA}\""
 fi
 
 # copy over diag_table for multiphysics ensemble
-if [ "${STOCH}" = "TRUE" ] && [ ${BKTYPE} -eq 0 ] && [ ${DO_ENSFCST_MULPHY} = "TRUE" ]; then
-  rm -fr ${run_dir}/diag_table
-  cp ${PARMrrfs}/diag_table.rrfsens_phy${ensmem_indx} ${run_dir}/diag_table
+if [ "${STOCH}" = "TRUE" ] && [ ${BKTYPE} -eq 0 ] && [ "${DO_ENSFCST_MULPHY}" = "TRUE" ]; then
+  rm -f ${DATA}/diag_table
+  cp ${PARMrrfs}/diag_table.rrfsens_phy${ENSMEM_INDX} ${DATA}/diag_table
 fi
 
 #
@@ -563,12 +531,12 @@ fi
 #
 $USHrrfs/create_ufs_configure_file.py \
   --path-to-defns ${GLOBAL_VAR_DEFNS_FP} \
-  --run-dir ${run_dir} 
+  --run-dir ${DATA} 
 export err=$?
 if [ $err -ne 0 ]; then
   err_exit "Call to function to create the UFS configuration file for
-the current cycle's (cdate) run directory (DATA) failed:
-  DATA = \"${run_dir}\""
+the current cycle's working directory (DATA) failed:
+  DATA = \"${DATA}\""
 fi
 #
 #-----------------------------------------------------------------------
@@ -604,10 +572,10 @@ fi
 #-----------------------------------------------------------------------
 #
 export pgm="ufs_model"
-cp ${FV3_EXEC_FP} ${run_dir}/$pgm
+cp ${FV3_EXEC_FP} ${DATA}/$pgm
 . prep_step
 
-$APRUN ${run_dir}/$pgm >>$pgmout 2>errfile
+$APRUN ${DATA}/$pgm >>$pgmout 2>errfile
 export err=$?; err_chk
 #
 #-----------------------------------------------------------------------

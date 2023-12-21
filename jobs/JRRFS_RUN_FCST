@@ -9,7 +9,8 @@
 #
 #-----------------------------------------------------------------------
 #
-
+date
+export PS4='+ $SECONDS + '
 #
 #-----------------------------------------------------------------------
 #
@@ -17,11 +18,7 @@
 #
 #-----------------------------------------------------------------------
 #
-. ${GLOBAL_VAR_DEFNS_FP}
-. $USHrrfs/source_util_funcs.sh
-
-date
-export PS4='+ $SECONDS + '
+. ${HOMErrfs}/ush/source_util_funcs.sh
 #
 #-----------------------------------------------------------------------
 #
@@ -61,31 +58,102 @@ the specified cycle.
 #
 #-----------------------------------------------------------------------
 #
-# Create the INPUT and RESTART directories under the run directory.
+# Set the NCO standard environment variables (Table 1, pp.4)
 #
 #-----------------------------------------------------------------------
+#
+# Define job and jobid by default for rocoto
+WORKFLOW_MANAGER="${WORKFLOW_MANAGER:-rocoto}"
+if [ "${WORKFLOW_MANAGER}" = "rocoto" ]; then
+  # Flag for shared working directory
+  flag_shared_working_dir="TRUE"
+  if [ "${SCHED}" = "slurm" ]; then
+    job_default=${SLURM_JOB_NAME}
+    pid_default=${SLURM_JOB_ID}
+  elif [ "${SCHED}" = "pbspro" ]; then
+    job_default=${PBS_JOBNAME}
+    pid_default=${PBS_JOBID}
+  else
+    job_default="task"
+    pid_default=$$
+  fi
+  if [ "${flag_shared_working_dir}" = "TRUE" ]; then
+    jobid_default="${job_default}.${PDY}${cyc}"
+  else
+    jobid_default="${job_default}.${pid_default}"
+  fi
+fi
+export job="${job:-${job_default}}"
+export jobid="${jobid:-${jobid_default}}"
+
+# Set environment variables
+export NET="${NET:-${NET_default}}"
+export RUN="${RUN:-${RUN_default}}"
+
+export USHrrfs="${HOMErrfs}/ush"
+export EXECrrfs="${HOMErrfs}/exec"
+export PARMrrfs="${HOMErrfs}/parm"
+export SCRIPTSrrfs="${HOMErrfs}/scripts"
+export LOGDIR="${COMROOT}/output/logs"
+#
+#-----------------------------------------------------------------------
+#
+# Create a temp working directory (DATA) and cd into it.
+#
+#-----------------------------------------------------------------------
+#
+export DATA="${DATA:-${DATAROOT}/${jobid}}"
+mkdir -p $DATA
+cd $DATA
+#
+#-----------------------------------------------------------------------
+#
+# Set COM type definitions.
+#
+#-----------------------------------------------------------------------
+#
+[[ "$WORKFLOW_MANAGER" = "rocoto" ]] && export COMROOT=$COMROOT
+export COMIN="${COMIN:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})}"
+export COMOUT_BASEDIR="${COMOUT:-$(compath.py -o ${NET}/${model_ver})}"
+export COMOUT="${COMOUT_BASEDIR}/${RUN}.${PDY}/${cyc}"
+export COMOUT_gridspec="${COMOUT_BASEDIR}/grid_spec"
+export COMOUT_fcst="${COMOUT}${SLASH_ENSMEM_SUBDIR}/fcst"
+
+mkdir -p ${COMOUT}
+mkdir -p ${COMOUT_gridspec}
+mkdir -p ${COMOUT_fcst}
+
+# Run setpdy to initialize PDYm and PDYp variables
+export cycle="${cycle:-t${cyc}z}"
+setpdy.sh
+. ./PDY
+#
+#-----------------------------------------------------------------------
+#
+# Set other environment variables.
+#
+#-----------------------------------------------------------------------
+#
 # CYCLE_TYPE is to indicate which type of cycle this job for:
 #   spinup: this job is for spin-up cycles
 #   others(prod): this job is for product cycle
 #
-CYCLE_TYPE=${CYCLE_TYPE:-prod}
-CYCLE_SUBTYPE=${CYCLE_SUBTYPE:-empty}
-if [ ${CYCLE_TYPE} == "spinup" ]; then
-  export run_dir="${CYCLE_DIR}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam_spinup"
-  if  [ ${CYCLE_SUBTYPE} == "ensinit" ]; then
-    run_dir="${CYCLE_DIR}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam_ensinit"
-  fi
-else
-  export run_dir="${CYCLE_DIR}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam"
-fi
+export CYCLE_TYPE="${CYCLE_TYPE:-prod}"
+export CYCLE_SUBTYPE="${CYCLE_SUBTYPE:-empty}"
 
-mkdir -p ${run_dir}/INPUT
-mkdir -p ${run_dir}/RESTART
-
-export gridspec_dir=${NWGES_BASEDIR}/grid_spec
-mkdir -p ${gridspec_dir}
-
-cd ${run_dir}
+export CDATE="${CDATE:-${PDY}${cyc}}"
+export ENSMEM_INDX="${ENSMEM_INDX:-}"
+export SLASH_ENSMEM_SUBDIR="${SLASH_ENSMEM_SUBDIR:-}"
+export RESTART_HRS="${RESTART_HRS:-0}"
+#
+#-----------------------------------------------------------------------
+#
+# Create the INPUT and RESTART directories under the run directory.
+#
+#-----------------------------------------------------------------------
+#
+mkdir -p ${DATA}/INPUT
+mkdir -p ${DATA}/RESTART
 #
 #-----------------------------------------------------------------------
 #
@@ -93,19 +161,24 @@ cd ${run_dir}
 #
 #-----------------------------------------------------------------------
 #
-export pgmout="${run_dir}/OUTPUT.$$"
+export pgmout="${DATA}/OUTPUT.$$"
 env
 
-$SCRIPTSrrfs/exrrfs_run_fcst.sh \
-  cdate="${CDATE}" \
-  cycle_type="${CYCLE_TYPE}" \
-  cycle_subtype="${CYCLE_SUBTYPE}" \
-  ensmem_indx="${ENSMEM_INDX}" \
-  slash_ensmem_subdir="${SLASH_ENSMEM_SUBDIR}"
+$SCRIPTSrrfs/exrrfs_run_fcst.sh
 export err=$?; err_chk
 
 if [ -e "$pgmout" ]; then
   cat $pgmout
+fi
+#
+#-----------------------------------------------------------------------
+#
+# Whether or not working directory DATA should be kept.
+#
+#-----------------------------------------------------------------------
+#
+if [ "${KEEPDATA}" = "NO" ]; then
+  rm -rf ${DATA}
 fi
 #
 #-----------------------------------------------------------------------
