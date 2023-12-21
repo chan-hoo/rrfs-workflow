@@ -603,7 +603,7 @@ if [ ${BKTYPE} -eq 1 ] && [ ${n_iolayouty} -ge 1 ]; then
   do
     iii=$(printf %4.4i $ii)
     if [ -f "grid_spec.nc.${iii}" ]; then
-      cp grid_spec.nc.${iii} ${gridspec_dir}/fv3_grid_spec.${iii}
+      cp grid_spec.nc.${iii} ${COMOUT_gridspec}/fv3_grid_spec.${iii}
     else
       err_exit "\
       Cannot create symlink because target does not exist:

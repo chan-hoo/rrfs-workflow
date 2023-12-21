@@ -114,14 +114,12 @@ cd $DATA
 #
 [[ "$WORKFLOW_MANAGER" = "rocoto" ]] && export COMROOT=$COMROOT
 export COMIN="${COMIN:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})}"
-export COMOUT_BASEDIR="${COMOUT:-$(compath.py -o ${NET}/${model_ver})}"
+export COMOUT_BASEDIR="${COMOUT_BASEDIR:-$(compath.py -o ${NET}/${model_ver})}"
 export COMOUT="${COMOUT_BASEDIR}/${RUN}.${PDY}/${cyc}"
 export COMOUT_gridspec="${COMOUT_BASEDIR}/grid_spec"
-export COMOUT_fcst="${COMOUT}${SLASH_ENSMEM_SUBDIR}/fcst"
 
 mkdir -p ${COMOUT}
 mkdir -p ${COMOUT_gridspec}
-mkdir -p ${COMOUT_fcst}
 
 # Run setpdy to initialize PDYm and PDYp variables
 export cycle="${cycle:-t${cyc}z}"

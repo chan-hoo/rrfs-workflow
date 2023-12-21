@@ -48,33 +48,6 @@ the output files corresponding to a specified forecast hour.
 #
 #-----------------------------------------------------------------------
 #
-# Specify the set of valid argument names for this script/function.  
-# Then process the arguments provided to this script/function (which 
-# should consist of a set of name-value pairs of the form arg1="value1",
-# etc).
-#
-#-----------------------------------------------------------------------
-#
-valid_args=( \
-"cdate" \
-"fhr" \
-"tmmark" \
-"cycle_type" \
-)
-process_args valid_args "$@"
-#
-#-----------------------------------------------------------------------
-#
-# For debugging purposes, print out values of arguments passed to this
-# script.  Note that these will be printed out only if VERBOSE is set to
-# TRUE.
-#
-#-----------------------------------------------------------------------
-#
-print_input_args valid_args
-#
-#-----------------------------------------------------------------------
-#
 # Set environment
 #
 #-----------------------------------------------------------------------
@@ -121,22 +94,13 @@ esac
 #
 #-----------------------------------------------------------------------
 #
-# Remove any files from previous runs.
-#
-#-----------------------------------------------------------------------
-#
-rm -f fort.*
-#
-#-----------------------------------------------------------------------
-#
 # Get the cycle date and hour (in formats of yyyymmdd and hh, respectively)
-# from cdate.
+# from CDATE.
 #
 #-----------------------------------------------------------------------
 #
-yyyymmdd=${cdate:0:8}
-hh=${cdate:8:2}
-cyc=$hh
+yyyymmdd=${CDATE:0:8}
+hh=${CDATE:8:2}
 #
 #-----------------------------------------------------------------------
 #
@@ -145,8 +109,21 @@ cyc=$hh
 #
 #-----------------------------------------------------------------------
 #
-dyn_file="${run_dir}/dynf${fhr}.nc"
-phy_file="${run_dir}/phyf${fhr}.nc"
+if [ "${DO_NON_DA_RUN}" = "TRUE" ]; then
+  DATAFCST="${DATAROOT}/${TAG}_${RUN_FCST_TN}.${CDATE}"
+else
+  if [ "${CYCLE_TYPE}" = "spinup" ]; then
+    if [ "${CYCLE_SUBTYPE}" = "ensinit" ]; then
+      DATAFCST="${DATAROOT}/${TAG}_${RUN_FCST_TN}_ensinit${USCORE_ENSMEM_NAME}"
+    else
+      DATAFCST="${DATAROOT}/${TAG}_${RUN_FCST_TN}_spinup${USCORE_ENSMEM_NAME}"
+    fi
+  else
+    DATAFCST="${DATAROOT}/${TAG}_${RUN_FCST_TN}_prod${USCORE_ENSMEM_NAME}"    
+  fi
+fi
+dyn_file="${DATAFCST}/dynf${fhr}.nc"
+phy_file="${DATAFCST}/phyf${fhr}.nc"
 
 len_fhr=${#fhr}
 if [ ${len_fhr} -eq 9 ]; then
@@ -186,33 +163,33 @@ EOF
 #
 #-----------------------------------------------------------------------
 #
-# stage necessary files in fhr_dir.
+# stage necessary files in working directory DATA.
 #
 #-----------------------------------------------------------------------
 #
 cp ${UPP_DIR}/parm/nam_micro_lookup.dat ./eta_micro_lookup.dat
 ln -snf ${FIX_UPP_CRTM}/*bin ./
-if [ ${USE_CUSTOM_POST_CONFIG_FILE} = "TRUE" ]; then
+if [ "${USE_CUSTOM_POST_CONFIG_FILE}" = "TRUE" ]; then
   post_config_fp="${CUSTOM_POST_CONFIG_FP}"
   post_params_fp="${CUSTOM_POST_PARAMS_FP}"
   print_info_msg "
 ====================================================================
 Copying the user-defined post flat file specified by CUSTOM_POST_CONFIG_FP
-to the post forecast hour directory (fhr_dir):
+to working directory (DATA):
   CUSTOM_POST_CONFIG_FP = \"${CUSTOM_POST_CONFIG_FP}\"
   CUSTOM_POST_PARAMS_FP = \"${CUSTOM_POST_PARAMS_FP}\"
-  fhr_dir = \"${fhr_dir}\"
+  DATA = \"${DATA}\"
 ===================================================================="
 else
   post_config_fp="${UPP_DIR}/parm/postxconfig-NT-fv3lam_rrfs.txt"
   post_params_fp="${UPP_DIR}/parm/params_grib2_tbl_new"
   print_info_msg "
 ====================================================================
-Copying the default post flat file specified by post_config_fp to the post
-forecast hour directory (fhr_dir):
+Copying the default post flat file specified by post_config_fp to
+working directory (DATA):
   post_config_fp = \"${post_config_fp}\"
   post_params_fp = \"${post_params_fp}\"
-  fhr_dir = \"${fhr_dir}\"
+  DATA = \"${DATA}\"
 ===================================================================="
 fi
 cp ${post_config_fp} ./postxconfig-NT.txt
@@ -260,19 +237,14 @@ export err=$?; err_chk
 #
 #-----------------------------------------------------------------------
 #
-# Move (and rename) the output files from the work directory to their
-# final location (postprd_dir).  Then delete the work directory.
-#
-#-----------------------------------------------------------------------
-#
-#
-#-----------------------------------------------------------------------
+# Move (and rename) the output files from the work directory to COMOUT
 #
 # A separate ${post_fhr} forecast hour variable is required for the post
 # files, since they may or may not be three digits long, depending on the
 # length of the forecast.
 #
 # A separate ${subh_fhr} is needed for subhour post.
+#
 #-----------------------------------------------------------------------
 #
 # get the length of the fhr string to decide format of forecast time stamp.
@@ -329,32 +301,14 @@ elif  [ ${PREDEF_GRID_NAME} = "RRFS_NA_3km" ]; then
   gridname=""
 fi
 net4=$(echo ${NET:0:4} | tr '[:upper:]' '[:lower:]')
-bgdawp=${postprd_dir}/${net4}.t${cyc}z.prslev.f${fhr}.${gridname}grib2
-bgrd3d=${postprd_dir}/${net4}.t${cyc}z.natlev.f${fhr}.${gridname}grib2
-bgifi=${postprd_dir}/${net4}.t${cyc}z.ififip.f${fhr}.${gridname}grib2
+bgdawp=${COMOUT}/${net4}.${cycle}.prslev.f${fhr}.${gridname}grib2
+bgrd3d=${COMOUT}/${net4}.${cycle}.natlev.f${fhr}.${gridname}grib2
+bgifi=${COMOUT}/${net4}.${cycle}.ififip.f${fhr}.${gridname}grib2
 
 wgrib2 PRSLEV.GrbF${post_fhr} -set center 7 -grib ${bgdawp} >>$pgmout 2>>errfile
 wgrib2 NATLEV.GrbF${post_fhr} -set center 7 -grib ${bgrd3d} >>$pgmout 2>>errfile
 if [ -f IFIFIP.GrbF${post_fhr} ]; then
   wgrib2 IFIFIP.GrbF${post_fhr} -set center 7 -grib ${bgifi} >>$pgmout 2>>errfile
-fi
-
-#
-#-----------------------------------------------------------------------
-#   clean forecast netcdf files for saving space
-#-----------------------------------------------------------------------
-#
-if [ ${PREDEF_GRID_NAME} = "RRFS_NA_3km" ]; then
-  indx="00 06 12 18"
-  for i in $indx
-  do
-    if [ "$cyc" == $i ]; then
-      echo "long forecast cycle, keep .nc for bufrsnd" 
-    else
-      rm -f ${dyn_file}
-      rm -f ${phy_file}
-    fi
-  done
 fi
 #
 #-----------------------------------------------------------------------

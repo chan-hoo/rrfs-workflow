@@ -8,19 +8,16 @@
 #
 #-----------------------------------------------------------------------
 #
-
-#
-#-----------------------------------------------------------------------
-#
-# Source the variable definitions file and the bash utility functions.
-#
-#-----------------------------------------------------------------------
-#
-. ${GLOBAL_VAR_DEFNS_FP}
-. $USHrrfs/source_util_funcs.sh
-
 date
 export PS4='+ $SECONDS + '
+#
+#-----------------------------------------------------------------------
+#
+# Source the bash utility functions.
+#
+#-----------------------------------------------------------------------
+#
+. ${HOMErrfs}/ush/source_util_funcs.sh
 #
 #-----------------------------------------------------------------------
 #
@@ -60,54 +57,88 @@ on the output files corresponding to a specified forecast hour.
 #
 #-----------------------------------------------------------------------
 #
-# Set the run directory.
+# Set the NCO standard environment variables (Table 1, pp.4)
 #
 #-----------------------------------------------------------------------
+#
+# Define job and jobid by default for rocoto
+WORKFLOW_MANAGER="${WORKFLOW_MANAGER:-rocoto}"
+if [ "${WORKFLOW_MANAGER}" = "rocoto" ]; then
+  # Flag for shared working directory
+  flag_shared_working_dir="FALSE"
+  if [ "${SCHED}" = "slurm" ]; then
+    job_default=${SLURM_JOB_NAME}
+    pid_default=${SLURM_JOB_ID}
+  elif [ "${SCHED}" = "pbspro" ]; then
+    job_default=${PBS_JOBNAME}
+    pid_default=${PBS_JOBID}
+  else
+    job_default="task"
+    pid_default=$$
+  fi
+  if [ "${flag_shared_working_dir}" = "TRUE" ]; then
+    jobid_default="${job_default}.${PDY}${cyc}"
+  else
+    jobid_default="${job_default}.${pid_default}"
+  fi
+fi
+export job="${job:-${job_default}}"
+export jobid="${jobid:-${jobid_default}}"
+
+# Set environment variables
+export NET="${NET:-${NET_default}}"
+export RUN="${RUN:-${RUN_default}}"
+
+export USHrrfs="${HOMErrfs}/ush"
+export EXECrrfs="${HOMErrfs}/exec"
+export PARMrrfs="${HOMErrfs}/parm"
+export SCRIPTSrrfs="${HOMErrfs}/scripts"
+export LOGDIR="${COMROOT}/output/logs"
+#
+#-----------------------------------------------------------------------
+#
+# Create a temp working directory (DATA) and cd into it.
+#
+#-----------------------------------------------------------------------
+#
+export DATA="${DATA:-${DATAROOT}/${jobid}}"
+mkdir -p $DATA
+cd $DATA
+#
+#-----------------------------------------------------------------------
+#
+# Set COM type definitions.
+#
+#-----------------------------------------------------------------------
+#
+[[ "$WORKFLOW_MANAGER" = "rocoto" ]] && export COMROOT=$COMROOT
+export COMIN="${COMIN:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})}"
+export COMOUT="${COMOUT:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})}"
+
+mkdir -p ${COMOUT}
+
+# Run setpdy to initialize PDYm and PDYp variables
+export cycle="${cycle:-t${cyc}z}"
+setpdy.sh
+. ./PDY
+#
+#-----------------------------------------------------------------------
+#
+# Set other environment variables.
+#
+#-----------------------------------------------------------------------
+#
+#
 # CYCLE_TYPE is to indicate which type of cycle this job for:
 #   spinup: this job is for spin-up cycles
 #   others(prod): this job is for product cycle
 #
-CYCLE_TYPE=${CYCLE_TYPE:-prod}
-if [ ${CYCLE_TYPE} == "spinup" ]; then
-  export run_dir="${CYCLE_DIR}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam_spinup"
-else
-  export run_dir="${CYCLE_DIR}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam"
-fi
-#
-#-----------------------------------------------------------------------
-#
-# If it doesn't already exist, create the directory (postprd_dir) in which 
-# to store post-processing output.  (Note that postprd_dir may already 
-# have been created by this post-processing script run for a different 
-# forecast hour of the same cycle and/or ensemble member.)  Also, create 
-# a temporary work directory (fhr_dir) for the current forecast hour.  
-# fhr_dir will be deleted later after the processing for the current 
-# forecast hour is complete.  Then change location to fhr_dir.
-#
-# Note that there may be a preexisting version of fhr_dir from previous 
-# runs of this script for the current forecast hour (and current cycle), 
-# e.g. from the workflow task that runs this script failing and then being 
-# called again.  Thus, we first make sure preexisting versions are deleted.
-#
-#-----------------------------------------------------------------------
-#
-export COMOUT="${COMOUT_BASEDIR}/$RUN.$PDY/$cyc${SLASH_ENSMEM_SUBDIR}"
-if [ ${CYCLE_TYPE} = "spinup" ]; then
-  COMOUT="${COMOUT_BASEDIR}/$RUN.$PDY/${cyc}_spinup${SLASH_ENSMEM_SUBDIR}"
-fi
-mkdir -p "${COMOUT}"
+export CYCLE_TYPE="${CYCLE_TYPE:-prod}"
+export CYCLE_SUBTYPE="${CYCLE_SUBTYPE:-empty}"
 
-export postprd_dir="${CYCLE_DIR}${SLASH_ENSMEM_SUBDIR}/postprd"
-if [ "${CYCLE_TYPE}" = "spinup" ]; then
-  postprd_dir="${CYCLE_DIR}${SLASH_ENSMEM_SUBDIR}/postprd_spinup"
-fi
-mkdir -p "${postprd_dir}"
-
-export fhr_dir="${postprd_dir}/$fhr"
-check_for_preexist_dir_file "${fhr_dir}" "delete"
-mkdir -p "${fhr_dir}"
-
-cd "${fhr_dir}"
+export CDATE="${CDATE:-${PDY}${cyc}}"
+export SLASH_ENSMEM_SUBDIR="${SLASH_ENSMEM_SUBDIR:-}"
+export fhr="${fhr:-000}"
 #
 #-----------------------------------------------------------------------
 #
@@ -115,14 +146,10 @@ cd "${fhr_dir}"
 #
 #-----------------------------------------------------------------------
 #
-export pgmout="${fhr_dir}/OUTPUT.$$"
+export pgmout="${DATA}/OUTPUT.$$"
 env
 
-$SCRIPTSrrfs/exrrfs_run_post.sh \
-  cdate="${CDATE}" \
-  fhr="${fhr}" \
-  tmmark="${TMMARK}" \
-  cycle_type="${CYCLE_TYPE}"
+$SCRIPTSrrfs/exrrfs_run_post.sh
 export err=$?; err_chk
 
 if [ -e "$pgmout" ]; then

@@ -519,7 +519,7 @@ MODULES_RUN_TASK_FP script.
     &NATIVE_RUN_FCST;
     &NODESIZE_ALL;
     <walltime>{{ wtime_run_fcst }}</walltime>
-    <jobname>&RUN_FCST_TN;</jobname>
+    <jobname>&TAG;_&RUN_FCST_TN;</jobname>
     <join><cyclestr>&LOGDIR;/&RUN_FCST_TN;_@Y@m@d@H.log</cyclestr></join>
 
     <envar><name>HOMErrfs</name><value>&HOMErrfs;</value></envar>
@@ -581,13 +581,12 @@ MODULES_RUN_TASK_FP script.
 	<envar><name>GLOBAL_VAR_DEFNS_FP</name><value>&GLOBAL_VAR_DEFNS_FP;</value></envar>
         <envar><name>SLASH_ENSMEM_SUBDIR</name><value><cyclestr>{{ slash_ensmem_subdir }}</cyclestr></value></envar>
         <envar><name>fhr</name><value>#fhr#</value></envar>
-        <envar><name>TMMARK</name><value>tm00</value></envar>
 
         <dependency>
           <or>
             <taskdep task="&RUN_FCST_TN;"/>
             <and>
-	    <datadep age="05:00"><cyclestr>&COMROOT;/&NET_default;/&model_ver;/@Y@m@d/@H/fcst_fv3lam/log.atm.f#fhr#</cyclestr></datadep>
+	    <datadep age="05:00"><cyclestr>&DATAROOT;/&TAG;_&RUN_FCST_TN;.@Y@m@d@H/log.atm.f#fhr#</cyclestr></datadep>
             </and>
           </or>
         </dependency>
