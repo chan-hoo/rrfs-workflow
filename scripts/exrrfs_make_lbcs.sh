@@ -86,7 +86,7 @@ esac
 #
 #-----------------------------------------------------------------------
 #
-extrn_mdl_staging_dir="${COMIN}/${EXTRN_MDL_NAME_LBCS}/for_LBCS"
+extrn_mdl_staging_dir="${COMOUT}${SLASH_ENSMEM_SUBDIR}/${EXTRN_MDL_NAME_LBCS}/for_LBCS"
 extrn_mdl_var_defns_fp="${extrn_mdl_staging_dir}/${EXTRN_MDL_LBCS_VAR_DEFNS_FN}"
 . ${extrn_mdl_var_defns_fp}
 #

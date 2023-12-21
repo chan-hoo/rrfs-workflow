@@ -89,7 +89,7 @@ esac
 #
 #-----------------------------------------------------------------------
 #
-extrn_mdl_staging_dir="${COMIN}/${EXTRN_MDL_NAME_ICS}/for_ICS"
+extrn_mdl_staging_dir="${COMOUT}${SLASH_ENSMEM_SUBDIR}/${EXTRN_MDL_NAME_ICS}/for_ICS"
 extrn_mdl_var_defns_fp="${extrn_mdl_staging_dir}/${EXTRN_MDL_ICS_VAR_DEFNS_FN}"
 . ${extrn_mdl_var_defns_fp}
 #
@@ -653,6 +653,8 @@ export err=$?; err_chk
 #     -) https://dtcenter.org/sites/default/files/events/2020/20201105-1300p-fv3-gfdl-1.pdf
 #
 cdate_crnt_fhr_m1=$( date --utc --date "$yyyymmdd $hh UTC - 1 hours" "+%Y%m%d%H" )
+yyyymmdd_m1="${cdate_crnt_fhr_m1:0:8}"
+hh_m1="${cdate_crnt_fhr_m1:8:2}"
 if [ $DO_ENS_BLENDING = "TRUE" ] &&
    [ $cdate_crnt_fhr -ge ${FIRST_BLENDED_CYCLE_DATE} ] &&
    [ $EXTRN_MDL_NAME_ICS = "GDASENKF" ]; then
@@ -682,9 +684,9 @@ if [ $DO_ENS_BLENDING = "TRUE" ] &&
    #cp_vrfy gfs_ctrl.nc .
 
    # Required NETCDF files - RRFS
-   cp ${NWGES_BASEDIR}/${cdate_crnt_fhr_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${yyyymmdd}.${hh}0000.fv_core.res.tile1.nc ./fv_core.res.tile1.nc
-   cp ${NWGES_BASEDIR}/${cdate_crnt_fhr_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${yyyymmdd}.${hh}0000.fv_tracer.res.tile1.nc ./fv_tracer.res.tile1.nc
-   cp ${NWGES_BASEDIR}/${cdate_crnt_fhr_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${yyyymmdd}.${hh}0000.fv_core.res.nc ./fv_core.res.nc
+   cp ${COMIN}/${yyyymmdd_m1}/${hh_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${yyyymmdd}.${hh}0000.fv_core.res.tile1.nc ./fv_core.res.tile1.nc
+   cp ${COMIN}/${yyyymmdd_m1}/${hh_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${yyyymmdd}.${hh}0000.fv_tracer.res.tile1.nc ./fv_tracer.res.tile1.nc
+   cp ${COMIN}/${yyyymmdd_m1}/${hh_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${yyyymmdd}.${hh}0000.fv_core.res.nc ./fv_core.res.nc
 
    # Required FIX files
    cp $FIXLAM/${CRES}_grid.tile7.nc .
@@ -717,11 +719,11 @@ if [ $DO_ENS_BLENDING = "TRUE" ] &&
    ${BLENDINGPYTHON} exrrfs_blending_fv3.py $Lx $glb $reg $trcr $blend $use_host_enkf
 
    # Move the remaining RESTART files to INPUT
-   cp ${NWGES_BASEDIR}/${cdate_crnt_fhr_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${yyyymmdd}.${hh}0000.coupler.res             ${DATA}/coupler.res
-   cp ${NWGES_BASEDIR}/${cdate_crnt_fhr_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${yyyymmdd}.${hh}0000.fv_core.res.nc          ${DATA}/fv_core.res.nc
-   cp ${NWGES_BASEDIR}/${cdate_crnt_fhr_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${yyyymmdd}.${hh}0000.fv_srf_wnd.res.tile1.nc ${DATA}/fv_srf_wnd.res.tile1.nc
-   cp ${NWGES_BASEDIR}/${cdate_crnt_fhr_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${yyyymmdd}.${hh}0000.phy_data.nc             ${DATA}/phy_data.nc
-   cp ${NWGES_BASEDIR}/${cdate_crnt_fhr_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${yyyymmdd}.${hh}0000.sfc_data.nc             ${DATA}/sfc_data.nc
+   cp ${COMIN}/${yyyymmdd_m1}/${hh_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${yyyymmdd}.${hh}0000.coupler.res  ${DATA}/coupler.res
+   cp ${COMIN}/${yyyymmdd_m1}/${hh_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${yyyymmdd}.${hh}0000.fv_core.res.nc  ${DATA}/fv_core.res.nc
+   cp ${COMIN}/${yyyymmdd_m1}/${hh_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${yyyymmdd}.${hh}0000.fv_srf_wnd.res.tile1.nc ${DATA}/fv_srf_wnd.res.tile1.nc
+   cp ${COMIN}/${yyyymmdd_m1}/${hh_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${yyyymmdd}.${hh}0000.phy_data.nc  ${DATA}/phy_data.nc
+   cp ${COMIN}/${yyyymmdd_m1}/${hh_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${yyyymmdd}.${hh}0000.sfc_data.nc  ${DATA}/sfc_data.nc
    cp gfs.bndy.nc ${DATA}/gfs_bndy.tile${TILE_RGNL}.000.nc
 fi
 #
@@ -734,13 +736,9 @@ fi
 #-----------------------------------------------------------------------
 #
 if [[ $DO_ENS_BLENDING = "FALSE" || ($DO_ENS_BLENDING = "TRUE" && $cdate_crnt_fhr -lt ${FIRST_BLENDED_CYCLE_DATE}) ]]; then
-  mv out.atm.tile${TILE_RGNL}.nc \
-        ${DATA}/gfs_data.tile${TILE_RGNL}.halo${NH0}.nc
-
-  mv out.sfc.tile${TILE_RGNL}.nc \
-        ${DATA}/sfc_data.tile${TILE_RGNL}.halo${NH0}.nc
-
-  mv gfs.bndy.nc ${DATA}/gfs_bndy.tile${TILE_RGNL}.000.nc
+  mv out.atm.tile${TILE_RGNL}.nc gfs_data.tile${TILE_RGNL}.halo${NH0}.nc
+  mv out.sfc.tile${TILE_RGNL}.nc sfc_data.tile${TILE_RGNL}.halo${NH0}.nc
+  mv gfs.bndy.nc gfs_bndy.tile${TILE_RGNL}.000.nc
 fi
 #
 #-----------------------------------------------------------------------
@@ -749,9 +747,9 @@ fi
 #
 #-----------------------------------------------------------------------
 #
-cp ${DATA}/*.nc ${COMOUT}/.
+cp ${DATA}/*.nc ${COMOUT_ics}/.
 if [ $DO_ENS_BLENDING = "TRUE" ] && [ $cdate_crnt_fhr -ge ${FIRST_BLENDED_CYCLE_DATE} ]; then
-  cp ${DATA}/coupler.res ${COMOUT}/.
+  cp ${DATA}/coupler.res ${COMOUT_ics}/.
 fi
 #
 #-----------------------------------------------------------------------
