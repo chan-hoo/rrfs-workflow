@@ -124,7 +124,7 @@ export LOGDIR="${COMROOT}/output/logs"
 #
 #-----------------------------------------------------------------------
 #
-export DATA=${DATAROOT}/${jobid}
+export DATA="${DATA:-${DATAROOT}/${jobid}}"
 mkdir -p $DATA
 cd $DATA
 #
@@ -135,9 +135,9 @@ cd $DATA
 #-----------------------------------------------------------------------
 #
 [[ "$WORKFLOW_MANAGER" = "rocoto" ]] && export COMROOT=$COMROOT
-export COMIN="$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})"
-export COMOUT="$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})"
-export COMOUTwmo="${COMOUT}/wmo"
+export COMIN="${COMIN:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})}"
+export COMOUT="${COMOUT:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})}"
+export COMOUTwmo="${COMOUTwmo:-${COMOUT}/wmo}"
 
 mkdir -p ${COMIN}
 mkdir -p ${COMOUT}

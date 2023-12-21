@@ -12,9 +12,6 @@ TAG="c0v00"
 MODEL="rrfs_b"
 RUN="rrfs"
 
-#ACCOUNT="your account on hera"
-
-STMP="/scratch2/NCEPDEV/stmp3/${USER}/test_da"
 PTMP="/scratch2/NCEPDEV/stmp3/${USER}/test_da"
 
 EXTRN_MDL_DATE_JULIAN="TRUE"
@@ -26,6 +23,11 @@ EXTRN_MDL_DATE_JULIAN="TRUE"
 PREDEF_GRID_NAME=RRFS_CONUS_3km
 
 . set_rrfs_config_general.sh
+
+################################################################
+#ACCOUNT="your account on hera"
+################################################################
+
 . set_rrfs_config_SDL_VDL_MixEn.sh
 
 #DO_ENSEMBLE="TRUE"

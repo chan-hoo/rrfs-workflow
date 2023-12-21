@@ -49,30 +49,6 @@ hour zero).
 #
 #-----------------------------------------------------------------------
 #
-# Specify the set of valid argument names for this script/function.  Then
-# process the arguments provided to this script/function (which should
-# consist of a set of name-value pairs of the form arg1="value1", etc).
-#
-#-----------------------------------------------------------------------
-#
-valid_args=( \
-"bcgrp" \
-"bcgrpnum" \
-)
-process_args valid_args "$@"
-#
-#-----------------------------------------------------------------------
-#
-# For debugging purposes, print out values of arguments passed to this
-# script.  Note that these will be printed out only if VERBOSE is set to
-# TRUE.
-#
-#-----------------------------------------------------------------------
-#
-print_input_args valid_args
-#
-#-----------------------------------------------------------------------
-#
 # Set machine-dependent parameters.
 #
 #-----------------------------------------------------------------------
@@ -110,7 +86,7 @@ esac
 #
 #-----------------------------------------------------------------------
 #
-extrn_mdl_staging_dir="${CYCLE_DIR}${SLASH_ENSMEM_SUBDIR}/${EXTRN_MDL_NAME_LBCS}/for_LBCS"
+extrn_mdl_staging_dir="${COMIN}/${EXTRN_MDL_NAME_LBCS}/for_LBCS"
 extrn_mdl_var_defns_fp="${extrn_mdl_staging_dir}/${EXTRN_MDL_LBCS_VAR_DEFNS_FN}"
 . ${extrn_mdl_var_defns_fp}
 #

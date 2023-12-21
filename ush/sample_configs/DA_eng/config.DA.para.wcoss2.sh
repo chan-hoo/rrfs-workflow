@@ -19,7 +19,6 @@ envir="test"
 NET="rrfs_a"
 TAG="c0v00"
 
-STMP="/lfs/h2/emc/stmp/${USER}/test_da"
 PTMP="/lfs/h2/emc/ptmp/${USER}/test_da"
 ################################################################
 
