@@ -114,12 +114,12 @@ if [ "${DO_NON_DA_RUN}" = "TRUE" ]; then
 else
   if [ "${CYCLE_TYPE}" = "spinup" ]; then
     if [ "${CYCLE_SUBTYPE}" = "ensinit" ]; then
-      DATAFCST="${DATAROOT}/${TAG}_${RUN_FCST_TN}_ensinit${USCORE_ENSMEM_NAME}"
+      DATAFCST="${DATAROOT}/${TAG}_${RUN_FCST_TN}_ensinit${USCORE_ENSMEM_NAME}.${CDATE}"
     else
-      DATAFCST="${DATAROOT}/${TAG}_${RUN_FCST_TN}_spinup${USCORE_ENSMEM_NAME}"
+      DATAFCST="${DATAROOT}/${TAG}_${RUN_FCST_TN}_spinup${USCORE_ENSMEM_NAME}.${CDATE}"
     fi
   else
-    DATAFCST="${DATAROOT}/${TAG}_${RUN_FCST_TN}_prod${USCORE_ENSMEM_NAME}"    
+    DATAFCST="${DATAROOT}/${TAG}_${RUN_FCST_TN}_prod${USCORE_ENSMEM_NAME}.${CDATE}"
   fi
 fi
 dyn_file="${DATAFCST}/dynf${fhr}.nc"
