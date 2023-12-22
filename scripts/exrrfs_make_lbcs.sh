@@ -73,6 +73,10 @@ case "$MACHINE" in
     APRUN="srun --export=ALL"
     ;;
 
+  "HERCULES")
+    APRUN="srun --export=ALL"
+    ;;
+
   "JET")
     APRUN="srun --export=ALL"
     ;;
