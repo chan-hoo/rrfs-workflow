@@ -126,13 +126,15 @@ NCO environment variables.
 <!ENTITY GLOBAL_VAR_DEFNS_FP      "{{ global_var_defns_fp }}">
 <!ENTITY LOAD_MODULES_RUN_TASK_FP "{{ load_modules_run_task_fp }}">
 
-<!ENTITY OBSPATH                  "{{ obspath }}">
-<!ENTITY OBSPATH_PM               "{{ obspath_pm }}">
-<!ENTITY RRFSE_FG_ROOT            "{{ rrfse_nwges_basedir }}">
+<!ENTITY OBSPATH        "{{ obspath }}">
+<!ENTITY OBSPATH_PM     "{{ obspath_pm }}">
+
+<!ENTITY COMIN_BASEDIR  "&COMROOT;/&NET_default;/&model_ver;/&RUN_default;">
+<!ENTITY COMINrrfse     "{{ cominrrfse }}">
 {%- if is_rtma %}
-<!ENTITY FG_ROOT                  "{{ fg_rootdir }}">
+<!ENTITY FG_ROOT        "{{ fg_rootdir }}">
 {%- else %}
-<!ENTITY FG_ROOT                  "{{ nwges_basedir }}">
+<!ENTITY FG_ROOT        "&COMIN_BASEDIR;">
 {%- endif %}
 
 <!--
@@ -1602,7 +1604,7 @@ MODULES_RUN_TASK_FP script.
              {%- endfor %}
                  </or>
              {% for h in range(1, num_ens_members+1) %}
-             <datadep age="00:00:01:00"><cyclestr offset="-{{ da_cycle_interval_hrs }}:00:00">&RRFSE_FG_ROOT;/@Y@m@d@H/mem{{ "%04d" % h  }}/fcst_fv3lam_spinup/RESTART/</cyclestr><cyclestr>@Y@m@d.@H0000.coupler.res</cyclestr></datadep>
+             <datadep age="00:00:01:00"><cyclestr offset="-{{ da_cycle_interval_hrs }}:00:00">&COMINrrfse;/@Y@m@d@H/mem{{ "%04d" % h  }}/fcst_fv3lam_spinup/RESTART/</cyclestr><cyclestr>@Y@m@d.@H0000.coupler.res</cyclestr></datadep>
              {%- endfor %}
                </and>
                <and> 
@@ -1610,7 +1612,7 @@ MODULES_RUN_TASK_FP script.
                <strneq><left>{{ h }}</left><right><cyclestr>@H</cyclestr></right></strneq>
              {%- endfor %}
              {% for h in range(1, num_ens_members+1) %}
-             <datadep age="00:00:01:00"><cyclestr offset="-{{ da_cycle_interval_hrs }}:00:00">&RRFSE_FG_ROOT;/@Y@m@d@H/mem{{ "%04d" % h  }}/fcst_fv3lam/RESTART/</cyclestr><cyclestr>@Y@m@d.@H0000.coupler.res</cyclestr></datadep>
+             <datadep age="00:00:01:00"><cyclestr offset="-{{ da_cycle_interval_hrs }}:00:00">&COMINrrfse;/@Y@m@d@H/mem{{ "%04d" % h  }}/fcst_fv3lam/RESTART/</cyclestr><cyclestr>@Y@m@d.@H0000.coupler.res</cyclestr></datadep>
              {%- endfor %}
                </and>
              </or>
@@ -1653,7 +1655,6 @@ MODULES_RUN_TASK_FP script.
     <envar><name>SCHED</name><value>&SCHED;</value></envar>
     <envar><name>GLOBAL_VAR_DEFNS_FP</name><value>&GLOBAL_VAR_DEFNS_FP;</value></envar>
     <envar><name>SLASH_ENSMEM_SUBDIR</name><value>{{ slash_ensmem_subdir }}</value></envar>
-    <envar><name>RRFSE_FG_ROOT</name><value><cyclestr>&RRFSE_FG_ROOT;</cyclestr></value></envar>
     <envar><name>CYCLE_TYPE</name><value><cyclestr>spinup</cyclestr></value></envar>
     <envar><name>GSI_TYPE</name><value><cyclestr>ANALYSIS</cyclestr></value></envar>
     <envar><name>MEM_TYPE</name><value><cyclestr>MEMBER</cyclestr></value></envar>
@@ -1689,18 +1690,24 @@ MODULES_RUN_TASK_FP script.
     <jobname>&TAG;_&HYBRID_RADAR_REF_TN;_spinup</jobname>
     <join><cyclestr>&LOGDIR;/&HYBRID_RADAR_REF_TN;spinup_&TAG;@Y@m@d@H.log</cyclestr></join>
 
-    <envar><name>GLOBAL_VAR_DEFNS_FP</name><value>&GLOBAL_VAR_DEFNS_FP;</value></envar>
+    <envar><name>HOMErrfs</name><value>&HOMErrfs;</value></envar>
+    <envar><name>envir</name><value>&envir;</value></envar>
+    <envar><name>model_ver</name><value>&model_ver;</value></envar>
+    <envar><name>NET_default</name><value>&NET_default;</value></envar>
+    <envar><name>RUN_default</name><value>&RUN_default;</value></envar>
+    <envar><name>COMROOT</name><value>&COMROOT;</value></envar>
+    <envar><name>DATAROOT</name><value>&DATAROOT;</value></envar>
+    <envar><name>KEEPDATA</name><value>&KEEPDATA;</value></envar>
     <envar><name>PDY</name><value><cyclestr>@Y@m@d</cyclestr></value></envar>
     <envar><name>cyc</name><value><cyclestr>@H</cyclestr></value></envar>
     <envar><name>CDATE</name><value><cyclestr>@Y@m@d@H</cyclestr></value></envar>
-    <envar><name>CYCLE_DIR</name><value><cyclestr>&CYCLE_BASEDIR;/@Y@m@d@H</cyclestr></value></envar>
-    <envar><name>CYCLE_ROOT</name><value><cyclestr>&CYCLE_BASEDIR;</cyclestr></value></envar>
-    <envar><name>RRFSE_FG_ROOT</name><value><cyclestr>&RRFSE_FG_ROOT;</cyclestr></value></envar>
+    <envar><name>WORKFLOW_MANAGER</name><value>&WORKFLOW_MANAGER;</value></envar>
+    <envar><name>SCHED</name><value>&SCHED;</value></envar>
+    <envar><name>GLOBAL_VAR_DEFNS_FP</name><value>&GLOBAL_VAR_DEFNS_FP;</value></envar>
+    <envar><name>SLASH_ENSMEM_SUBDIR</name><value>{{ slash_ensmem_subdir }}</value></envar>
     <envar><name>CYCLE_TYPE</name><value><cyclestr>spinup</cyclestr></value></envar>
     <envar><name>GSI_TYPE</name><value><cyclestr>ANALYSIS</cyclestr></value></envar>
     <envar><name>MEM_TYPE</name><value><cyclestr>MEMBER</cyclestr></value></envar>
-    <envar><name>SLASH_ENSMEM_SUBDIR</name><value><cyclestr></cyclestr></value></envar>
-    <envar><name>SATBIAS_DIR</name><value><cyclestr>&NWGES_BASEDIR;/satbias</cyclestr></value></envar>
     <envar><name>nens</name><value>30</value></envar>
     <envar><name>OB_TYPE</name><value>radardbz</value></envar>
 
@@ -2659,7 +2666,7 @@ MODULES_RUN_TASK_FP script.
              {%- endfor %}
              </or>
              {% for h in range(1, num_ens_members+1) %}
-             <datadep age="00:00:01:00"><cyclestr offset="-{{ da_cycle_interval_hrs }}:00:00">&RRFSE_FG_ROOT;/@Y@m@d@H/mem{{ "%04d" % h  }}/fcst_fv3lam_spinup/RESTART/</cyclestr><cyclestr>@Y@m@d.@H0000.coupler.res</cyclestr></datadep>
+             <datadep age="00:00:01:00"><cyclestr offset="-{{ da_cycle_interval_hrs }}:00:00">&COMINrrfse;/@Y@m@d@H/mem{{ "%04d" % h  }}/fcst_fv3lam_spinup/RESTART/</cyclestr><cyclestr>@Y@m@d.@H0000.coupler.res</cyclestr></datadep>
              {%- endfor %}
             </and>
             <and> 
@@ -2669,13 +2676,13 @@ MODULES_RUN_TASK_FP script.
              {%- endfor %}
              </or>
              {% for h in range(1, num_ens_members+1) %}
-             <datadep age="00:00:01:00"><cyclestr offset="-{{ da_cycle_interval_hrs }}:00:00">&RRFSE_FG_ROOT;/@Y@m@d@H/mem{{ "%04d" % h  }}/fcst_fv3lam/RESTART/</cyclestr><cyclestr>@Y@m@d.@H0000.coupler.res</cyclestr></datadep>
+             <datadep age="00:00:01:00"><cyclestr offset="-{{ da_cycle_interval_hrs }}:00:00">&COMINrrfse;/@Y@m@d@H/mem{{ "%04d" % h  }}/fcst_fv3lam/RESTART/</cyclestr><cyclestr>@Y@m@d.@H0000.coupler.res</cyclestr></datadep>
              {%- endfor %}
             </and>
            {%- else %} 
             <and>
              {% for h in range(1, num_ens_members+1) %}
-             <datadep age="00:00:01:00"><cyclestr offset="-{{ da_cycle_interval_hrs }}:00:00">&RRFSE_FG_ROOT;/@Y@m@d@H/mem{{ "%04d" % h  }}/fcst_fv3lam/RESTART/</cyclestr><cyclestr>@Y@m@d.@H0000.coupler.res</cyclestr></datadep>
+             <datadep age="00:00:01:00"><cyclestr offset="-{{ da_cycle_interval_hrs }}:00:00">&COMINrrfse;/@Y@m@d@H/mem{{ "%04d" % h  }}/fcst_fv3lam/RESTART/</cyclestr><cyclestr>@Y@m@d.@H0000.coupler.res</cyclestr></datadep>
              {%- endfor %}
             </and>
            {%- endif %} 

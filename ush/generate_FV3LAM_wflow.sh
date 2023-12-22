@@ -424,6 +424,7 @@ settings="\
 #
   'is_rtma':  ${IS_RTMA}
   'fg_rootdir': ${FG_ROOTDIR}
+  'cominrrfse': ${COMINrrfse}
 #
 # Number of physical cores per node for the current machine.
 #
