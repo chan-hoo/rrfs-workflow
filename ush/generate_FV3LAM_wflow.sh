@@ -431,12 +431,6 @@ settings="\
 #
 # Directories and files.
 #
-  'ensctrl_cycle_basedir': ${ENSCTRL_CYCLE_BASEDIR:-}
-  'nwges_basedir': ${NWGES_BASEDIR:-}
-  'ensctrl_nwges_basedir': ${ENSCTRL_NWGES_BASEDIR:-}
-  'ensctrl_comout_basedir': ${ENSCTRL_COMOUT_BASEDIR:-}
-  'ensctrl_comout_dir': ${ENSCTRL_COMOUT_DIR:-}
-  'rrfse_nwges_basedir': ${RRFSE_NWGES_BASEDIR:-}
   'obspath': ${OBSPATH}
   'obspath_pm': ${OBSPATH_PM}
   'global_var_defns_fp': ${GLOBAL_VAR_DEFNS_FP}
@@ -539,7 +533,6 @@ settings="\
   'do_nldn_lght': ${DO_NLDN_LGHT}
   'regional_ensemble_option': ${regional_ensemble_option}
   'radar_ref_thinning': ${RADAR_REF_THINNING}
-  'ensctrl_stmp': ${ENSCTRL_STMP}
   'use_rrfse_ens': ${USE_RRFSE_ENS}
 #
 # cycle start and end date

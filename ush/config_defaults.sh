@@ -297,14 +297,6 @@ MAILCC_default=""
 # used) under this directory.  This variable should be set to a null 
 # string in this file, but it can be specified in the user-specified 
 # workflow configuration file (EXPT_CONFIG_FN).
-#
-# NWGES:
-# The beginning portion of the directory that will contain the output 
-# files from the forecast for a given cycle.  For a cycle 
-# that starts on the date specified by yyyymmdd and hour specified by hh
-# (where yyyymmdd and hh are as described above), the directory in which
-# the forecast output files will be placed will be:
-#   $NWGES/$NET/$envir/$RUN.$yyyymmdd/$hh
 # 
 # Setup default observation locations for data assimilation:
 #
@@ -342,16 +334,12 @@ MAILCC_default=""
 #
 COMINgfs=""
 COMINgefs=""
+COMINrrfse=""
+
 FIXLAM_NCO_BASEDIR=""
-ENSCTRL_STMP="/base/path/of/directory/containing/model/input/and/raw/output/files"
-RRFSE_NWGES_BASEDIR="/base/path/of/directory/containing/model/restart/files"
 RUN_ensctrl="experiment_name"
 TAG="dev_grid"
 PTMP="/base/path/of/directory/containing/postprocessed/output/files"
-ENSCTRL_PTMP="/base/path/of/directory/containing/postprocessed/output/files"
-NWGES="/base/path/of/directory/containing/model/output/files"
-ENSCTRL_NWGES="/base/path/of/directory/containing/model/restart/files"
-RRFSE_NWGES="/base/path/of/directory/containing/model/output/files"
 
 ARCHIVEDIR="/5year/BMC/wrfruc/rrfs_dev1"
 NCARG_ROOT="/apps/ncl/6.5.0-CentOS6.10_64bit_nodap_gnu447"
@@ -1536,7 +1524,7 @@ SAVE_CYCLE_LOG="TRUE"
 #
 # FG_ROOTDIR:
 # First Guess Root Directory, APP will find corresponding first guess
-# fields from this directory. RRFS will find FG under NWGES_BASEDIR,
+# fields from this directory. RRFS will find FG under COMIN/COMOT,
 # but we needs to explicitly specify where to find FG for RTMA.
 # So this parameter only matters for RTMA
 #
@@ -1559,7 +1547,6 @@ OROG_DIR=""
 RUN_TASK_MAKE_SFC_CLIMO="FALSE"
 SFC_CLIMO_DIR=""
 
-#
 NCORES_PER_NODE=24 #Jet default value
 IS_RTMA="FALSE"
 FG_ROOTDIR=""

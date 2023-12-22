@@ -1187,13 +1187,8 @@ check_for_preexist_dir_file "$EXPTDIR" "${PREEXISTING_DIR_METHOD}"
 # FIXcrtm:
 # This is the directory that will contain the coefficient files for CRTM
 #
-# ENSCTRL_CYCLE_BASEDIR:
-# The base directory of the control member for EnKF recentering, in which
-# the directories for the various cycles will be placed.
-#
 #-----------------------------------------------------------------------
 #
-
 FIXam="${EXPTDIR}/fix_am"
 FIXLAM="${EXPTDIR}/fix_lam"
 FIXgsi="${EXPTDIR}/fix_gsi"
@@ -1202,14 +1197,6 @@ FIXuppcrtm="${EXPTDIR}/fix_upp_crtm"
 FIXsmokedust="${EXPTDIR}/fix_smoke_dust"
 FIXbufrsnd="${EXPTDIR}/fix_bufrsnd"
 SST_ROOT="${SST_ROOT}"
-
-ENSCTRL_CYCLE_BASEDIR="${ENSCTRL_STMP}"
-ENSCTRL_COMROOT="${ENSCTRL_PTMP}"
-ENSCTRL_COMOUT_BASEDIR="${ENSCTRL_COMROOT}/prod"
-ENSCTRL_COMOUT_DIR="${ENSCTRL_COMOUT_BASEDIR}/${RUN_ensctrl}.@Y@m@d"
-NWGES_BASEDIR="$NWGES"
-ENSCTRL_NWGES_BASEDIR="${ENSCTRL_NWGES}"
-RRFSE_NWGES_BASEDIR="${RRFSE_NWGES}"
 #
 #-----------------------------------------------------------------------
 #
@@ -2309,7 +2296,6 @@ LIB64dir="$LIB64dir"
 FIXam="$FIXam"
 FIXLAM="$FIXLAM"
 FIXgsm="$FIXgsm"
-NWGES_BASEDIR="${NWGES_BASEDIR}"
 UFS_WTHR_MDL_DIR="${UFS_WTHR_MDL_DIR}"
 UFS_UTILS_DIR="${UFS_UTILS_DIR}"
 SFC_CLIMO_INPUT_DIR="${SFC_CLIMO_INPUT_DIR}"

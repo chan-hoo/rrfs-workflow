@@ -424,7 +424,7 @@ MODULES_RUN_TASK_FP script.
     <envar><name>WORKFLOW_MANAGER</name><value>&WORKFLOW_MANAGER;</value></envar>
     <envar><name>SCHED</name><value>&SCHED;</value></envar>
     <envar><name>GLOBAL_VAR_DEFNS_FP</name><value>&GLOBAL_VAR_DEFNS_FP;</value></envar>
-    <envar><name>SLASH_ENSMEM_SUBDIR</name><value><cyclestr>{{ slash_ensmem_subdir }}</cyclestr></value></envar>
+    <envar><name>SLASH_ENSMEM_SUBDIR</name><value>{{ slash_ensmem_subdir }}</value></envar>
 
     <dependency>
       <and>
@@ -482,7 +482,7 @@ MODULES_RUN_TASK_FP script.
       <envar><name>GLOBAL_VAR_DEFNS_FP</name><value>&GLOBAL_VAR_DEFNS_FP;</value></envar>
       <envar><name>bcgrp</name><value>#bcgrp#</value></envar>
       <envar><name>bcgrpnum</name><value>{{ boundary_proc_group_num }}</value></envar>
-      <envar><name>SLASH_ENSMEM_SUBDIR</name><value><cyclestr>{{ slash_ensmem_subdir }}</cyclestr></value></envar>
+      <envar><name>SLASH_ENSMEM_SUBDIR</name><value>{{ slash_ensmem_subdir }}</value></envar>
 
       <dependency>
         <and>
@@ -536,7 +536,7 @@ MODULES_RUN_TASK_FP script.
     <envar><name>WORKFLOW_MANAGER</name><value>&WORKFLOW_MANAGER;</value></envar>
     <envar><name>SCHED</name><value>&SCHED;</value></envar>
     <envar><name>GLOBAL_VAR_DEFNS_FP</name><value>&GLOBAL_VAR_DEFNS_FP;</value></envar>
-    <envar><name>SLASH_ENSMEM_SUBDIR</name><value><cyclestr>{{ slash_ensmem_subdir }}</cyclestr></value></envar>
+    <envar><name>SLASH_ENSMEM_SUBDIR</name><value>{{ slash_ensmem_subdir }}</value></envar>
     <envar><name>ENSMEM_INDX</name><value><cyclestr>#{{ ensmem_indx_name }}#</cyclestr></value></envar>
     <envar><name>RESTART_HRS</name><value><cyclestr>0</cyclestr></value></envar>
 
@@ -579,7 +579,7 @@ MODULES_RUN_TASK_FP script.
         <envar><name>WORKFLOW_MANAGER</name><value>&WORKFLOW_MANAGER;</value></envar>
         <envar><name>SCHED</name><value>&SCHED;</value></envar>
 	<envar><name>GLOBAL_VAR_DEFNS_FP</name><value>&GLOBAL_VAR_DEFNS_FP;</value></envar>
-        <envar><name>SLASH_ENSMEM_SUBDIR</name><value><cyclestr>{{ slash_ensmem_subdir }}</cyclestr></value></envar>
+        <envar><name>SLASH_ENSMEM_SUBDIR</name><value>{{ slash_ensmem_subdir }}</value></envar>
         <envar><name>fhr</name><value>#fhr#</value></envar>
 
         <dependency>
