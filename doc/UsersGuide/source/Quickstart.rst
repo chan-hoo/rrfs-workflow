@@ -18,23 +18,19 @@ Building RRFS workflow
 
          git clone -b dev-sci https://github.com/NOAA-EMC/rrfs-workflow.git
 
-   #. Check out the external components:
+   #. Check out the external components and build the executables:
+
+      .. code-block:: console
+
+         cd rrfs-workflow/sorc
+         ./app_build.sh --extrn
+
+      This is equal to the following two commands:
 
       .. code-block:: console
 
          cd rrfs-workflow/sorc
          ./manage_externals/checkout_externals
-
-   #. Set up the build environment and build the executables:
-
-      .. code-block:: console
-            
-         ./app_build.sh
-
-      Alternatively, the above command can be followed by the platform (machine) name as follows:
-
-      .. code-block:: console
-            
          ./app_build.sh --platform=<machine>
 
       where ``<machine>`` is ``wcoss2``, ``hera``, ``jet``, ``orion``, or ``hercules``.
@@ -98,6 +94,8 @@ Engineering Test: Non-DA
          USE_CRON_TO_RELAUNCH="TRUE"
          CRON_RELAUNCH_INTVL_MNTS="03"
 
+      .. note::         
+         On Orion, the crontab is available only on ``orion-login-1``.
 
 Engineering Test: DA
 ===============================================
