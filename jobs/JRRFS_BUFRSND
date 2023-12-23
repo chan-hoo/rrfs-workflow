@@ -78,11 +78,12 @@ on the output files corresponding to a specified forecast hour.
 #
 #-----------------------------------------------------------------------
 #
+# Flag for shared working directory
+flag_shared_working_dir="FALSE"
+
 # Define job and jobid by default for rocoto
 WORKFLOW_MANAGER="${WORKFLOW_MANAGER:-rocoto}"
 if [ "${WORKFLOW_MANAGER}" = "rocoto" ]; then
-  # Flag for shared working directory
-  flag_shared_working_dir="FALSE"
   if [ "${SCHED}" = "slurm" ]; then
     job_default=${SLURM_JOB_NAME}
     pid_default=${SLURM_JOB_ID}
@@ -106,6 +107,8 @@ export jobid="${jobid:-${jobid_default}}"
 export NET="${NET:-${NET_default}}"
 export RUN="${RUN:-${RUN_default}}"
 
+export SENDCOM="${SENDCOM:-YES}"
+
 export USHrrfs="${HOMErrfs}/ush"
 export EXECrrfs="${HOMErrfs}/exec"
 export PARMrrfs="${HOMErrfs}/parm"
@@ -121,6 +124,7 @@ export LOGDIR="${COMROOT}/output/logs"
 export DATA="${DATA:-${DATAROOT}/${jobid}}"
 mkdir -p $DATA
 cd $DATA
+mkdir -p $DATA/bufrpost
 #
 #-----------------------------------------------------------------------
 #
@@ -129,10 +133,14 @@ cd $DATA
 #-----------------------------------------------------------------------
 #
 [[ "$WORKFLOW_MANAGER" = "rocoto" ]] && export COMROOT=$COMROOT
-export COMIN="${COMIN:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})}"
-export COMOUT="${COMOUT:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})}"
+export COMIN="${COMIN:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc}${SLASH_ENSMEM_SUBDIR})}"
+export COMOUT="${COMOUT:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc}${SLASH_ENSMEM_SUBDIR})}"
 
 mkdir -p ${COMOUT}
+mkdir -p "${COMOUT}/RESTART"
+mkdir -p "${COMOUT}/INPUT"
+mkdir -p "${COMOUT}/gempak"
+mkdir -p "${COMOUT}/bufr.${cyc}"
 
 # Run setpdy to initialize PDYm and PDYp variables
 export cycle="${cycle:-t${cyc}z}"
@@ -145,67 +153,15 @@ setpdy.sh
 #
 #-----------------------------------------------------------------------
 #
-
-
-
-
-
-#
-#-----------------------------------------------------------------------
-#
-# Set the run directory.
-#
-#-----------------------------------------------------------------------
 # CYCLE_TYPE is to indicate which type of cycle this job for:
 #   spinup: this job is for spin-up cycles
 #   others(prod): this job is for product cycle
 #
-# NWGES_DIR is the directory in which the model restart file will be saved
-#
-CYCLE_TYPE=${CYCLE_TYPE:-prod}
-if [ "${CYCLE_TYPE}" = "spinup" ]; then
-  run_dir="${CYCLE_DIR}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam_spinup"
-  nwges_dir="${NWGES_DIR}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam_spinup"
-else
-  run_dir="${CYCLE_DIR}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam"
-  nwges_dir="${NWGES_DIR}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam"
-fi
+export CYCLE_TYPE="${CYCLE_TYPE:-prod}"
+export CYCLE_SUBTYPE="${CYCLE_SUBTYPE:-empty}"
 
-mkdir -p "${nwges_dir}/RESTART"
-mkdir -p "${nwges_dir}/INPUT"
-#
-#-----------------------------------------------------------------------
-#
-# If it doesn't already exist, create the directory (bufrsnd_dir) in which 
-# to store bufr sounding output.  (Note that bufrsnd_dir may already 
-# have been created by this bufr sounding script run for a different 
-# forecast hour of the same cycle and/or ensemble member.)  Also, create 
-# a temporary work directory (fhr_dir) for the current forecast hour.  
-# fhr_dir will be deleted later after the processing for the current 
-# forecast hour is complete.  Then change location to fhr_dir.
-#
-# Note that there may be a preexisting version of fhr_dir from previous 
-# runs of this script for the current forecast hour (and current cycle), 
-# e.g. from the workflow task that runs this script failing and then being 
-# called again.  Thus, we first make sure preexisting versions are deleted.
-#
-#-----------------------------------------------------------------------
-#
-export COMOUT="${COMOUT_BASEDIR}/$RUN.$PDY/$cyc${SLASH_ENSMEM_SUBDIR}"
-if [ "${CYCLE_TYPE}" = "spinup" ]; then
-  COMOUT="${COMOUT_BASEDIR}/$RUN.$PDY/${cyc}_spinup${SLASH_ENSMEM_SUBDIR}"
-fi
-mkdir -p "${COMOUT}"
-
-export bufrsnd_dir="${CYCLE_DIR}${SLASH_ENSMEM_SUBDIR}/bufrsnd"
-if [ "${CYCLE_TYPE}" = "spinup" ]; then
-  bufrsnd_dir="${CYCLE_DIR}${SLASH_ENSMEM_SUBDIR}/bufrsnd_spinup"
-fi
-mkdir -p "${bufrsnd_dir}"
-
-export fhr_dir="${bufrsnd_dir}"
-
-cd "${bufrsnd_dir}"
+export CDATE="${CDATE:-${PDY}${cyc}}"
+export fhr="01"
 #
 #-----------------------------------------------------------------------
 #
@@ -213,18 +169,10 @@ cd "${bufrsnd_dir}"
 #
 #-----------------------------------------------------------------------
 #
-fhr=01
-
-export pgmout="${bufrsnd_dir}/OUTPUT.$$"
+export pgmout="${DATA}/OUTPUT.$$"
 env
 
-$SCRIPTSrrfs/exrrfs_bufrsnd.sh \
-  cdate="${CDATE}" \
-  run_dir="${run_dir}" \
-  nwges_dir="${nwges_dir}" \
-  fhr="${fhr}" \
-  tmmark="${TMMARK}" \
-  cycle_type="${CYCLE_TYPE}"
+$SCRIPTSrrfs/exrrfs_bufrsnd.sh
 export err=$?; err_chk
 
 if [ -e "$pgmout" ]; then
@@ -237,7 +185,7 @@ fi
 #
 #-----------------------------------------------------------------------
 #
-if [ "${KEEPDATA}" = "NO" ]; then
+if [ "${KEEPDATA}" = "NO" ] && [ "${flag_shared_working_dir}" = "FALSE" ]; then
   rm -rf ${DATA}
 fi
 #

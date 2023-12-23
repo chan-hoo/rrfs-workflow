@@ -1434,7 +1434,7 @@ MODULES_RUN_TASK_FP script.
     <dependency>
       <and>
        <taskdep task="&SAVE_RESTART_TN;_ensinit{{ uscore_ensmem_name }}"/>
-       <datadep age="00:00:00:05"><cyclestr>&ENSCTRL_COMOUT_DIR;/@H_spinup/nonvarcldanl_complete.txt</cyclestr></datadep>
+       <datadep age="00:00:00:05"><cyclestr>&LOGDIR;/nonvarcldanl_complete_@Y@m@d@H.txt</cyclestr></datadep>
       </and>
     </dependency>
 
@@ -1484,7 +1484,7 @@ MODULES_RUN_TASK_FP script.
           <taskdep task="&PREP_CYC_SPINUP_TN;_mem{{ "%04d" % m }}"/>
         {%- endif %}
         {%- endfor %}
-        <datadep age="00:00:00:05"><cyclestr>&ENSCTRL_COMOUT_DIR;/@H_spinup/nonvarcldanl_complete.txt</cyclestr></datadep>
+        <datadep age="00:00:00:05"><cyclestr>&LOGDIR;/nonvarcldanl_complete_@Y@m@d@H</cyclestr></datadep>
       </and>
     </dependency>
   </task>
@@ -3080,8 +3080,7 @@ MODULES_RUN_TASK_FP script.
           <taskdep task="&RUN_ENKFUPDT_TN;"/>
           {%- endif %}
           <or>
-          <datadep age="00:00:00:05"><cyclestr>&ENSCTRL_COMOUT_DIR;/@H/nonvarcldanl_complete.txt</cyclestr></datadep>
-          <datadep age="00:00:00:05"><cyclestr>&ENSCTRL_COMOUT_DIR;/@H_spinup/nonvarcldanl_complete.txt</cyclestr></datadep>
+          <datadep age="00:00:00:05"><cyclestr>&LOGDIR;/nonvarcldanl_complete_@Y@m@d@H</cyclestr></datadep>
           </or>
          </and>
         {% endif %}

@@ -47,35 +47,6 @@ This is the ex-script for the task that runs the bufr-sounding
 #
 #-----------------------------------------------------------------------
 #
-# Specify the set of valid argument names for this script/function.  
-# Then process the arguments provided to this script/function (which 
-# should consist of a set of name-value pairs of the form arg1="value1",
-# etc).
-#
-#-----------------------------------------------------------------------
-#
-valid_args=( \
-"cdate" \
-"run_dir" \
-"nwges_dir" \
-"fhr" \
-"tmmark" \
-"cycle_type" \
-)
-process_args valid_args "$@"
-#
-#-----------------------------------------------------------------------
-#
-# For debugging purposes, print out values of arguments passed to this
-# script.  Note that these will be printed out only if VERBOSE is set to
-# TRUE.
-#
-#-----------------------------------------------------------------------
-#
-print_input_args valid_args
-#
-#-----------------------------------------------------------------------
-#
 # Set environment
 #
 #-----------------------------------------------------------------------
@@ -122,21 +93,13 @@ esac
 #
 #-----------------------------------------------------------------------
 #
-# Remove any files from previous runs.
-#
-#-----------------------------------------------------------------------
-#
-rm -f fort.*
-#
-#-----------------------------------------------------------------------
-#
 # Get the cycle date and hour (in formats of yyyymmdd and hh, respectively)
 # from cdate.
 #
 #-----------------------------------------------------------------------
 #
-yyyymmdd=${cdate:0:8}
-hh=${cdate:8:2}
+yyyymmdd=${CDATE:0:8}
+hh=${CDATE:8:2}
 cyc=$hh
 #
 #-----------------------------------------------------------------------
@@ -146,46 +109,29 @@ cyc=$hh
 #
 #-----------------------------------------------------------------------
 #
-PARMfv3=${FIX_BUFRSND}  #/lfs/h2/emc/lam/noscrub/emc.lam/FIX_RRFS/bufrsnd
-
-DATA=$bufrsnd_dir
-
-mkdir -p $DATA/bufrpost
 cd $DATA/bufrpost
 
-export tmmark=tm00
+export tmmark="tm00"
 
-cp $PARMfv3/${PREDEF_GRID_NAME}/rrfs_profdat regional_profdat
+cp ${FIX_BUFRSND}/${PREDEF_GRID_NAME}/rrfs_profdat regional_profdat
 
 OUTTYP=netcdf
-
 model=FV3S
-
 INCR=01
 FHRLIM=60
 
 let NFILE=1
 
 START_DATE=$(echo "${CDATE}" | sed 's/\([[:digit:]]\{2\}\)$/ \1/')
-
-PDY=$cdate
-
-YYYY=`echo $PDY | cut -c1-4`
-MM=`echo $PDY | cut -c5-6`
-DD=`echo $PDY | cut -c7-8`
-CYCLE=$PDY$cyc
-
-startd=$YYYY$MM$DD
-startdate=$CYCLE
-
-STARTDATE=${YYYY}-${MM}-${DD}_${cyc}:00:00
+yyyy=${CDATE:0:4}
+mm=${CDATE:4:2}
+dd=${CDATE:6:2}
+STARTDATE=${yyyy}-${mm}-${dd}_${cyc}:00:00
 endtime=$(date +%Y%m%d%H -d "${START_DATE} +60 hours")
-
-YYYY=`echo $endtime | cut -c1-4`
-MM=`echo $endtime | cut -c5-6`
-DD=`echo $endtime | cut -c7-8`
-
-FINALDATE=${YYYY}-${MM}-${DD}_${cyc}:00:00
+yyyy=`echo $endtime | cut -c1-4`
+mm=`echo $endtime | cut -c5-6`
+dd=`echo $endtime | cut -c7-8`
+FINALDATE=${yyyy}-${mm}-${dd}_${cyc}:00:00
 
 if [ -e sndpostdone00.tm00 ]; then
   lasthour=`ls -1rt sndpostdone??.tm00 | tail -1 | cut -c 12-13`
@@ -198,9 +144,15 @@ else
 fi
 
 echo starting with fhr $fhr
-
-INPUT_DATA=$run_dir
-########################################################
+if [ "${CYCLE_TYPE}" = "spinup" ]; then
+  if [ "${CYCLE_SUBTYPE}" = "ensinit" ]; then
+    DATAFCST="${DATAROOT}/${TAG}_${RUN_FCST_TN}_ensinit${USCORE_ENSMEM_NAME}.${CDATE}"
+  else
+    DATAFCST="${DATAROOT}/${TAG}_${RUN_FCST_TN}_spinup${USCORE_ENSMEM_NAME}.${CDATE}"
+  fi
+else
+  DATAFCST="${DATAROOT}/${TAG}_${RUN_FCST_TN}_prod${USCORE_ENSMEM_NAME}.${CDATE}"
+fi
 
 while [ $fhr -le $FHRLIM ]
 do
@@ -210,16 +162,15 @@ do
   let fhrold="$fhr - 1"
 
   if [ $model = "FV3S" ]; then
-
-    OUTFILDYN=$INPUT_DATA/dynf0${fhr}.nc
-    OUTFILPHYS=$INPUT_DATA/phyf0${fhr}.nc
+    OUTFILDYN="${DATAFCST}/dynf0${fhr}.nc"
+    OUTFILPHYS="${DATAFCST}/phyf0${fhr}.nc"
 
     icnt=1
 
     # wait for model restart file
     while [ $icnt -lt 1000 ]
     do
-      if [ -s $INPUT_DATA/log.atm.f0${fhr} ]; then
+      if [ -s "${DATAFCST}/log.atm.f0${fhr}" ]; then
         break
       else
         icnt=$((icnt + 1))
@@ -252,12 +203,12 @@ $OUTFILDYN
 $OUTFILPHYS
 EOF
 
+  export pgm="rrfs_bufr.exe"
+  . prep_step
+
   export FORT19="$DATA/bufrpost/regional_profdat"
   export FORT79="$DATA/bufrpost/profilm.c1.${tmmark}"
   export FORT11="itag"
-
-  export pgm="rrfs_bufr.exe"
-  . prep_step
 
   ${APRUNC} ${EXECrrfs}/$pgm >>$pgmout 2>errfile
   export err=$?; err_chk
@@ -285,10 +236,11 @@ cd $DATA
 # SNDP code
 ########################################################
 
-export pgm=rrfs_sndp
+export pgm="rrfs_sndp.exe"
+. prep_step
 
-cp $PARMfv3/regional_sndp.parm.mono $DATA/regional_sndp.parm.mono
-cp $PARMfv3/regional_bufr.tbl $DATA/regional_bufr.tbl
+cp ${FIX_BUFRSND}/regional_sndp.parm.mono $DATA/regional_sndp.parm.mono
+cp ${FIX_BUFRSND}/regional_bufr.tbl $DATA/regional_bufr.tbl
 
 export FORT11="$DATA/regional_sndp.parm.mono"
 export FORT32="$DATA/regional_bufr.tbl"
@@ -302,26 +254,13 @@ nlev=65
 FCST_LEN_HRS=$FHRLIM
 echo "$nlev $NSTAT $FCST_LEN_HRS" > itag
 
-export pgm="rrfs_sndp.exe"
-. prep_step
-
 ${APRUNS} ${EXECrrfs}/$pgm < itag >>$pgmout 2>errfile
 export err=$?; err_chk
 mv errfile errfile_rrfs_sndp
 
-SENDCOM=YES
-
 if [ "${SENDCOM}" = "YES" ]; then
   cp $DATA/class1.bufr $COMOUT/rrfs.t${cyc}z.class1.bufr
   cp $DATA/profilm.c1.${tmmark} ${COMOUT}/rrfs.t${cyc}z.profilm.c1
-fi
-
-# remove bufr file breakout directory in $COMOUT if it exists
-
-if [ -d ${COMOUT}/bufr.${cyc} ]; then
-  cd $COMOUT
-  rm -r bufr.${cyc}
-  cd $DATA
 fi
 
 rm stnmlist_input
@@ -332,20 +271,16 @@ $DATA/class1.bufr
 ${COMOUT}/bufr.${cyc}/bufr
 EOF
 
-mkdir -p ${COMOUT}/bufr.${cyc}
+export pgm="rrfs_stnmlist.exe"
+. prep_step
 
 export FORT20=$DATA/class1.bufr
 export DIRD=${COMOUT}/bufr.${cyc}/bufr
 
 echo "before stnmlist.exe"
-
-export pgm="rrfs_stnmlist.exe"
-. prep_step
-
 ${APRUNS} ${EXECrrfs}/$pgm < stnmlist_input >>$pgmout 2>errfile
 export err=$?; err_chk
 mv errfile errfile_rrfs_stnmlist
-
 echo "after stnmlist.exe"
 
 echo ${COMOUT}/bufr.${cyc} > ${COMOUT}/bufr.${cyc}/bufrloc
@@ -363,17 +298,14 @@ err2=$?
 cp $GEMPAKrrfs/fix/sfrrfs.prm sfrrfs.prm
 err3=$?
 
-mkdir -p $COMOUT/gempak
-
 if [ $err1 -ne 0 -o $err2 -ne 0 -o $err3 -ne 0 ]; then
   err_exit "Missing GEMPAK BUFR tables"
 fi
 
 #  Set input file name.
-INFILE=$COMOUT/rrfs.t${cyc}z.class1.bufr
-export INFILE
+export INFILE=$COMOUT/rrfs.${cycle}.class1.bufr
 
-outfilbase=rrfs_${PDY}${cyc}
+outfilbase=rrfs_${CDATE}
 
 namsnd << EOF > /dev/null
 SNBUFR   = $INFILE

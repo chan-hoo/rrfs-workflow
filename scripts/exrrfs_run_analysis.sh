@@ -1003,9 +1003,9 @@ fi
 #
 #-----------------------------------------------------------------------
 #
-touch ${COMOUT}/gsi_complete.txt
-if [[ ${anav_type} == "radardbz" || ${anav_type} == "conv_dbz" ]]; then
-  touch ${COMOUT}/gsi_complete_radar.txt # for nonvarcldanl
+touch ${LOGDIR}/gsi_complete_${CDATE}.txt
+if [[ "${anav_type}" == "radardbz" || "${anav_type}" == "conv_dbz" ]]; then
+  touch ${COMOUT}/gsi_complete_radar_${CDATE}.txt # for nonvarcldanl
 fi
 #
 #-----------------------------------------------------------------------

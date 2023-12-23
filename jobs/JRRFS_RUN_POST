@@ -61,11 +61,12 @@ on the output files corresponding to a specified forecast hour.
 #
 #-----------------------------------------------------------------------
 #
+# Flag for shared working directory
+flag_shared_working_dir="FALSE"
+
 # Define job and jobid by default for rocoto
 WORKFLOW_MANAGER="${WORKFLOW_MANAGER:-rocoto}"
 if [ "${WORKFLOW_MANAGER}" = "rocoto" ]; then
-  # Flag for shared working directory
-  flag_shared_working_dir="FALSE"
   if [ "${SCHED}" = "slurm" ]; then
     job_default=${SLURM_JOB_NAME}
     pid_default=${SLURM_JOB_ID}
@@ -128,7 +129,6 @@ setpdy.sh
 #
 #-----------------------------------------------------------------------
 #
-#
 # CYCLE_TYPE is to indicate which type of cycle this job for:
 #   spinup: this job is for spin-up cycles
 #   others(prod): this job is for product cycle
@@ -154,6 +154,16 @@ export err=$?; err_chk
 
 if [ -e "$pgmout" ]; then
   cat $pgmout
+fi
+#
+#-----------------------------------------------------------------------
+#
+# Whether or not working directory DATA should be kept.
+#
+#-----------------------------------------------------------------------
+#
+if [ "${KEEPDATA}" = "NO" ] && [ "${flag_shared_working_dir}" = "FALSE" ]; then
+  rm -rf ${DATA}
 fi
 #
 #-----------------------------------------------------------------------
