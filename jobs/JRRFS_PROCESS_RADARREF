@@ -60,11 +60,12 @@ preprocess with FV3 for the specified cycle.
 #
 #-----------------------------------------------------------------------
 #
+# Flag for shared working directory
+flag_shared_working_dir="FALSE"
+
 # Define job and jobid by default for rocoto
 WORKFLOW_MANAGER="${WORKFLOW_MANAGER:-rocoto}"
 if [ "${WORKFLOW_MANAGER}" = "rocoto" ]; then
-  # Flag for shared working directory
-  flag_shared_working_dir="FALSE"
   if [ "${SCHED}" = "slurm" ]; then
     job_default=${SLURM_JOB_NAME}
     pid_default=${SLURM_JOB_ID}
@@ -111,10 +112,13 @@ cd $DATA
 #-----------------------------------------------------------------------
 #
 [[ "$WORKFLOW_MANAGER" = "rocoto" ]] && export COMROOT=$COMROOT
-export COMIN="${COMIN:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})}"
-export COMOUT="${COMOUT:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})}"
+export COMIN="${COMIN:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc}${SLASH_ENSMEM_SUBDIR})}"
+export COMOUT_BASEDIR="${COMOUT_BASEDIR:-$(compath.py -o ${NET}/${model_ver})}"
+export COMOUT="${COMOUT_BASEDIR}/${RUN}.${PDY}/${cyc}${SLASH_ENSMEM_SUBDIR}"
+export COMOUT_gridspec="${COMOUT_BASEDIR}/grid_spec"
 
 mkdir -p ${COMOUT}
+mkdir -p ${COMOUT_gridspec}
 
 # Run setpdy to initialize PDYm and PDYp variables
 export cycle="${cycle:-t${cyc}z}"
@@ -127,50 +131,13 @@ setpdy.sh
 #
 #-----------------------------------------------------------------------
 #
+# CYCLE_TYPE is to indicate which type of cycle this job for:
+#   spinup: this job is for spin-up cycles
+#   others(prod): this job is for product cycle
+#
+export CYCLE_TYPE="${CYCLE_TYPE:-prod}"
 
-
-
-
-
-
-
-
-#
-#-----------------------------------------------------------------------
-#
-# Create the working directory under the cycle directory.
-#
-#-----------------------------------------------------------------------
-#
-if [ "${CYCLE_TYPE}" = "spinup" ]; then
-  export workdir=${CYCLE_DIR}/process_radarref_spinup
-  if [ "${DO_ENSEMBLE}" = "TRUE" ]; then
-    workdir=${CYCLE_DIR}/process_radarref_spinup_enkf
-  fi
-else
-  export workdir=${CYCLE_DIR}/process_radarref
-  if [ "${DO_ENSEMBLE}" = "TRUE" ]; then
-    workdir=${CYCLE_DIR}/process_radarref_enkf
-  fi
-fi
-rm -fr ${workdir}
-mkdir -p ${workdir}
-cd ${workdir}
-#
-export gridspec_dir=${NWGES_BASEDIR}/grid_spec
-#
-#-----------------------------------------------------------------------
-#
-# create COMOUT directory
-#
-#-----------------------------------------------------------------------
-#
-if [ "${CYCLE_TYPE}" = "spinup" ]; then
-  export COMOUT="${COMOUT_BASEDIR}/$RUN.$PDY/${cyc}_spinup"
-else
-  export COMOUT="${COMOUT_BASEDIR}/$RUN.$PDY/${cyc}"
-fi
-mkdir -p "${COMOUT}"
+export CDATE="${CDATE:-${PDY}${cyc}}"
 #
 #-----------------------------------------------------------------------
 #
@@ -178,12 +145,10 @@ mkdir -p "${COMOUT}"
 #
 #-----------------------------------------------------------------------
 #
-export pgmout="${workdir}/OUTPUT.$$"
+export pgmout="${DATA}/OUTPUT.$$"
 env
 
-$SCRIPTSrrfs/exrrfs_process_radarref.sh \
-  CYCLE_DIR="${CYCLE_DIR}" cycle_type="${CYCLE_TYPE}" \
-  RADAR_REF_THINNING="${RADAR_REF_THINNING}"
+$SCRIPTSrrfs/exrrfs_process_radarref.sh
 export err=$?; err_chk
 
 if [ -e "$pgmout" ]; then
@@ -196,7 +161,7 @@ fi
 #
 #-----------------------------------------------------------------------
 #
-if [ "${KEEPDATA}" = "NO" ]; then
+if [ "${KEEPDATA}" = "NO" ] && [ "${flag_shared_working_dir}" = "FALSE" ]; then
   rm -rf ${DATA}
 fi
 #

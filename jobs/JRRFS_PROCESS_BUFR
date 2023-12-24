@@ -60,11 +60,12 @@ the specified cycle.
 #
 #-----------------------------------------------------------------------
 #
+# Flag for shared working directory
+flag_shared_working_dir="FALSE"
+
 # Define job and jobid by default for rocoto
 WORKFLOW_MANAGER="${WORKFLOW_MANAGER:-rocoto}"
 if [ "${WORKFLOW_MANAGER}" = "rocoto" ]; then
-  # Flag for shared working directory
-  flag_shared_working_dir="FALSE"
   if [ "${SCHED}" = "slurm" ]; then
     job_default=${SLURM_JOB_NAME}
     pid_default=${SLURM_JOB_ID}
@@ -111,8 +112,8 @@ cd $DATA
 #-----------------------------------------------------------------------
 #
 [[ "$WORKFLOW_MANAGER" = "rocoto" ]] && export COMROOT=$COMROOT
-export COMIN="${COMIN:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})}"
-export COMOUT="${COMOUT:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})}"
+export COMIN="${COMIN:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc}${SLASH_ENSMEM_SUBDIR})}"
+export COMOUT="${COMOUT:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc}${SLASH_ENSMEM_SUBDIR})}"
 
 mkdir -p ${COMOUT}
 
@@ -127,48 +128,7 @@ setpdy.sh
 #
 #-----------------------------------------------------------------------
 #
-
-
-
-
-
-
-
-
-#
-#-----------------------------------------------------------------------
-#
-# Create the working directory under the cycle directory.
-#
-#-----------------------------------------------------------------------
-#
-if [ "${CYCLE_TYPE}" = "spinup" ]; then
-  export workdir=${CYCLE_DIR}/process_bufr_spinup
-  if [ "${DO_ENSEMBLE}" = "TRUE" ]; then
-    workdir=${CYCLE_DIR}/process_bufr_spinup_enkf
-  fi
-else
-  export workdir=${CYCLE_DIR}/process_bufr
-  if [ "${DO_ENSEMBLE}" = "TRUE" ]; then
-    workdir=${CYCLE_DIR}/process_bufr_enkf
-  fi
-fi
-rm -fr ${workdir}
-mkdir -p ${workdir}
-cd ${workdir}
-#
-#-----------------------------------------------------------------------
-#
-# create COMOUT directory
-#
-#-----------------------------------------------------------------------
-#
-if [ "${CYCLE_TYPE}" = "spinup" ]; then
-  export COMOUT="${COMOUT_BASEDIR}/$RUN.$PDY/${cyc}_spinup"
-else
-  export COMOUT="${COMOUT_BASEDIR}/$RUN.$PDY/${cyc}"
-fi
-mkdir -p "${COMOUT}"
+export CDATE="${CDATE:-${PDY}${cyc}}"
 #
 #-----------------------------------------------------------------------
 #
@@ -176,11 +136,10 @@ mkdir -p "${COMOUT}"
 #
 #-----------------------------------------------------------------------
 #
-export pgmout="${workdir}/OUTPUT.$$"
+export pgmout="${DATA}/OUTPUT.$$"
 env
 
-$SCRIPTSrrfs/exrrfs_process_bufr.sh \
-  CYCLE_DIR="${CYCLE_DIR}"
+$SCRIPTSrrfs/exrrfs_process_bufr.sh
 export err=$?; err_chk
 
 if [ -e "$pgmout" ]; then
@@ -193,7 +152,7 @@ fi
 #
 #-----------------------------------------------------------------------
 #
-if [ "${KEEPDATA}" = "NO" ]; then
+if [ "${KEEPDATA}" = "NO" ] && [ "${flag_shared_working_dir}" = "FALSE" ]; then
   rm -rf ${DATA}
 fi
 #

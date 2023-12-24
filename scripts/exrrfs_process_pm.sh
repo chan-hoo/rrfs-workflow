@@ -48,28 +48,6 @@ pm) preprocess for the specified cycle.
 #
 #-----------------------------------------------------------------------
 #
-# Specify the set of valid argument names for this script/function.  
-# Then process the arguments provided to this script/function (which 
-# should consist of a set of name-value pairs of the form arg1="value1",
-# etc).
-#
-#-----------------------------------------------------------------------
-#
-valid_args=( "CYCLE_DIR" )
-process_args valid_args "$@"
-#
-#-----------------------------------------------------------------------
-#
-# For debugging purposes, print out values of arguments passed to this
-# script.  Note that these will be printed out only if VERBOSE is set to
-# TRUE.
-#
-#-----------------------------------------------------------------------
-#
-print_input_args valid_args
-#
-#-----------------------------------------------------------------------
-#
 # Set environment.
 #
 #-----------------------------------------------------------------------
@@ -103,23 +81,11 @@ esac
 #
 #-----------------------------------------------------------------------
 #
-# Extract from CDATE the starting year, month, day, and hour of the
-# forecast.  These are needed below for various operations.
+# Extract from CDATE the starting year, month, day, and hour of forecast.
 #
 #-----------------------------------------------------------------------
 #
 START_DATE=$(echo "${CDATE}" | sed 's/\([[:digit:]]\{2\}\)$/ \1/')
-YYYYMMDDHH=$(date +%Y%m%d%H -d "${START_DATE}")
-JJJ=$(date +%j -d "${START_DATE}")
-
-YYYY=${YYYYMMDDHH:0:4}
-MM=${YYYYMMDDHH:4:2}
-DD=${YYYYMMDDHH:6:2}
-HH=${YYYYMMDDHH:8:2}
-YYYYMMDD=${YYYYMMDDHH:0:8}
-
-YYJJJHH=$(date +"%y%j%H" -d "${START_DATE}")
-PREYYJJJHH=$(date +"%y%j%H" -d "${START_DATE} 1 hours ago")
 #
 #-----------------------------------------------------------------------
 #
@@ -136,8 +102,7 @@ print_info_msg "$VERBOSE" "fixgriddir is $fixgriddir"
 #
 #-----------------------------------------------------------------------
 #
-BUFR_TABLE=${FIX_GSI}/pm.bufrtable
-cp $BUFR_TABLE .
+cp ${FIX_GSI}/pm.bufrtable .
 #
 #-----------------------------------------------------------------------
 #
@@ -154,7 +119,7 @@ pm_dat=pm.dat
 pm_bufr=pm.bufr
 
 n=0
-checkfile=${OBSPATH_PM}/${AQObs}_${YYYYMMDD}${HH}.dat
+checkfile=${OBSPATH_PM}/${AQObs}_${CDATE}.dat
 while [[ $n -le 2 ]] ; do
   if [ -r "${checkfile}" ] ; then
     print_info_msg "$VERBOSE" "Found ${checkfile}; Use it as observation "
@@ -190,7 +155,7 @@ fi
 #
 cat << EOF > namelist.pm
  &setup
-  analysis_time = "${YYYYMMDDHH}",
+  analysis_time = "${CDATE}",
   infile="${pm_dat}",
   outfile="${pm_bufr}",
   cnt=${pm_cnt},
@@ -206,7 +171,7 @@ EOF
 export pgm="process_pm.exe"
 . prep_step
 
-if [[ "$run_pm" == true ]]; then
+if [ "$run_pm" = true ]; then
   $APRUN ${EXECrrfs}/$pgm >>$pgmout 2>errfile
   export err=$?; err_chk
 fi

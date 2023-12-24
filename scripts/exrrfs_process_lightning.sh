@@ -48,28 +48,6 @@ with FV3 for the specified cycle.
 #
 #-----------------------------------------------------------------------
 #
-# Specify the set of valid argument names for this script/function.  
-# Then process the arguments provided to this script/function (which 
-# should consist of a set of name-value pairs of the form arg1="value1",
-# etc).
-#
-#-----------------------------------------------------------------------
-#
-valid_args=( "CYCLE_DIR" )
-process_args valid_args "$@"
-#
-#-----------------------------------------------------------------------
-#
-# For debugging purposes, print out values of arguments passed to this
-# script.  Note that these will be printed out only if VERBOSE is set to
-# TRUE.
-#
-#-----------------------------------------------------------------------
-#
-print_input_args valid_args
-#
-#-----------------------------------------------------------------------
-#
 # Set environment
 #
 #-----------------------------------------------------------------------
@@ -103,21 +81,11 @@ esac
 #
 #-----------------------------------------------------------------------
 #
-# Extract from CDATE the starting year, month, day, and hour of the
-# forecast.  These are needed below for various operations.
+# Extract from CDATE the starting year, month, day, and hour of forecast.
 #
 #-----------------------------------------------------------------------
 #
 START_DATE=$(echo "${CDATE}" | sed 's/\([[:digit:]]\{2\}\)$/ \1/')
-YYYYMMDDHH=$(date +%Y%m%d%H -d "${START_DATE}")
-JJJ=$(date +%j -d "${START_DATE}")
-
-YYYY=${YYYYMMDDHH:0:4}
-MM=${YYYYMMDDHH:4:2}
-DD=${YYYYMMDDHH:6:2}
-HH=${YYYYMMDDHH:8:2}
-YYYYMMDD=${YYYYMMDDHH:0:8}
-
 YYJJJHH=$(date +"%y%j%H" -d "${START_DATE}")
 PREYYJJJHH=$(date +"%y%j%H" -d "${START_DATE} 1 hours ago")
 #
@@ -127,10 +95,9 @@ PREYYJJJHH=$(date +"%y%j%H" -d "${START_DATE} 1 hours ago")
 #
 #-----------------------------------------------------------------------
 #
-fixdir=$FIX_GSI
 fixgriddir=$FIX_GSI/${PREDEF_GRID_NAME}
 
-print_info_msg "$VERBOSE" "fixdir is $fixdir"
+print_info_msg "$VERBOSE" "fixdir is $FIX_GSI"
 print_info_msg "$VERBOSE" "fixgriddir is $fixgriddir"
 #
 #-----------------------------------------------------------------------
@@ -178,9 +145,7 @@ echo "found GLD360 files: ${filenum}"
 #
 #-----------------------------------------------------------------------
 #
-BUFR_TABLE=${fixdir}/prepobs_prep_RAP.bufrtable
-
-cp $BUFR_TABLE prepobs_prep.bufrtable
+cp ${FIX_GSI}/prepobs_prep_RAP.bufrtable prepobs_prep.bufrtable
 #
 #-----------------------------------------------------------------------
 #
@@ -213,11 +178,11 @@ EOF
 export pgm="process_Lightning.exe"
 . prep_step
 
-if [[ "$run_lightning" == true ]]; then
+if [ "$run_lightning" = true ]; then
   $APRUN ${EXECrrfs}/$pgm < namelist.lightning >>$pgmout 2>errfile
   export err=$?; err_chk
 
-  cp LightningInFV3LAM.dat ${COMOUT}/rrfs.t${HH}z.LightningInFV3LAM_NLDN.bin
+  cp LightningInFV3LAM.dat ${COMOUT}/rrfs.${cycle}.LightningInFV3LAM_NLDN.bin
 fi
 #
 #-----------------------------------------------------------------------

@@ -533,7 +533,6 @@ settings="\
   'do_post_prod': ${DO_POST_PROD}
   'do_nldn_lght': ${DO_NLDN_LGHT}
   'regional_ensemble_option': ${regional_ensemble_option}
-  'radar_ref_thinning': ${RADAR_REF_THINNING}
   'use_rrfse_ens': ${USE_RRFSE_ENS}
 #
 # cycle start and end date

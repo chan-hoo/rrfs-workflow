@@ -106,18 +106,6 @@ print_info_msg "$VERBOSE" "fixgriddir is $fixgriddir"
 #
 #-----------------------------------------------------------------------
 #
-if [ "${CYCLE_TYPE}" = "spinup" ]; then
-  cycle_tag="_spinup"
-else
-  cycle_tag=""
-fi
-if [ "${MEM_TYPE}" = "MEAN" ]; then
-  bkpath=${cycle_dir}/ensmean/fcst_fv3lam${cycle_tag}/INPUT
-else
-  bkpath=${cycle_dir}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam${cycle_tag}/INPUT
-fi
-
-
 if [ "${MEM_TYPE}" = "MEAN" ]; then
   bkpath="${COMIN}/ensmean/INPUT"
 else
@@ -132,7 +120,7 @@ else
   fi
 fi
 
-if [ ${l_cld_uncertainty} == ".true." ]; then
+if [ "${l_cld_uncertainty}" = ".true." ]; then
   # Copy analysis fields into uncertainties - data will be overwritten
   echo "EXREGIONAL_NONVARCLDANL.SH: copy tracer file into uncertainty file "
   cp ${bkpath}/fv_tracer.res.tile1.nc  ${bkpath}/fv_tracer.unc.tile1.nc

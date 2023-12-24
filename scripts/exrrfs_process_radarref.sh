@@ -48,28 +48,6 @@ with FV3 for the specified cycle.
 #
 #-----------------------------------------------------------------------
 #
-# Specify the set of valid argument names for this script/function.  
-# Then process the arguments provided to this script/function (which 
-# should consist of a set of name-value pairs of the form arg1="value1",
-# etc).
-#
-#-----------------------------------------------------------------------
-#
-valid_args=( "CYCLE_DIR" "cycle_type" "RADAR_REF_THINNING" )
-process_args valid_args "$@"
-#
-#-----------------------------------------------------------------------
-#
-# For debugging purposes, print out values of arguments passed to this
-# script.  Note that these will be printed out only if VERBOSE is set to
-# TRUE.
-#
-#-----------------------------------------------------------------------
-#
-print_input_args valid_args
-#
-#-----------------------------------------------------------------------
-#
 # Set environment
 #
 #-----------------------------------------------------------------------
@@ -105,20 +83,15 @@ esac
 #
 #-----------------------------------------------------------------------
 #
-# Extract from CDATE the starting year, month, day, and hour of the
-# forecast.  These are needed below for various operations.
+# Extract from CDATE the starting year, month, day, and hour of forecast.
 #
 #-----------------------------------------------------------------------
 #
 START_DATE=$(echo "${CDATE}" | sed 's/\([[:digit:]]\{2\}\)$/ \1/')
-YYYYMMDDHH=$(date +%Y%m%d%H -d "${START_DATE}")
-JJJ=$(date +%j -d "${START_DATE}")
 
-YYYY=${YYYYMMDDHH:0:4}
-MM=${YYYYMMDDHH:4:2}
-DD=${YYYYMMDDHH:6:2}
-HH=${YYYYMMDDHH:8:2}
-YYYYMMDD=${YYYYMMDDHH:0:8}
+yyyy=${CDATE:0:4}
+mm=${CDATE:4:2}
+dd=${CDATE:6:2}
 #
 #-----------------------------------------------------------------------
 #
@@ -130,16 +103,16 @@ YYYYMMDD=${YYYYMMDDHH:0:8}
 #
 BKTYPE=0
 if [ "${DO_SPINUP}" = "TRUE" ]; then
-  if [ "${cycle_type}" = "spinup" ]; then
+  if [ "${CYCLE_TYPE}" = "spinup" ]; then
     for cyc_start in "${CYCL_HRS_SPINSTART[@]}"; do
-      if [ ${HH} -eq ${cyc_start} ]; then
+      if [ ${cyc} -eq ${cyc_start} ]; then
         BKTYPE=1
       fi
     done
   fi
 else
   for cyc_start in "${CYCL_HRS_PRODSTART[@]}"; do
-    if [ ${HH} -eq ${cyc_start} ]; then
+    if [ ${cyc} -eq ${cyc_start} ]; then
         BKTYPE=1
     fi
   done
@@ -163,13 +136,12 @@ export pgm="process_NSSL_mosaic.exe"
 
 for bigmin in ${RADARREFL_TIMELEVEL[@]}; do
   bigmin=$( printf %2.2i $bigmin )
-  mkdir ${workdir}/${bigmin}
-  cd ${workdir}/${bigmin}
+  mkdir ${DATA}/${bigmin}
+  cd ${DATA}/${bigmin}
 
-  fixdir=$FIX_GSI/
   fixgriddir=$FIX_GSI/${PREDEF_GRID_NAME}
 
-  print_info_msg "$VERBOSE" "fixdir is $fixdir"
+  print_info_msg "$VERBOSE" "fixdir is $FIX_GSI"
   print_info_msg "$VERBOSE" "fixgriddir is $fixgriddir"
   #
   #-----------------------------------------------------------------------
@@ -187,7 +159,7 @@ for bigmin in ${RADARREFL_TIMELEVEL[@]}; do
       for ii in $list_iolayout
       do
         iii=$(printf %4.4i $ii)
-        cp ${gridspec_dir}/fv3_grid_spec.${iii}  fv3sar_grid_spec.nc.${iii}
+        cp ${COMOUT_gridspec}/fv3_grid_spec.${iii}  fv3sar_grid_spec.nc.${iii}
       done
     fi
   fi
@@ -228,20 +200,20 @@ for bigmin in ${RADARREFL_TIMELEVEL[@]}; do
   for min in ${RADARREFL_MINS[@]}
   do
     min=$( printf %2.2i $((bigmin+min)) )
-    echo "Looking for data valid:"${YYYY}"-"${MM}"-"${DD}" "${HH}":"${min}
+    echo "Looking for data valid:"${yyyy}"-"${mm}"-"${dd}" "${cyc}":"${min}
     s=0
     while [[ $s -le 59 ]]; do
       ss=$(printf %2.2i ${s})
-      nsslfile=${NSSL}/*${mrms}_00.50_${YYYY}${MM}${DD}-${HH}${min}${ss}.${obs_appendix}
+      nsslfile=${NSSL}/*${mrms}_00.50_${yyyy}${mm}${dd}-${cyc}${min}${ss}.${obs_appendix}
       if [ -s $nsslfile ]; then
         echo 'Found '${nsslfile}
-        nsslfile1=*${mrms}_*_${YYYY}${MM}${DD}-${HH}${min}*.${obs_appendix}
+        nsslfile1=*${mrms}_*_${yyyy}${mm}${dd}-${cyc}${min}*.${obs_appendix}
         numgrib2=$(ls ${NSSL}/${nsslfile1} | wc -l)
         echo 'Number of GRIB-2 files: '${numgrib2}
         if [ ${numgrib2} -ge 10 ] && [ ! -e filelist_mrms ]; then
           cp ${NSSL}/${nsslfile1} . 
           ls ${nsslfile1} > filelist_mrms 
-          echo 'Creating links for ${YYYY}${MM}${DD}-${HH}${min}'
+          echo 'Creating links for ${yyyy}${mm}${dd}-${cyc}${min}'
         fi
       fi
       ((s+=1))
@@ -259,10 +231,10 @@ for bigmin in ${RADARREFL_TIMELEVEL[@]}; do
   fi
 
   if [ -s filelist_mrms ]; then
-     if [ ${obs_appendix} == "grib2.gz" ]; then
+     if [ "${obs_appendix}" = "grib2.gz" ]; then
         gzip -d *.gz
         mv filelist_mrms filelist_mrms_org
-        ls MergedReflectivityQC_*_${YYYY}${MM}${DD}-${HH}????.grib2 > filelist_mrms
+        ls MergedReflectivityQC_*_${yyyy}${mm}${dd}-${cyc}????.grib2 > filelist_mrms
      fi
 
      numgrib2=$(more filelist_mrms | wc -l)
@@ -278,9 +250,7 @@ for bigmin in ${RADARREFL_TIMELEVEL[@]}; do
   # copy bufr table from fix directory
   #
   #-----------------------------------------------------------------------
-  BUFR_TABLE=${fixdir}/prepobs_prep_RAP.bufrtable
-
-  cp $BUFR_TABLE prepobs_prep.bufrtable
+  cp ${FIX_GSI}/prepobs_prep_RAP.bufrtable prepobs_prep.bufrtable
   #
   #-----------------------------------------------------------------------
   #
@@ -305,7 +275,7 @@ for bigmin in ${RADARREFL_TIMELEVEL[@]}; do
 cat << EOF > namelist.mosaic
    &setup
     tversion=1,
-    analysis_time = ${YYYYMMDDHH},
+    analysis_time = ${CDATE},
     dataPath = './',
     fv3_io_layout_y=${n_iolayouty},
    /
