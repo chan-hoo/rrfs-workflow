@@ -48,33 +48,7 @@ the output files corresponding to a specified forecast hour.
 #
 #-----------------------------------------------------------------------
 #
-# Specify the set of valid argument names for this script/function.  
-# Then process the arguments provided to this script/function (which 
-# should consist of a set of name-value pairs of the form arg1="value1",
-# etc).
-#
-#-----------------------------------------------------------------------
-#
-valid_args=( \
-"cdate" \
-"fhr" \
-"tmmark" \
-)
-process_args valid_args "$@"
-#
-#-----------------------------------------------------------------------
-#
-# For debugging purposes, print out values of arguments passed to this
-# script.  Note that these will be printed out only if VERBOSE is set to
-# TRUE.
-#
-#-----------------------------------------------------------------------
-#
-print_input_args valid_args
-#
-#-----------------------------------------------------------------------
-#
-# Set environment
+# Set environment variables.
 #
 #-----------------------------------------------------------------------
 #
@@ -117,17 +91,6 @@ Run command has not been specified for this machine:
     ;;
 
 esac
-#
-#-----------------------------------------------------------------------
-#
-# Get the cycle date and hour (in formats of yyyymmdd and hh, respectively)
-# from cdate.
-#
-#-----------------------------------------------------------------------
-#
-yyyymmdd=${cdate:0:8}
-hh=${cdate:8:2}
-cyc=$hh
 #
 #-----------------------------------------------------------------------
 #
@@ -191,10 +154,10 @@ fi
 #
 net4=$(echo ${NET:0:4} | tr '[:upper:]' '[:lower:]')
 #
-prslev=${net4}.t${cyc}z.prslev.f${fhr}.${gridname}grib2
-natlev=${net4}.t${cyc}z.natlev.f${fhr}.${gridname}grib2
-ififip=${net4}.t${cyc}z.ififip.f${fhr}.${gridname}grib2
-testbed=${net4}.t${cyc}z.testbed.f${fhr}.${gridname}grib2
+prslev=${net4}.${cycle}.prslev.f${fhr}.${gridname}grib2
+natlev=${net4}.${cycle}.natlev.f${fhr}.${gridname}grib2
+ififip=${net4}.${cycle}.ififip.f${fhr}.${gridname}grib2
+testbed=${net4}.${cycle}.testbed.f${fhr}.${gridname}grib2
 
 # extract the output fields for the testbed
 if [[ ! -z ${TESTBED_FIELDS_FN} ]]; then
@@ -215,18 +178,18 @@ fi
 #Link output for transfer to Jet
 # Should the following be done only if on jet??
 
-# Seems like start_date is the same as "$yyyymmdd $hh", where yyyymmdd
-# and hh are calculated above, i.e. start_date is just cdate but with a
-# space inserted between the dd and hh.  If so, just use "$yyyymmdd $hh"
+# Seems like start_date is the same as "$YYYYMMDD $HH", where YYYYMMDD
+# and HH are calculated above, i.e. start_date is just cdate but with a
+# space inserted between the dd and hh.  If so, just use "$YYYYMMDD $HH"
 # instead of calling sed.
 
-basetime=$( date +%y%j%H%M -d "${yyyymmdd} ${hh}" )
-cp ${postprd_dir}/${prslev} ${COMOUT}/${prslev}
-cp ${postprd_dir}/${natlev} ${COMOUT}/${natlev}
-if [ -f  ${postprd_dir}/${ififip} ]; then
-  cp ${postprd_dir}/${ififip} ${COMOUT}/${ififip}
+basetime=$( date +%y%j%H%M -d "${PDY} ${cyc}" )
+cp ${DATA}/${prslev} ${COMOUT}/${prslev}
+cp ${DATA}/${natlev} ${COMOUT}/${natlev}
+if [ -f  ${DATA}/${ififip} ]; then
+  cp ${DATA}/${ififip} ${COMOUT}/${ififip}
 fi
-cp ${postprd_dir}/${testbed}  ${COMOUT}/${testbed}
+cp ${DATA}/${testbed}  ${COMOUT}/${testbed}
 
 wgrib2 ${COMOUT}/${prslev} -s > ${COMOUT}/${prslev}.idx
 wgrib2 ${COMOUT}/${natlev} -s > ${COMOUT}/${natlev}.idx
@@ -239,11 +202,8 @@ wgrib2 ${COMOUT}/${testbed} -s > ${COMOUT}/${testbed}.idx
 if [ "${DO_PARALLEL_PRDGEN}" = "TRUE" ]; then
   #  parallel run wgrib2 for product generation
   if [ "${PREDEF_GRID_NAME}" = "RRFS_NA_3km" ]; then
-    DATA=$postprd_dir
-    export DATA=$postprd_dir
     DATAprdgen=$DATA/prdgen_${fhr}
     mkdir $DATAprdgen
-    USHrrfs=$USHrrfs/prdgen
 
     wgrib2 ${COMOUT}/rrfs.t${cyc}z.prslev.f${fhr}.grib2 >& $DATAprdgen/prslevf${fhr}.txt
 
@@ -271,7 +231,7 @@ if [ "${DO_PARALLEL_PRDGEN}" = "TRUE" ]; then
       for task in $(seq ${tasks[count]})
       do
         mkdir -p $DATAprdgen/prdgen_${domain}_${task}
-        echo "$USHrrfs/rrfs_prdgen_subpiece.sh $fhr $cyc $task $domain ${DATAprdgen} ${COMOUT} &" >> $DATAprdgen/poescript_${fhr}
+        echo "$USHrrfs/prdgen/rrfs_prdgen_subpiece.sh $fhr $cyc $task $domain ${DATAprdgen} ${COMOUT} &" >> $DATAprdgen/poescript_${fhr}
       done
       count=$count+1
     done
@@ -292,19 +252,19 @@ if [ "${DO_PARALLEL_PRDGEN}" = "TRUE" ]; then
     do
       for task in $(seq ${tasks[count]})
       do
-        cat $DATAprdgen/prdgen_${domain}_${task}/${domain}_${task}.grib2 >> ${COMOUT}/rrfs.t${cyc}z.prslev.f${fhr}.${domain}.grib2
+        cat $DATAprdgen/prdgen_${domain}_${task}/${domain}_${task}.grib2 >> ${COMOUT}/rrfs.${cycle}.prslev.f${fhr}.${domain}.grib2
       done
-      wgrib2 ${COMOUT}/rrfs.t${cyc}z.prslev.f${fhr}.${domain}.grib2 -s > ${COMOUT}/rrfs.t${cyc}z.prslev.f${fhr}.${domain}.grib2.idx
+      wgrib2 ${COMOUT}/rrfs.${cycle}.prslev.f${fhr}.${domain}.grib2 -s > ${COMOUT}/rrfs.${cycle}.prslev.f${fhr}.${domain}.grib2.idx
       count=$count+1
     done
 
     # Rename conus grib2 files to conus_3km
-    mv ${COMOUT}/rrfs.t${cyc}z.prslev.f${fhr}.conus.grib2 ${COMOUT}/rrfs.t${cyc}z.prslev.f${fhr}.conus_3km.grib2
-    mv ${COMOUT}/rrfs.t${cyc}z.prslev.f${fhr}.conus.grib2.idx ${COMOUT}/rrfs.t${cyc}z.prslev.f${fhr}.conus_3km.grib2.idx
+    mv ${COMOUT}/rrfs.${cycle}.prslev.f${fhr}.conus.grib2 ${COMOUT}/rrfs.${cycle}.prslev.f${fhr}.conus_3km.grib2
+    mv ${COMOUT}/rrfs.${cycle}.prslev.f${fhr}.conus.grib2.idx ${COMOUT}/rrfs.${cycle}.prslev.f${fhr}.conus_3km.grib2.idx
 
     # create testbed files on 3-km CONUS grid
-    prslev_conus=${net4}.t${cyc}z.prslev.f${fhr}.conus_3km.grib2
-    testbed_conus=${net4}.t${cyc}z.testbed.f${fhr}.conus_3km.grib2
+    prslev_conus=${net4}.${cycle}.prslev.f${fhr}.conus_3km.grib2
+    testbed_conus=${net4}.${cycle}.testbed.f${fhr}.conus_3km.grib2
     if [[ ! -z ${TESTBED_FIELDS_FN} ]]; then
       if [[ -f ${FIX_UPP}/${TESTBED_FIELDS_FN} ]]; then
         wgrib2 ${COMOUT}/${prslev_conus} | grep -F -f ${FIX_UPP}/${TESTBED_FIELDS_FN} | wgrib2 -i -grib ${COMOUT}/${testbed_conus} ${COMOUT}/${prslev_conus}
@@ -318,7 +278,7 @@ if [ "${DO_PARALLEL_PRDGEN}" = "TRUE" ]; then
   fi
 
   rm -fr $DATAprdgen
-  rm -f $DATA/*.t${cyc}z.*.f${fhr}.*.grib2
+  rm -f $DATA/*.${cycle}.*.f${fhr}.*.grib2
 
 else
   #
@@ -381,8 +341,6 @@ else
     done
   fi
 fi  # block for parallel or series wgrib2 runs.
-
-rm -rf ${fhr_dir}
 #
 #-----------------------------------------------------------------------
 #

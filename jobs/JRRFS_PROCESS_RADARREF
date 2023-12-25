@@ -107,6 +107,20 @@ cd $DATA
 #
 #-----------------------------------------------------------------------
 #
+# Set other environment variables.
+#
+#-----------------------------------------------------------------------
+#
+# CYCLE_TYPE is to indicate which type of cycle this job for:
+#   spinup: this job is for spin-up cycles
+#   others(prod): this job is for product cycle
+#
+export CYCLE_TYPE="${CYCLE_TYPE:-prod}"
+
+export CDATE="${CDATE:-${PDY}${cyc}}"
+#
+#-----------------------------------------------------------------------
+#
 # Set COM type definitions.
 #
 #-----------------------------------------------------------------------
@@ -124,20 +138,6 @@ mkdir -p ${COMOUT_gridspec}
 export cycle="${cycle:-t${cyc}z}"
 setpdy.sh
 . ./PDY
-#
-#-----------------------------------------------------------------------
-#
-# Set other environment variables.
-#
-#-----------------------------------------------------------------------
-#
-# CYCLE_TYPE is to indicate which type of cycle this job for:
-#   spinup: this job is for spin-up cycles
-#   others(prod): this job is for product cycle
-#
-export CYCLE_TYPE="${CYCLE_TYPE:-prod}"
-
-export CDATE="${CDATE:-${PDY}${cyc}}"
 #
 #-----------------------------------------------------------------------
 #

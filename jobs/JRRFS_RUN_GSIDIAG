@@ -60,11 +60,12 @@ the specified cycle.
 #
 #-----------------------------------------------------------------------
 #
+# Flag for shared working directory
+flag_shared_working_dir="FALSE"
+
 # Define job and jobid by default for rocoto
 WORKFLOW_MANAGER="${WORKFLOW_MANAGER:-rocoto}"
 if [ "${WORKFLOW_MANAGER}" = "rocoto" ]; then
-  # Flag for shared working directory
-  flag_shared_working_dir="FALSE"
   if [ "${SCHED}" = "slurm" ]; then
     job_default=${SLURM_JOB_NAME}
     pid_default=${SLURM_JOB_ID}
@@ -106,13 +107,28 @@ cd $DATA
 #
 #-----------------------------------------------------------------------
 #
+# Set other environment variables.
+#
+#-----------------------------------------------------------------------
+#
+# CYCLE_TYPE is to indicate which type of cycle this job for:
+#   spinup: this job is for spin-up cycles
+#   others(prod): this job is for product cycle
+#
+export CYCLE_TYPE="${CYCLE_TYPE:-prod}"
+export GSI_TYPE="${GSI_TYPE:-empty}"
+
+export CDATE="${CDATE:-${PDY}${cyc}}"
+#
+#-----------------------------------------------------------------------
+#
 # Set COM type definitions.
 #
 #-----------------------------------------------------------------------
 #
 [[ "$WORKFLOW_MANAGER" = "rocoto" ]] && export COMROOT=$COMROOT
 export COMIN="${COMIN:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})}"
-export COMOUT="${COMOUT:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})}"
+export COMOUT="${COMOUT:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc}${SLASH_ENSMEM_SUBDIR})}"
 
 mkdir -p ${COMOUT}
 
@@ -120,67 +136,15 @@ mkdir -p ${COMOUT}
 export cycle="${cycle:-t${cyc}z}"
 setpdy.sh
 . ./PDY
-#
-#-----------------------------------------------------------------------
-#
-# Set other environment variables.
-#
-#-----------------------------------------------------------------------
-#
 
-
-
-
-
-
-
-#
-#-----------------------------------------------------------------------
-#
-# Create the working directory under the cycle directory.
-#
-#-----------------------------------------------------------------------
-# CYCLE_TYPE is to indicate which type of cycle this job for:
-#   spinup: this job is for spin-up cycles
-#   others(prod): this job is for product cycle
-#
-export CYCLE_TYPE=${CYCLE_TYPE:-prod}
-
-if [ "${CYCLE_TYPE}" = "spinup" ]; then
-  analworkname="_gsi_spinup"
-else
-  analworkname="_gsi"
-fi
-analworkdir_conv_dbz="${CYCLE_DIR}/anal_conv_dbz${analworkname}"
+analworkdir_conv_dbz="${DATA}/anal_conv_dbz"
 if [ -r ${analworkdir_conv_dbz} ] ; then
   export analworkdir_conv="${analworkdir_conv_dbz}"
   export analworkdir_dbz="${analworkdir_conv_dbz}"
 else
-  export analworkdir_conv="${CYCLE_DIR}/anal_conv${analworkname}"
-  export analworkdir_dbz="${CYCLE_DIR}/anal_radardbz${analworkname}"
+  export analworkdir_conv="${DATA}/anal_conv"
+  export analworkdir_dbz="${DATA}/anal_radardbz"
 fi
-
-if [ ! -d "${SATBIAS_DIR}" ]; then
-  echo "making satbias_dir directory for cycling bias correction files" 
-  mkdir -p ${SATBIAS_DIR}
-fi
-#
-#-----------------------------------------------------------------------
-#
-# create COMOUT directory
-#
-#-----------------------------------------------------------------------
-#
-if [ "${CYCLE_TYPE}" = "spinup" ]; then
-  export COMOUT="${COMOUT_BASEDIR}/$RUN.$PDY/${cyc}_spinup${SLASH_ENSMEM_SUBDIR}"
-else
-  if [ "${MEM_TYPE}" = "MEAN" ]; then
-    export COMOUT="${COMOUT_BASEDIR}/$RUN.$PDY/$cyc/ensmean"
-  else
-    export COMOUT="${COMOUT_BASEDIR}/$RUN.$PDY/${cyc}${SLASH_ENSMEM_SUBDIR}"
-  fi
-fi
-mkdir -p "${COMOUT}"
 #
 #-----------------------------------------------------------------------
 #
@@ -191,10 +155,7 @@ mkdir -p "${COMOUT}"
 export pgmout="${DATA}/OUTPUT.$$"
 env
 
-$SCRIPTSrrfs/exrrfs_run_gsidiag.sh \
-             gsi_type="${GSI_TYPE}" \
-             mem_type="${MEM_TYPE}" \
-             satbias_dir="${SATBIAS_DIR}"
+$SCRIPTSrrfs/exrrfs_run_gsidiag.sh
 export err=$?; err_chk
 
 if [ -e "$pgmout" ]; then
@@ -207,7 +168,7 @@ fi
 #
 #-----------------------------------------------------------------------
 #
-if [ "${KEEPDATA}" = "NO" ]; then
+if [ "${KEEPDATA}" = "NO" ] && [ "${flag_shared_working_dir}" = "FALSE" ]; then
   rm -rf ${DATA}
 fi
 #

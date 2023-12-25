@@ -106,26 +106,6 @@ cd $DATA
 #
 #-----------------------------------------------------------------------
 #
-# Set COM type definitions.
-#
-#-----------------------------------------------------------------------
-#
-[[ "$WORKFLOW_MANAGER" = "rocoto" ]] && export COMROOT=$COMROOT
-export COMIN="${COMIN:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc}${SLASH_ENSMEM_SUBDIR})}"
-export COMOUT_BASEDIR="${COMOUT_BASEDIR:-$(compath.py -o ${NET}/${model_ver})}"
-export COMOUT="${COMOUT_BASEDIR}/${RUN}.${PDY}/${cyc}${SLASH_ENSMEM_SUBDIR}"
-export COMOUT_gridspec="${COMOUT_BASEDIR}/grid_spec"
-
-mkdir -p ${COMOUT}
-mkdir -p ${COMOUT_gridspec}
-
-# Run setpdy to initialize PDYm and PDYp variables
-export cycle="${cycle:-t${cyc}z}"
-setpdy.sh
-. ./PDY
-#
-#-----------------------------------------------------------------------
-#
 # Set other environment variables.
 #
 #-----------------------------------------------------------------------
@@ -139,6 +119,30 @@ export CYCLE_SUBTYPE="${CYCLE_SUBTYPE:-empty}"
 export MEM_TYPE="${MEM_TYPE:-empty}"
 
 export CDATE="${CDATE:-${PDY}${cyc}}"
+#
+#-----------------------------------------------------------------------
+#
+# Set COM type definitions.
+#
+#-----------------------------------------------------------------------
+#
+[[ "$WORKFLOW_MANAGER" = "rocoto" ]] && export COMROOT=$COMROOT
+export COMIN="${COMIN:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc}${SLASH_ENSMEM_SUBDIR})}"
+export COMOUT_BASEDIR="${COMOUT_BASEDIR:-$(compath.py -o ${NET}/${model_ver})}"
+if [ "${MEM_TYPE}" = "MEAN" ]; then
+  export COMOUT="${COMOUT_BASEDIR}/${RUN}.${PDY}/${cyc}/ensmean"
+else
+  export COMOUT="${COMOUT_BASEDIR}/${RUN}.${PDY}/${cyc}${SLASH_ENSMEM_SUBDIR}"
+fi
+export COMOUT_gridspec="${COMOUT_BASEDIR}/grid_spec"
+
+mkdir -p ${COMOUT}
+mkdir -p ${COMOUT_gridspec}
+
+# Run setpdy to initialize PDYm and PDYp variables
+export cycle="${cycle:-t${cyc}z}"
+setpdy.sh
+. ./PDY
 #
 #-----------------------------------------------------------------------
 #

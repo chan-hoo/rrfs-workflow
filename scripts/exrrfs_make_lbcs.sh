@@ -399,19 +399,19 @@ list file has not specified for this external LBC model (EXTRN_MDL_NAME_LBCS):
 # hour of the the external model forecast.  Then add the forecast hour
 # to it to get a date and time corresponding to the current forecast time.
 #
-  yyyymmdd="${EXTRN_MDL_CDATE:0:8}"
-  mm="${EXTRN_MDL_CDATE:4:2}"
-  dd="${EXTRN_MDL_CDATE:6:2}"
-  hh="${EXTRN_MDL_CDATE:8:2}"
+  YYYYMMDD="${EXTRN_MDL_CDATE:0:8}"
+  MM="${EXTRN_MDL_CDATE:4:2}"
+  DD="${EXTRN_MDL_CDATE:6:2}"
+  HH="${EXTRN_MDL_CDATE:8:2}"
 
-  cdate_crnt_fhr=$( date --utc --date "${yyyymmdd} ${hh} UTC + ${fhr} hours" "+%Y%m%d%H" )
+  cdate_crnt_fhr=$( date --utc --date "${YYYYMMDD} ${HH} UTC + ${fhr} hours" "+%Y%m%d%H" )
 #
 # Get the month, day, and hour corresponding to the current forecast time
 # of the the external model.
 #
-  mm="${cdate_crnt_fhr:4:2}"
-  dd="${cdate_crnt_fhr:6:2}"
-  hh="${cdate_crnt_fhr:8:2}"
+  MM="${cdate_crnt_fhr:4:2}"
+  DD="${cdate_crnt_fhr:6:2}"
+  HH="${cdate_crnt_fhr:8:2}"
 #
 # Build the FORTRAN namelist file that chgres_cube will read in.
 #
@@ -445,9 +445,9 @@ list file has not specified for this external LBC model (EXTRN_MDL_NAME_LBCS):
  'data_dir_input_grid': ${extrn_mdl_staging_dir},
  'atm_files_input_grid': ${fn_atm},
  'grib2_file_input_grid': \"${fn_grib2}\",
- 'cycle_mon': $((10#${mm})),
- 'cycle_day': $((10#${dd})),
- 'cycle_hour': $((10#${hh})),
+ 'cycle_mon': $((10#${MM})),
+ 'cycle_day': $((10#${DD})),
+ 'cycle_hour': $((10#${HH})),
  'convert_atm': True,
  'regional': 2,
  'halo_bndy': $((10#${NH4})),

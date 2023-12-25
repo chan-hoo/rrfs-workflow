@@ -48,34 +48,7 @@ with FV3 for the specified cycle.
 #
 #-----------------------------------------------------------------------
 #
-# Specify the set of valid argument names for this script/function.  
-# Then process the arguments provided to this script/function (which 
-# should consist of a set of name-value pairs of the form arg1="value1",
-# etc).
-#
-#-----------------------------------------------------------------------
-# 
-valid_args=( \
-"cycle_dir" \
-"cycle_type" \
-"mem_type" \
-"slash_ensmem_subdir" \
-)
-process_args valid_args "$@"
-#
-#-----------------------------------------------------------------------
-#
-# For debugging purposes, print out values of arguments passed to this
-# script.  Note that these will be printed out only if VERBOSE is set to
-# TRUE.
-#
-#-----------------------------------------------------------------------
-#
-print_input_args valid_args
-#
-#-----------------------------------------------------------------------
-#
-# Load modules.
+# Set environment variables.
 #
 #-----------------------------------------------------------------------
 #
@@ -110,32 +83,6 @@ esac
 #
 #-----------------------------------------------------------------------
 #
-# Extract from CDATE the starting year, month, day, and hour of the
-# forecast.  These are needed below for various operations.
-#
-#-----------------------------------------------------------------------
-#
-START_DATE=$(echo "${CDATE}" | sed 's/\([[:digit:]]\{2\}\)$/ \1/')
-YYYYMMDDHH=$(date +%Y%m%d%H -d "${START_DATE}")
-JJJ=$(date +%j -d "${START_DATE}")
-
-YYYY=${YYYYMMDDHH:0:4}
-MM=${YYYYMMDDHH:4:2}
-DD=${YYYYMMDDHH:6:2}
-HH=${YYYYMMDDHH:8:2}
-YYYYMMDD=${YYYYMMDDHH:0:8}
-#
-#-----------------------------------------------------------------------
-#
-# Define fix directory
-#
-#-----------------------------------------------------------------------
-#
-fixgriddir=$FIX_GSI/${PREDEF_GRID_NAME}
-print_info_msg "$VERBOSE" "fixgriddir is $fixgriddir"
-#
-#-----------------------------------------------------------------------
-#
 # Prepare files and folders
 #
 #-----------------------------------------------------------------------
@@ -145,26 +92,19 @@ mkdir -p GSI_diags
 mkdir -p obs
 mkdir -p geoval
 
-# Define either "spinup" or "prod" cycle
-if [ "${cycle_type}" = "spinup" ]; then
-  cycle_tag="_spinup"
-else
-  cycle_tag=""
-fi
-
 # Create folders under COMOUT
 mkdir -p ${COMOUT}/jedienvar_ioda
 mkdir -p ${COMOUT}/jedienvar_ioda/anal_gsi
 mkdir -p ${COMOUT}/jedienvar_ioda/jedi_obs
 
 # Specify the path of the GSI Analysis working folder
-gsidiag_path=${cycle_dir}${slash_ensmem_subdir}/anal_conv_gsi${cycle_tag}
+gsidiag_path=${COMIN}
 
 # Copy GSI ncdiag files to COMOUT 
 cp ${gsidiag_path}/ncdiag* ${COMOUT}/jedienvar_ioda/anal_gsi/
 
 # Copy only ncdiag first guess files to the workfing folder
-cp ${COMOUT}/jedienvar_ioda/anal_gsi/*ges* ${workdir}/GSI_diags
+cp ${COMOUT}/jedienvar_ioda/anal_gsi/*ges* ${DATA}/GSI_diags
 #
 #-----------------------------------------------------------------------
 #
@@ -172,7 +112,7 @@ cp ${COMOUT}/jedienvar_ioda/anal_gsi/*ges* ${workdir}/GSI_diags
 #
 #-----------------------------------------------------------------------
 # 
-cd ${workdir}/GSI_diags
+cd ${DATA}/GSI_diags
 fl=`ls -1 ncdiag*`
 
 for ifl in $fl
@@ -190,7 +130,7 @@ done
 #
 #-----------------------------------------------------------------------
 #  
-cd ${workdir}
+cd ${DATA}
 
 # Specify the IODA python script
 IODACDir=/scratch1/BMC/zrtrr/llin/220601_jedi/ioda-bundle_20220530/ioda-bundle/build/bin
@@ -200,14 +140,14 @@ export PYTHONPATH=/scratch1/BMC/zrtrr/llin/220501_emc_reg_wflow/dr-jedi-ioda/iod
 
 # Running the python script
 PYTHONEXE=/scratch1/NCEPDEV/da/python/hpc-stack/miniconda3/core/miniconda3/4.6.14/envs/iodaconv/bin/python
-${PYTHONEXE} ${IODACDir}/proc_gsi_ncdiag.py -o $workdir/obs -g $workdir/geoval $workdir/GSI_diags
+${PYTHONEXE} ${IODACDir}/proc_gsi_ncdiag.py -o $DATA/obs -g $DATA/geoval $DATA/GSI_diags
 export err=$?
 if [ $err -ne 0 ]; then
   err_exit "Call to executable to run No Var Cloud Analysis returned with nonzero exit code."
 fi
 
 # Copy IODA obs files to COMOUT
-cp ${workdir}/obs/*nc4 ${COMOUT}/jedienvar_ioda/jedi_obs/
+cp ${DATA}/obs/*nc4 ${COMOUT}/jedienvar_ioda/jedi_obs/
 
 #
 #-----------------------------------------------------------------------
@@ -216,7 +156,7 @@ cp ${workdir}/obs/*nc4 ${COMOUT}/jedienvar_ioda/jedi_obs/
 # 
 #-----------------------------------------------------------------------
 #
-touch jedienvar_ioda_complete.txt
+touch ${LOGDIR}/jedienvar_ioda_complete_${CDATE}.txt
 #
 #-----------------------------------------------------------------------
 #

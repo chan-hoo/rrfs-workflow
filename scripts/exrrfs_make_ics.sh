@@ -517,20 +517,20 @@ esac
 #
 #-----------------------------------------------------------------------
 #
-yyyymmdd="${EXTRN_MDL_CDATE:0:8}"
-mm="${EXTRN_MDL_CDATE:4:2}"
-dd="${EXTRN_MDL_CDATE:6:2}"
-hh="${EXTRN_MDL_CDATE:8:2}"
+YYYYMMDD="${EXTRN_MDL_CDATE:0:8}"
+MM="${EXTRN_MDL_CDATE:4:2}"
+DD="${EXTRN_MDL_CDATE:6:2}"
+HH="${EXTRN_MDL_CDATE:8:2}"
 
 fhr="${EXTRN_MDL_ICS_OFFSET_HRS}"
-cdate_crnt_fhr=$( date --utc --date "${yyyymmdd} ${hh} UTC + ${fhr} hours" "+%Y%m%d%H" )
+cdate_crnt_fhr=$( date --utc --date "${YYYYMMDD} ${HH} UTC + ${fhr} hours" "+%Y%m%d%H" )
 #
 # Get the month, day, and hour corresponding to the current forecast time
 # of the the external model.
 #
-mm="${cdate_crnt_fhr:4:2}"
-dd="${cdate_crnt_fhr:6:2}"
-hh="${cdate_crnt_fhr:8:2}"
+MM="${cdate_crnt_fhr:4:2}"
+DD="${cdate_crnt_fhr:6:2}"
+HH="${cdate_crnt_fhr:8:2}"
 #
 #-----------------------------------------------------------------------
 #
@@ -567,9 +567,9 @@ settings="
  'atm_files_input_grid': ${fn_atm},
  'sfc_files_input_grid': ${fn_sfc},
  'grib2_file_input_grid': \"${fn_grib2}\",
- 'cycle_mon': $((10#${mm})),
- 'cycle_day': $((10#${dd})),
- 'cycle_hour': $((10#${hh})),
+ 'cycle_mon': $((10#${MM})),
+ 'cycle_day': $((10#${DD})),
+ 'cycle_hour': $((10#${HH})),
  'convert_atm': True,
  'convert_sfc': True,
  'convert_nst': ${convert_nst},
@@ -656,9 +656,9 @@ export err=$?; err_chk
 #     -) https://github.com/NOAA-GFDL/GFDL_atmos_cubed_sphere/blob/bdeee64e860c5091da2d169b1f4307ad466eca2c/tools/external_ic.F90
 #     -) https://dtcenter.org/sites/default/files/events/2020/20201105-1300p-fv3-gfdl-1.pdf
 #
-cdate_crnt_fhr_m1=$( date --utc --date "$yyyymmdd $hh UTC - 1 hours" "+%Y%m%d%H" )
-yyyymmdd_m1="${cdate_crnt_fhr_m1:0:8}"
-hh_m1="${cdate_crnt_fhr_m1:8:2}"
+cdate_crnt_fhr_m1=$( date --utc --date "$YYYYMMDD $HH UTC - 1 hours" "+%Y%m%d%H" )
+YYYYMMDD_m1="${cdate_crnt_fhr_m1:0:8}"
+HH_m1="${cdate_crnt_fhr_m1:8:2}"
 if [ $DO_ENS_BLENDING = "TRUE" ] &&
    [ $cdate_crnt_fhr -ge ${FIRST_BLENDED_CYCLE_DATE} ] &&
    [ $EXTRN_MDL_NAME_ICS = "GDASENKF" ]; then
@@ -688,9 +688,9 @@ if [ $DO_ENS_BLENDING = "TRUE" ] &&
    #cp_vrfy gfs_ctrl.nc .
 
    # Required NETCDF files - RRFS
-   cp ${COMIN}/${yyyymmdd_m1}/${hh_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${yyyymmdd}.${hh}0000.fv_core.res.tile1.nc ./fv_core.res.tile1.nc
-   cp ${COMIN}/${yyyymmdd_m1}/${hh_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${yyyymmdd}.${hh}0000.fv_tracer.res.tile1.nc ./fv_tracer.res.tile1.nc
-   cp ${COMIN}/${yyyymmdd_m1}/${hh_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${yyyymmdd}.${hh}0000.fv_core.res.nc ./fv_core.res.nc
+   cp ${COMIN}/${YYYYMMDD_m1}/${HH_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${YYYYMMDD}.${HH}0000.fv_core.res.tile1.nc ./fv_core.res.tile1.nc
+   cp ${COMIN}/${YYYYMMDD_m1}/${HH_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${YYYYMMDD}.${HH}0000.fv_tracer.res.tile1.nc ./fv_tracer.res.tile1.nc
+   cp ${COMIN}/${YYYYMMDD_m1}/${HH_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${YYYYMMDD}.${HH}0000.fv_core.res.nc ./fv_core.res.nc
 
    # Required FIX files
    cp $FIXLAM/${CRES}_grid.tile7.nc .
@@ -723,11 +723,11 @@ if [ $DO_ENS_BLENDING = "TRUE" ] &&
    ${BLENDINGPYTHON} exrrfs_blending_fv3.py $Lx $glb $reg $trcr $blend $use_host_enkf
 
    # Move the remaining RESTART files to INPUT
-   cp ${COMIN}/${yyyymmdd_m1}/${hh_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${yyyymmdd}.${hh}0000.coupler.res  ${DATA}/coupler.res
-   cp ${COMIN}/${yyyymmdd_m1}/${hh_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${yyyymmdd}.${hh}0000.fv_core.res.nc  ${DATA}/fv_core.res.nc
-   cp ${COMIN}/${yyyymmdd_m1}/${hh_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${yyyymmdd}.${hh}0000.fv_srf_wnd.res.tile1.nc ${DATA}/fv_srf_wnd.res.tile1.nc
-   cp ${COMIN}/${yyyymmdd_m1}/${hh_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${yyyymmdd}.${hh}0000.phy_data.nc  ${DATA}/phy_data.nc
-   cp ${COMIN}/${yyyymmdd_m1}/${hh_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${yyyymmdd}.${hh}0000.sfc_data.nc  ${DATA}/sfc_data.nc
+   cp ${COMIN}/${YYYYMMDD_m1}/${HH_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${YYYYMMDD}.${HH}0000.coupler.res  ${DATA}/coupler.res
+   cp ${COMIN}/${YYYYMMDD_m1}/${HH_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${YYYYMMDD}.${HH}0000.fv_core.res.nc  ${DATA}/fv_core.res.nc
+   cp ${COMIN}/${YYYYMMDD_m1}/${HH_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${YYYYMMDD}.${HH}0000.fv_srf_wnd.res.tile1.nc ${DATA}/fv_srf_wnd.res.tile1.nc
+   cp ${COMIN}/${YYYYMMDD_m1}/${HH_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${YYYYMMDD}.${HH}0000.phy_data.nc  ${DATA}/phy_data.nc
+   cp ${COMIN}/${YYYYMMDD_m1}/${HH_m1}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/RESTART/${YYYYMMDD}.${HH}0000.sfc_data.nc  ${DATA}/sfc_data.nc
    cp gfs.bndy.nc ${DATA}/gfs_bndy.tile${TILE_RGNL}.000.nc
 fi
 #

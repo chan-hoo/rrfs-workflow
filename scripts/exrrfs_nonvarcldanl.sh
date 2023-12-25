@@ -87,9 +87,9 @@ esac
 #
 #-----------------------------------------------------------------------
 #
-yyyy=${CDATE:0:4}
-mm=${CDATE:4:2}
-dd=${CDATE:6:2}
+YYYY=${CDATE:0:4}
+MM=${CDATE:4:2}
+DD=${CDATE:6:2}
 #
 #-----------------------------------------------------------------------
 #
@@ -244,9 +244,9 @@ fi
 cat << EOF > gsiparm.anl
 
  &SETUP
-  iyear=${yyyy},
-  imonth=${mm},
-  iday=${dd},
+  iyear=${YYYY},
+  imonth=${MM},
+  iday=${DD},
   ihour=${cyc},
   iminute=00,
   fv3_io_layout_y=${n_iolayouty},

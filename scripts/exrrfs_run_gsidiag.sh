@@ -48,30 +48,7 @@ specified cycle.
 #
 #-----------------------------------------------------------------------
 #
-# Specify the set of valid argument names for this script/function.
-# Then process the arguments provided to this script/function (which 
-# should consist of a set of name-value pairs of the form arg1="value1",
-# etc).
-#
-#-----------------------------------------------------------------------
-#
-valid_args=( "gsi_type" "mem_type" \
-             "satbias_dir" )
-process_args valid_args "$@"
-#
-#-----------------------------------------------------------------------
-#
-# For debugging purposes, print out values of arguments passed to this
-# script.  Note that these will be printed out only if VERBOSE is set to
-# TRUE.
-#
-#-----------------------------------------------------------------------
-#
-print_input_args valid_args
-#
-#-----------------------------------------------------------------------
-#
-# Set environment
+# Set environment variables.
 #
 #-----------------------------------------------------------------------
 #
@@ -116,28 +93,10 @@ case $MACHINE in
 esac
 #
 #-----------------------------------------------------------------------
-#
-# Extract from CDATE the starting year, month, day, and hour of the
-# forecast.  These are needed below for various operations.
-#
-#-----------------------------------------------------------------------
-#
-START_DATE=$(echo "${CDATE}" | sed 's/\([[:digit:]]\{2\}\)$/ \1/')
-
-YYYYMMDDHH=$(date +%Y%m%d%H -d "${START_DATE}")
-JJJ=$(date +%j -d "${START_DATE}")
-
-YYYY=${YYYYMMDDHH:0:4}
-MM=${YYYYMMDDHH:4:2}
-DD=${YYYYMMDDHH:6:2}
-HH=${YYYYMMDDHH:8:2}
-YYYYMMDD=${YYYYMMDDHH:0:8}
-#
-#-----------------------------------------------------------------------
 # skip if gsi_type is OBSERVER
 #-----------------------------------------------------------------------
 #
-if [ "${gsi_type}" = "OBSERVER" ]; then
+if [ "${GSI_TYPE}" = "OBSERVER" ]; then
    echo "Observer should not run this job"
    exit 0
 fi
@@ -180,8 +139,8 @@ for loop in $loops; do
       for type in $listall; do
          count=$(ls pe*.${type}_${loop} | wc -l)
          if [[ $count -gt 0 ]]; then
-            $(cat pe*.${type}_${loop} > diag_${type}_${string}.${YYYYMMDDHH})
-            echo "diag_${type}_${string}.${YYYYMMDDHH}" >> listrad_bin
+            $(cat pe*.${type}_${loop} > diag_${type}_${string}.${CDATE})
+            echo "diag_${type}_${string}.${CDATE}" >> listrad_bin
             numfile_rad_bin=`expr ${numfile_rad_bin} + 1`
          fi
       done
@@ -194,8 +153,8 @@ for loop in $loops; do
       for type in $listall; do
          count=$(ls pe*.${type}_${loop} | wc -l)
          if [[ $count -gt 0 ]]; then
-            $(cat pe*.${type}_${loop} > diag_${type}_${string}.${YYYYMMDDHH})
-            echo "diag_${type}_${string}.${YYYYMMDDHH}" >> listdbz_bin
+            $(cat pe*.${type}_${loop} > diag_${type}_${string}.${CDATE})
+            echo "diag_${type}_${string}.${CDATE}" >> listdbz_bin
             numfile_dbz_bin=`expr ${numfile_dbz_bin} + 1`
          fi
       done
@@ -215,12 +174,12 @@ for loop in $loops; do
          count=$(ls pe*.${type}_${loop}.nc4 | wc -l)
          if [[ $count -gt 0 ]]; then
             . prep_step   
-            ${APRUN} $pgm -o diag_${type}_${string}.${YYYYMMDDHH}.nc4 pe*.${type}_${loop}.nc4 >>$pgmout >errfile
+            ${APRUN} $pgm -o diag_${type}_${string}.${CDATE}.nc4 pe*.${type}_${loop}.nc4 >>$pgmout >errfile
             export err=$?; err_chk
 	    mv errfile errfile_nc_diag_cat_$type
 
-            cp diag_${type}_${string}.${YYYYMMDDHH}.nc4 ${COMOUT}
-            echo "diag_${type}_${string}.${YYYYMMDDHH}.nc4*" >> listcnv
+            cp diag_${type}_${string}.${CDATE}.nc4 ${COMOUT}
+            echo "diag_${type}_${string}.${CDATE}.nc4*" >> listcnv
             numfile_cnv=`expr ${numfile_cnv} + 1`
          fi
       done
@@ -228,12 +187,12 @@ for loop in $loops; do
       for type in $listall_rad; do
          count=$(ls pe*.${type}_${loop}.nc4 | wc -l)
          if [[ $count -gt 0 ]]; then
-            ${APRUN} $pgm -o diag_${type}_${string}.${YYYYMMDDHH}.nc4 pe*.${type}_${loop}.nc4 >>$pgmout >errfile
+            ${APRUN} $pgm -o diag_${type}_${string}.${CDATE}.nc4 pe*.${type}_${loop}.nc4 >>$pgmout >errfile
             export err=$?; err_chk
             mv errfile errfile_nc_diag_cat_$type
 
-            cp diag_${type}_${string}.${YYYYMMDDHH}.nc4 ${COMOUT}
-            echo "diag_${type}_${string}.${YYYYMMDDHH}.nc4*" >> listrad
+            cp diag_${type}_${string}.${CDATE}.nc4 ${COMOUT}
+            echo "diag_${type}_${string}.${CDATE}.nc4*" >> listrad
             numfile_rad=`expr ${numfile_rad} + 1`
          else
             echo 'No diag_' ${type} 'exist'
@@ -249,12 +208,12 @@ for loop in $loops; do
          count=$(ls pe*.${type}_${loop}.nc4 | wc -l)
          if [[ $count -gt 0 ]]; then
 	    . prep_step
-            ${APRUN} $pgm -o diag_${type}_${string}.${YYYYMMDDHH}.nc4 pe*.${type}_${loop}.nc4 >>$pgmout >errfile
+            ${APRUN} $pgm -o diag_${type}_${string}.${CDATE}.nc4 pe*.${type}_${loop}.nc4 >>$pgmout >errfile
             export err=$?; err_chk
 	    mv errfile errfile_nc_diag_cat_$type
 
-            cp diag_${type}_${string}.${YYYYMMDDHH}.nc4 ${COMOUT}
-            echo "diag_${type}_${string}.${YYYYMMDDHH}.nc4*" >> listdbz
+            cp diag_${type}_${string}.${CDATE}.nc4 ${COMOUT}
+            echo "diag_${type}_${string}.${CDATE}.nc4*" >> listdbz
             numfile_dbz=`expr ${numfile_dbz} + 1`
          fi
       done
@@ -279,26 +238,24 @@ if [ "${DO_RADDA}" = "TRUE" ]; then
      cd ${analworkdir_conv}
 
      if [ ${numfile_cnv} -gt 0 ]; then
-        tar -cvzf rrfs.${spinup_or_prod_rrfs}.${YYYYMMDDHH}_cnvstat_nc `cat listcnv`
-        cp ./rrfs.${spinup_or_prod_rrfs}.${YYYYMMDDHH}_cnvstat_nc  ${satbias_dir}/rrfs.${spinup_or_prod_rrfs}.${YYYYMMDDHH}_cnvstat
+        tar -cvzf rrfs.${spinup_or_prod_rrfs}.${CDATE}_cnvstat_nc `cat listcnv`
+        cp ./rrfs.${spinup_or_prod_rrfs}.${CDATE}_cnvstat_nc  ${COMOUT}/rrfs.${spinup_or_prod_rrfs}.${CDATE}_cnvstat
      fi
      if [ ${numfile_rad} -gt 0 ]; then
-        tar -cvzf rrfs.${spinup_or_prod_rrfs}.${YYYYMMDDHH}_radstat_nc `cat listrad`
-        cp ./rrfs.${spinup_or_prod_rrfs}.${YYYYMMDDHH}_radstat_nc  ${satbias_dir}/rrfs.${spinup_or_prod_rrfs}.${YYYYMMDDHH}_radstat
+        tar -cvzf rrfs.${spinup_or_prod_rrfs}.${CDATE}_radstat_nc `cat listrad`
+        cp ./rrfs.${spinup_or_prod_rrfs}.${CDATE}_radstat_nc  ${COMOUT}/rrfs.${spinup_or_prod_rrfs}.${CDATE}_radstat
      fi
      if [ ${numfile_rad_bin} -gt 0 ]; then
-        tar -cvzf rrfs.${spinup_or_prod_rrfs}.${YYYYMMDDHH}_radstat `cat listrad_bin`
-        cp ./rrfs.${spinup_or_prod_rrfs}.${YYYYMMDDHH}_radstat  ${satbias_dir}/rrfs.${spinup_or_prod_rrfs}.${YYYYMMDDHH}_radstat
+        tar -cvzf rrfs.${spinup_or_prod_rrfs}.${CDATE}_radstat `cat listrad_bin`
+        cp ./rrfs.${spinup_or_prod_rrfs}.${CDATE}_radstat  ${COMOUT}/rrfs.${spinup_or_prod_rrfs}.${CDATE}_radstat
      fi
 
      # For EnVar DA  
      if [ -r ./satbias_out ]; then
-       cp ./satbias_out ${satbias_dir}/rrfs.${spinup_or_prod_rrfs}.${YYYYMMDDHH}_satbias
-       cp ./satbias_out ${COMOUT}/rrfs.${spinup_or_prod_rrfs}.${YYYYMMDDHH}_satbias
+       cp ./satbias_out ${COMOUT}/rrfs.${spinup_or_prod_rrfs}.${COMOUT}_satbias
      fi
      if [ -r ./satbias_pc.out ]; then
-       cp ./satbias_pc.out ${satbias_dir}/rrfs.${spinup_or_prod_rrfs}.${YYYYMMDDHH}_satbias_pc
-       cp ./satbias_pc.out ${COMOUT}/rrfs.${spinup_or_prod_rrfs}.${YYYYMMDDHH}_satbias_pc
+       cp ./satbias_pc.out ${COMOUT}/rrfs.${spinup_or_prod_rrfs}.${COMOUT}_satbias_pc
      fi
   fi
 fi

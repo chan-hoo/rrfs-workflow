@@ -60,11 +60,12 @@ the specified cycle.
 #
 #-----------------------------------------------------------------------
 #
+# Flag for shared working directory
+flag_shared_working_dir="FALSE"
+
 # Define job and jobid by default for rocoto
 WORKFLOW_MANAGER="${WORKFLOW_MANAGER:-rocoto}"
 if [ "${WORKFLOW_MANAGER}" = "rocoto" ]; then
-  # Flag for shared working directory
-  flag_shared_working_dir="FALSE"
   if [ "${SCHED}" = "slurm" ]; then
     job_default=${SLURM_JOB_NAME}
     pid_default=${SLURM_JOB_ID}
@@ -106,15 +107,40 @@ cd $DATA
 #
 #-----------------------------------------------------------------------
 #
+# Set other environment variables.
+#
+#-----------------------------------------------------------------------
+#
+# CYCLE_TYPE is to indicate which type of cycle this job for:
+#   spinup: this job is for spin-up cycles
+#   others(prod): this job is for product cycle
+#
+export CYCLE_TYPE="${CYCLE_TYPE:-prod}"
+export CYCLE_SUBTYPE="${CYCLE_SUBTYPE:-empty}"
+export MEM_TYPE="${MEM_TYPE:-empty}"
+export GSI_TYPE="${GSI_TYPE:-empty}"
+export OB_TYPE="${OB_TYPE:-conv}"
+
+export CDATE="${CDATE:-${PDY}${cyc}}"
+#
+#-----------------------------------------------------------------------
+#
 # Set COM type definitions.
 #
 #-----------------------------------------------------------------------
 #
 [[ "$WORKFLOW_MANAGER" = "rocoto" ]] && export COMROOT=$COMROOT
 export COMIN="${COMIN:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})}"
-export COMOUT="${COMOUT:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})}"
+export COMOUT_BASEDIR="${COMOUT_BASEDIR:-$(compath.py -o ${NET}/${model_ver})}"
+if [ "${MEM_TYPE}" = "MEAN" ]; then
+  export COMOUT="${COMOUT_BASEDIR}/${RUN}.${PDY}/${cyc}/ensmean"
+else
+  export COMOUT="${COMOUT_BASEDIR}/${RUN}.${PDY}/${cyc}${SLASH_ENSMEM_SUBDIR}"
+fi
+export COMOUT_gridspec="${COMOUT_BASEDIR}/grid_spec"
 
 mkdir -p ${COMOUT}
+mkdir -p ${COMOUT_gridspec}
 
 # Run setpdy to initialize PDYm and PDYp variables
 export cycle="${cycle:-t${cyc}z}"
@@ -123,110 +149,14 @@ setpdy.sh
 #
 #-----------------------------------------------------------------------
 #
-# Set other environment variables.
-#
-#-----------------------------------------------------------------------
-#
-
-
-
-
-
-
-
-#
-#-----------------------------------------------------------------------
-#
-# Create the working directory under the cycle directory.
-#
-#-----------------------------------------------------------------------
-# CYCLE_TYPE is to indicate which type of cycle this job for:
-#   spinup: this job is for spin-up cycles
-#   others(prod): this job is for product cycle
-#
-export CYCLE_TYPE=${CYCLE_TYPE:-prod}
-export observer_nwges_dir=""
-
-if [ "${CYCLE_TYPE}" = "spinup" ]; then
-  analworkname="_gsi_spinup"
-else
-  analworkname="_gsi"
-fi
-
-if [[ ! -v OB_TYPE ]]; then
-  OB_TYPE="conv"
-fi
-if [ "${GSI_TYPE}" = "OBSERVER" ]; then
-  if [ "${MEM_TYPE}" = "MEAN" ]; then
-    export analworkdir="${CYCLE_DIR}/ensmean/observer${analworkname}"
-    SLASH_ENSMEM_SUBDIR=""
-    observer_nwges_dir="${NWGES_DIR}/ensmean/observer${analworkname}"
-  else
-    export analworkdir="${CYCLE_DIR}${SLASH_ENSMEM_SUBDIR}/observer${analworkname}"
-    observer_nwges_dir="${NWGES_DIR}${SLASH_ENSMEM_SUBDIR}/observer${analworkname}"
-  fi
-  mkdir -p ${observer_nwges_dir}
-else
-  export analworkdir="${CYCLE_DIR}${SLASH_ENSMEM_SUBDIR}/anal_${OB_TYPE}${analworkname}"
-fi
-
-rm -fr ${analworkdir}
-mkdir -p ${analworkdir}
-cd ${analworkdir}
-
-if [ ! -d "${SATBIAS_DIR}" ]; then
-  echo "making satbias_dir directory for cycling bias correction files" 
-  mkdir -p ${SATBIAS_DIR}
-fi
-
-# Folder for storing EnKF related satbias files
-if [ "${GSI_TYPE}" = "OBSERVER" ]; then
-  if [ "${MEM_TYPE}" = "MEAN" ]; then
-    if [ ! -d "${SATBIAS_DIR}_ensmean" ]; then
-      echo "making satbias_dir ensmean directory for cycling bias correction files" 
-      mkdir -p ${SATBIAS_DIR}_ensmean
-    fi    	  
-  fi
-fi
-#
-#  directory has grid_spec files for restart subdomains
-#
-export gridspec_dir=${NWGES_BASEDIR}/grid_spec
-#
-#-----------------------------------------------------------------------
-#
-# create COMOUT directory
-#
-#-----------------------------------------------------------------------
-#
-if [ "${CYCLE_TYPE}" = "spinup" ]; then
-  export COMOUT="${COMOUT_BASEDIR}/$RUN.$PDY/${cyc}_spinup${SLASH_ENSMEM_SUBDIR}"
-else
-  if [ "${MEM_TYPE}" = "MEAN" ]; then
-    export COMOUT="${COMOUT_BASEDIR}/$RUN.$PDY/$cyc/ensmean"
-  else
-    export COMOUT="${COMOUT_BASEDIR}/$RUN.$PDY/${cyc}${SLASH_ENSMEM_SUBDIR}"
-  fi
-fi
-mkdir -p "${COMOUT}"
-#
-#-----------------------------------------------------------------------
-#
 # Call the ex-script for this J-job.
 #
 #-----------------------------------------------------------------------
 #
-export pgmout="${analworkdir}/OUTPUT.$$"
+export pgmout="${DATA}/OUTPUT.$$"
 env
 
-$SCRIPTSrrfs/exrrfs_run_analysis.sh \
-             cycle_dir="${CYCLE_DIR}" \
-             gsi_type="${GSI_TYPE}" \
-             mem_type="${MEM_TYPE}" \
-             slash_ensmem_subdir="${SLASH_ENSMEM_SUBDIR}" \
-             rrfse_fg_root="${RRFSE_NWGES_BASEDIR}" \
-             satbias_dir="${SATBIAS_DIR}" \
-             ob_type="${OB_TYPE}"
+$SCRIPTSrrfs/exrrfs_run_analysis.sh
 export err=$?; err_chk
 
 if [ -e "$pgmout" ]; then
@@ -239,7 +169,7 @@ fi
 #
 #-----------------------------------------------------------------------
 #
-if [ "${KEEPDATA}" = "NO" ]; then
+if [ "${KEEPDATA}" = "NO" ] && [ "${flag_shared_working_dir}" = "FALSE" ]; then
   rm -rf ${DATA}
 fi
 #

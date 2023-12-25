@@ -219,15 +219,11 @@ if [ "${data_src}" = "disk" ]; then
   extrn_mdl_fns_str="( "$( printf "\"%s\" " "${extrn_mdl_fns_on_disk[@]}" )")"
 fi
 
-#
-#-----------------------------------------------------------------------
-#
-
-yyyymmdd=${extrn_mdl_cdate:0:8}
-hh=${extrn_mdl_cdate:8:2}
+YYYYMMDD=${extrn_mdl_cdate:0:8}
+HH=${extrn_mdl_cdate:8:2}
 
 echo extrn_mdl_cdate=${extrn_mdl_cdate}
-echo " yyyymmddhh= ${yyyymmdd} ${hh} "
+echo " YYYYMMDDHH = ${YYYYMMDD} ${HH} "
 
 for files in "${extrn_mdl_fps_on_disk[@]}"; do
   file=$( basename "$files" )
@@ -259,7 +255,7 @@ Need to do time interpolation!
     echo in1=${in1}
     in2=$( echo $file | sed 's/...$/'${fhrp}'/g' ) 
     echo in2=${in2}
-    vtime=$( date +%Y%m%d%H -d "${yyyymmdd} ${hh} +${fcsthr_m} hours" )
+    vtime=$( date +%Y%m%d%H -d "${YYYYMMDD} ${HH} +${fcsthr_m} hours" )
     echo vtime = $vtime
     a="vt=${vtime}"
     d1="${fcsthr} hour forecast"

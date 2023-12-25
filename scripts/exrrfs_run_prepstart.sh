@@ -48,29 +48,7 @@ specified cycle.
 #
 #-----------------------------------------------------------------------
 #
-# Specify the set of valid argument names for this script/function.  
-# Then process the arguments provided to this script/function (which 
-# should consist of a set of name-value pairs of the form arg1="value1",
-# etc).
-#
-#-----------------------------------------------------------------------
-#
-valid_args=( "cycle_dir" "lbcs_root" "fg_root")
-process_args valid_args "$@"
-#
-#-----------------------------------------------------------------------
-#
-# For debugging purposes, print out values of arguments passed to this
-# script.  Note that these will be printed out only if VERBOSE is set to
-# TRUE.
-#
-#-----------------------------------------------------------------------
-#
-print_input_args valid_args
-#
-#-----------------------------------------------------------------------
-#
-# Set environment
+# Set environment variables.
 #
 #-----------------------------------------------------------------------
 #
@@ -114,19 +92,14 @@ esac
 #-----------------------------------------------------------------------
 #
 START_DATE=$(echo "${CDATE}" | sed 's/\([[:digit:]]\{2\}\)$/ \1/')
-
-YYYYMMDDHH=$(date +%Y%m%d%H -d "${START_DATE}")
 JJJ=$(date +%j -d "${START_DATE}")
-
-YYYY=${YYYYMMDDHH:0:4}
-MM=${YYYYMMDDHH:4:2}
-DD=${YYYYMMDDHH:6:2}
-HH=${YYYYMMDDHH:8:2}
-YYYYMMDD=${YYYYMMDDHH:0:8}
-YYYYJJJHH=${YYYY}${JJJ}${HH}
+YYYY=${CDATE:0:4}
+MM=${CDATE:4:2}
+DD=${CDATE:6:2}
+YYYYJJJHH=${YYYY}${JJJ}${cyc}
 
 current_time=$(date "+%T")
-cdate_crnt_fhr=$( date --utc --date "${YYYYMMDD} ${HH} UTC" "+%Y%m%d%H" )
+cdate_crnt_fhr=$( date --utc --date "${PDY} ${cyc} UTC" "+%Y%m%d%H" )
 
 YYYYMMDDm1=$(date +%Y%m%d -d "${START_DATE} 1 days ago")
 YYYYMMDDm2=$(date +%Y%m%d -d "${START_DATE} 2 days ago")
@@ -149,8 +122,7 @@ YYJJJ2200000000=`date +"%y%j2200000000" -d "${START_DATE} 1 day ago"`
 #-----------------------------------------------------------------------
 #
 if [ "${DO_ENSFCST}" = "TRUE" ] &&  [ "${DO_ENKFUPDATE}" = "TRUE" ]; then
-  cd ${modelinputdir}
-  bkpath=${fg_root}/${YYYYMMDDHH}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/DA_OUTPUT  # use DA analysis from DA_OUTPUT
+  bkpath=${FG_ROOT}/${YYYYMMDDHH}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/DA_OUTPUT  # use DA analysis from DA_OUTPUT
   filelistn="fv_core.res.tile1.nc fv_srf_wnd.res.tile1.nc fv_tracer.res.tile1.nc phy_data.nc sfc_data.nc"
   checkfile=${bkpath}/coupler.res
   n_iolayouty=$(($IO_LAYOUT_Y-1))
@@ -195,7 +167,7 @@ BKTYPE=0
 if [ "${CYCLE_TYPE}" = "spinup" ]; then
   echo "spin up cycle"
   for cyc_start in "${CYCL_HRS_SPINSTART[@]}"; do
-    if [ ${HH} -eq ${cyc_start} ]; then
+    if [ ${cyc} -eq ${cyc_start} ]; then
       BKTYPE=1
       if [ "${DO_ENS_BLENDING}" = "TRUE" ] && [ $cdate_crnt_fhr -ge ${FIRST_BLENDED_CYCLE_DATE} ]; then
         echo "do blending"
@@ -210,7 +182,7 @@ if [ "${CYCLE_TYPE}" = "spinup" ]; then
 else
   echo " product cycle"
   for cyc_start in "${CYCL_HRS_PRODSTART[@]}"; do
-    if [ ${HH} -eq ${cyc_start} ]; then
+    if [ ${cyc} -eq ${cyc_start} ]; then
       if [ "${DO_SPINUP}" = "TRUE" ]; then
         BKTYPE=2   # using 1-h forecast from spinup cycle
       else
@@ -227,7 +199,7 @@ if [ "${DO_SURFACE_CYCLE}" = "TRUE" ]; then  # cycle surface fields
     if [ "${CYCLE_TYPE}" = "spinup" ]; then
       for cyc_start in "${CYCL_HRS_SPINSTART[@]}"; do
         SFC_CYCL_HH=$(( ${cyc_start} + ${SURFACE_CYCLE_DELAY_HRS} ))
-        if [ ${HH} -eq ${SFC_CYCL_HH} ]; then
+        if [ ${cyc} -eq ${SFC_CYCL_HH} ]; then
           if [ "${SURFACE_CYCLE_DELAY_HRS}" = "0" ]; then
             SFC_CYC=1  # cold start
           else
@@ -238,7 +210,7 @@ if [ "${DO_SURFACE_CYCLE}" = "TRUE" ]; then  # cycle surface fields
     fi
   else
     for cyc_start in "${CYCL_HRS_PRODSTART[@]}"; do
-       if [ ${HH} -eq ${cyc_start} ]; then
+       if [ ${cyc} -eq ${cyc_start} ]; then
           SFC_CYC=1  # cold start
        fi
     done
@@ -246,14 +218,14 @@ if [ "${DO_SURFACE_CYCLE}" = "TRUE" ]; then  # cycle surface fields
 fi
 
 # if do surface surgery, then skip surface cycle
-if [ ${YYYYMMDDHH} -eq ${SOIL_SURGERY_time} ] ; then
+if [ ${CDATE} -eq ${SOIL_SURGERY_time} ] ; then
   if [ "${CYCLE_TYPE}" = "spinup" ]; then
     SFC_CYC=3  # skip for soil surgery
   fi
 fi
 
-if [ ${BKTYPE} -eq 1 ] ; then  # cold start, use prepare cold strat initial files from ics
-    bkpath=${lbcs_root}/$YYYYMMDD$HH${SLASH_ENSMEM_SUBDIR}/ics
+if [ "${BKTYPE}" = "1" ]; then  # cold start, use prepare cold strat initial files from ics
+    bkpath=${COMIN_BASEDIR}/$CDATE${SLASH_ENSMEM_SUBDIR}/ics
     if [ -r "${bkpath}/gfs_data.tile7.halo0.nc" ]; then
       cp ${bkpath}/gfs_bndy.tile7.000.nc gfs_bndy.tile7.000.nc        
       cp ${bkpath}/gfs_ctrl.nc gfs_ctrl.nc        
@@ -264,14 +236,14 @@ if [ ${BKTYPE} -eq 1 ] ; then  # cold start, use prepare cold strat initial file
       ln -s ${bkpath}/sfc_data.tile7.halo0.nc bk_sfc_data.tile7.halo0.nc
       print_info_msg "$VERBOSE" "cold start from $bkpath"
       if [ "${SAVE_CYCLE_LOG}" = "TRUE" ] ; then
-        echo "${YYYYMMDDHH}(${CYCLE_TYPE}): cold start at ${current_time} from $bkpath " >> ${EXPTDIR}/log.cycles
+        echo "${CDATE}(${CYCLE_TYPE}): cold start at ${current_time} from $bkpath " >> ${EXPTDIR}/log.cycles
       fi
     else
       err_exit "Cannot find cold start initial condition from : ${bkpath}"
     fi
 
-elif [[ $BKTYPE == 3 ]]; then
-    bkpath=${lbcs_root}/$YYYYMMDD$HH${SLASH_ENSMEM_SUBDIR}/ics
+elif [ "${BKTYPE}" = "3" ]; then
+    bkpath=${COMIN_BASEDIR}/$CDATE${SLASH_ENSMEM_SUBDIR}/ics
     if [ -r "${bkpath}/coupler.res" ]; then
       cp ${bkpath}/fv_core.res.nc fv_core.res.nc
       cp ${bkpath}/fv_core.res.tile1.nc fv_core.res.tile1.nc
@@ -290,7 +262,7 @@ elif [[ $BKTYPE == 3 ]]; then
       ln -s ${bkpath}/sfc_data.nc bk_sfc_data.nc
 
       if [ "${SAVE_CYCLE_LOG}" = "TRUE" ] ; then
-        echo "${YYYYMMDDHH}(${CYCLE_TYPE}): blended warm start at ${current_time} from $bkpath " >> ${EXPTDIR}/log.cycles
+        echo "${CDATE}(${CYCLE_TYPE}): blended warm start at ${current_time} from $bkpath " >> ${EXPTDIR}/log.cycles
       fi
     else
       err_exit "Error: cannot find blended warm start initial condition from : ${bkpath}"
@@ -330,19 +302,19 @@ else
   #   So the defination of restart_prefix needs a "." at the end.
   #
   if [ "${CYCLE_SUBTYPE}" = "spinup" ] ; then
-    restart_prefix=$( date "+%Y%m%d.%H%M%S" -d "${YYYYMMDD} ${HH} + ${DT_ATMOS} seconds" ).
+    restart_prefix=$( date "+%Y%m%d.%H%M%S" -d "${PDY} ${cyc} + ${DT_ATMOS} seconds" ).
   else
-    restart_prefix="${YYYYMMDD}.${HH}0000."
+    restart_prefix="${PDY}.${cyc}0000."
   fi
 
   if [ "${CYCLE_SUBTYPE}" = "spinup" ] ; then
     # point to the 0-h cycle for the warm start from the 1 timestep restart files
     fg_restart_dirname=fcst_fv3lam_ensinit
-    bkpath=${fg_root}/${YYYYMMDDHH}${SLASH_ENSMEM_SUBDIR}/${fg_restart_dirname}/RESTART  # cycling, use background from RESTART
+    bkpath=${FG_ROOT}/${CDATE}${SLASH_ENSMEM_SUBDIR}/${fg_restart_dirname}/RESTART  # cycling, use background from RESTART
     ctrl_bkpath=${ctrlpath}/fcst_fv3lam_spinup/INPUT
   else
     YYYYMMDDHHmInterv=$( date +%Y%m%d%H -d "${START_DATE} ${DA_CYCLE_INTERV} hours ago" )
-    bkpath=${fg_root}/${YYYYMMDDHHmInterv}${SLASH_ENSMEM_SUBDIR}/${fg_restart_dirname}/RESTART  # cycling, use background from RESTART
+    bkpath=${FG_ROOT}/${YYYYMMDDHHmInterv}${SLASH_ENSMEM_SUBDIR}/${fg_restart_dirname}/RESTART  # cycling, use background from RESTART
 
     n=${DA_CYCLE_INTERV}
     while [[ $n -le 6 ]] ; do
@@ -364,9 +336,9 @@ else
      print_info_msg "$VERBOSE" "cannot find background from spin-up cycle, try product cycle"
      fg_restart_dirname=fcst_fv3lam
      YYYYMMDDHHmInterv=$( date +%Y%m%d%H -d "${START_DATE} ${DA_CYCLE_INTERV} hours ago" )
-     bkpath=${fg_root}/${YYYYMMDDHHmInterv}${SLASH_ENSMEM_SUBDIR}/${fg_restart_dirname}/RESTART  # cycling, use background from RESTART
+     bkpath=${FG_ROOT}/${YYYYMMDDHHmInterv}${SLASH_ENSMEM_SUBDIR}/${fg_restart_dirname}/RESTART  # cycling, use background from RESTART
 
-     restart_prefix="${YYYYMMDD}.${HH}0000."
+     restart_prefix="${PDY}.${cyc}0000."
      n=${DA_CYCLE_INTERV}
      while [[ $n -le 6 ]] ; do
        checkfile=${bkpath}/${restart_prefix}coupler.res
@@ -376,7 +348,7 @@ else
        else
          n=$((n + ${DA_CYCLE_INTERV}))
          YYYYMMDDHHmInterv=$( date +%Y%m%d%H -d "${START_DATE} ${n} hours ago" )
-         bkpath=${fg_root}/${YYYYMMDDHHmInterv}${SLASH_ENSMEM_SUBDIR}/${fg_restart_dirname}/RESTART  # cycling, use background from RESTART
+         bkpath=${FG_ROOT}/${YYYYMMDDHHmInterv}${SLASH_ENSMEM_SUBDIR}/${fg_restart_dirname}/RESTART  # cycling, use background from RESTART
          print_info_msg "$VERBOSE" "Trying this path: ${bkpath}"
        fi
      done
@@ -414,12 +386,12 @@ else
       done
     fi
     if [ "${CYCLE_SUBTYPE}" = "spinup" ] ; then
-      cp ${fg_root}/${YYYYMMDDHH}${SLASH_ENSMEM_SUBDIR}/${fg_restart_dirname}/INPUT/gfs_ctrl.nc  gfs_ctrl.nc
+      cp ${FG_ROOT}/${CDATE}${SLASH_ENSMEM_SUBDIR}/${fg_restart_dirname}/INPUT/gfs_ctrl.nc  gfs_ctrl.nc
     else
-      cp ${fg_root}/${YYYYMMDDHHmInterv}${SLASH_ENSMEM_SUBDIR}/${fg_restart_dirname}/INPUT/gfs_ctrl.nc  gfs_ctrl.nc
+      cp ${FG_ROOT}/${YYYYMMDDHHmInterv}${SLASH_ENSMEM_SUBDIR}/${fg_restart_dirname}/INPUT/gfs_ctrl.nc  gfs_ctrl.nc
     fi
     if [ "${SAVE_CYCLE_LOG}" = "TRUE" ] ; then
-      echo "${YYYYMMDDHH}(${CYCLE_TYPE}): warm start at ${current_time} from ${checkfile} " >> ${EXPTDIR}/log.cycles
+      echo "${CDATE}(${CYCLE_TYPE}): warm start at ${current_time} from ${checkfile} " >> ${EXPTDIR}/log.cycles
     fi
     #
     # remove checksum from restart files. Checksum will cause trouble if model initializes from analysis
@@ -466,22 +438,22 @@ fi
 #
 #-----------------------------------------------------------------------
 #
-if [ ${HH} -eq ${SNOWICE_update_hour} ] && [ "${CYCLE_TYPE}" = "prod" ] ; then
+if [ "${cyc}" -eq "${SNOWICE_update_hour}" ] && [ "${CYCLE_TYPE}" = "prod" ]; then
    echo "Update snow cover based on imssnow  at ${SNOWICE_update_hour}z"
    if [ -r "${IMSSNOW_ROOT}/latest.SNOW_IMS" ]; then
       cp ${IMSSNOW_ROOT}/latest.SNOW_IMS .
    elif [ -r "${IMSSNOW_ROOT}/${YYJJJ2200000000}" ]; then
       cp ${IMSSNOW_ROOT}/${YYJJJ2200000000} latest.SNOW_IMS
-   elif [ -r "${IMSSNOW_ROOT}/rap.${YYYYMMDD}/rap.t${HH}z.imssnow.grib2" ]; then
-      cp ${IMSSNOW_ROOT}/rap.${YYYYMMDD}/rap.t${HH}z.imssnow.grib2  latest.SNOW_IMS
-   elif [ -r "${IMSSNOW_ROOT}/rap.${YYYYMMDD}/rap_e.t${HH}z.imssnow.grib2" ]; then
-      cp ${IMSSNOW_ROOT}/rap_e.${YYYYMMDD}/rap_e.t${HH}z.imssnow.grib2  latest.SNOW_IMS
+   elif [ -r "${IMSSNOW_ROOT}/rap.${PDY}/rap.${cycle}.imssnow.grib2" ]; then
+      cp ${IMSSNOW_ROOT}/rap.${PDY}/rap.${cycle}.imssnow.grib2  latest.SNOW_IMS
+   elif [ -r "${IMSSNOW_ROOT}/rap.${PDY}/rap_e.${cycle}.imssnow.grib2" ]; then
+      cp ${IMSSNOW_ROOT}/rap_e.${PDY}/rap_e.${cycle}.imssnow.grib2  latest.SNOW_IMS
    else
      echo "${IMSSNOW_ROOT} data does not exist!!"
      echo "WARNING: No snow update at ${HH}!!!!"
    fi
    if [ -r "latest.SNOW_IMS" ]; then
-     ln -sf ./latest.SNOW_IMS                imssnow2
+     ln -sf ./latest.SNOW_IMS  imssnow2
 
      if [ "${IO_LAYOUT_Y}" = "1" ]; then
        ln -sf ${FIX_GSI}/${PREDEF_GRID_NAME}/fv3_grid_spec  fv3_grid_spec
@@ -489,7 +461,7 @@ if [ ${HH} -eq ${SNOWICE_update_hour} ] && [ "${CYCLE_TYPE}" = "prod" ] ; then
        for ii in ${list_iolayout}
        do
          iii=$(printf %4.4i $ii)
-         ln -sf ${gridspec_dir}/fv3_grid_spec.${iii}  fv3_grid_spec.${iii}
+         ln -sf ${COMOUT_gridspec}/fv3_grid_spec.${iii}  fv3_grid_spec.${iii}
        done
      fi
 
@@ -502,13 +474,13 @@ if [ ${HH} -eq ${SNOWICE_update_hour} ] && [ "${CYCLE_TYPE}" = "prod" ] ; then
 
      snowice_reference_time=$(wgrib2 -t latest.SNOW_IMS | tail -1) 
      if [ "${SAVE_CYCLE_LOG}" = "TRUE" ] ; then
-       echo "${YYYYMMDDHH}(${CYCLE_TYPE}): update snow/ice using ${snowice_reference_time}" >> ${EXPTDIR}/log.cycles
+       echo "${CDATE}(${CYCLE_TYPE}): update snow/ice using ${snowice_reference_time}" >> ${EXPTDIR}/log.cycles
      fi
    else
-     echo "WARNING: No latest IMS SNOW file for update at ${YYYYMMDDHH}!!!!"
+     echo "WARNING: No latest IMS SNOW file for update at ${CDATE}!!!!"
    fi
 else
-   echo "NOTE: No update for IMS SNOW/ICE at ${YYYYMMDDHH}!"
+   echo "NOTE: No update for IMS SNOW/ICE at ${CDATE}!"
 fi
 #
 #-----------------------------------------------------------------------
@@ -517,24 +489,24 @@ fi
 #
 #-----------------------------------------------------------------------
 #
-if [ ${HH} -eq ${SST_update_hour} ] && [ "${CYCLE_TYPE}" = "prod" ] ; then
+if [ "${cyc}" -eq "${SST_update_hour}" ] && [ "${CYCLE_TYPE}" = "prod" ] ; then
    echo "Update SST at ${SST_update_hour}z"
    if [ -r "${SST_ROOT}/latest.SST" ]; then
       cp ${SST_ROOT}/latest.SST .
    elif [ -r "${SST_ROOT}/${YYJJJ00000000}" ]; then
       cp ${SST_ROOT}/${YYJJJ00000000} latest.SST
-   elif [ -r "${SST_ROOT}/nsst.$YYYYMMDD/rtgssthr_grb_0.083.grib2" ]; then 
-      cp ${SST_ROOT}/nsst.$YYYYMMDD/rtgssthr_grb_0.083.grib2 latest.SST
+   elif [ -r "${SST_ROOT}/nsst.${PDY}/rtgssthr_grb_0.083.grib2" ]; then 
+      cp ${SST_ROOT}/nsst.${PDY}/rtgssthr_grb_0.083.grib2 latest.SST
    elif [ -r "${SST_ROOT}/nsst.$YYYYMMDDm1/rtgssthr_grb_0.083.grib2" ]; then 
       cp ${SST_ROOT}/nsst.$YYYYMMDDm1/rtgssthr_grb_0.083.grib2 latest.SST
    else
      echo "${SST_ROOT} data does not exist!!"
-     echo "WARNING: No SST update at ${HH}!!!!"
+     echo "WARNING: No SST update at ${cyc}!!!!"
    fi
    if [ -r "latest.SST" ]; then
-     cp ${FIXgsm}/RTG_SST_landmask.dat                RTG_SST_landmask.dat
-     ln -sf ./latest.SST                                  SSTRTG
-     cp ${FIX_GSI}/${PREDEF_GRID_NAME}/fv3_akbk       fv3_akbk
+     cp ${FIXgsm}/RTG_SST_landmask.dat RTG_SST_landmask.dat
+     ln -sf ./latest.SST SSTRTG
+     cp ${FIX_GSI}/${PREDEF_GRID_NAME}/fv3_akbk fv3_akbk
 
 cat << EOF > sst.namelist
 &setup
@@ -542,7 +514,7 @@ cat << EOF > sst.namelist
   iyear=${YYYY}
   imonth=${MM}
   iday=${DD}
-  ihr=${HH}
+  ihr=${cyc}
 /
 EOF
 
@@ -559,7 +531,7 @@ EOF
        for ii in ${list_iolayout}
        do
          iii=$(printf %4.4i $ii)
-         ln -sf ${gridspec_dir}/fv3_grid_spec.${iii}  fv3_grid_spec
+         ln -sf ${COMOUT_gridspec}/fv3_grid_spec.${iii}  fv3_grid_spec
          ln -sf sfc_data.nc.${iii} sfc_data.nc         
 
 	 . prep_step
@@ -574,13 +546,13 @@ EOF
 
      sst_reference_time=$(wgrib2 -t latest.SST) 
      if [ "${SAVE_CYCLE_LOG}" = "TRUE" ] ; then
-       echo "${YYYYMMDDHH}(${CYCLE_TYPE}): update SST using ${sst_reference_time}" >> ${EXPTDIR}/log.cycles
+       echo "${CDATE}(${CYCLE_TYPE}): update SST using ${sst_reference_time}" >> ${EXPTDIR}/log.cycles
      fi
    else
-     echo "WARNING: No latest SST file for update at ${YYYYMMDDHH}!!!!"
+     echo "WARNING: No latest SST file for update at ${CDATE}!!!!"
    fi
 else
-   echo "NOTE: No update for SST at ${YYYYMMDDHH}!"
+   echo "NOTE: No update for SST at ${CDATE}!"
 fi
 
 #-----------------------------------------------------------------------
@@ -589,7 +561,7 @@ fi
 #
 #-----------------------------------------------------------------------
 if [ "${DO_SMOKE_DUST}" = "TRUE" ] && [ "${CYCLE_TYPE}" = "spinup" ]; then  # cycle smoke/dust fields
-  if [ ${HH} -eq 4 ] || [ ${HH} -eq 16 ] ; then
+  if [ ${cyc} -eq 4 ] || [ ${cyc} -eq 16 ] ; then
       # figure out which surface is available
       surface_file_dir_name=fcst_fv3lam
       bkpath_find="missing"
@@ -643,7 +615,7 @@ if [ "${DO_SMOKE_DUST}" = "TRUE" ] && [ "${CYCLE_TYPE}" = "spinup" ]; then  # cy
             fi
           done
         fi
-        echo "${YYYYMMDDHH}(${CYCLE_TYPE}): cycle smoke/dust from ${checkfile} " >> ${EXPTDIR}/log.cycles
+        echo "${CDATE}(${CYCLE_TYPE}): cycle smoke/dust from ${checkfile} " >> ${EXPTDIR}/log.cycles
       fi
   fi
 fi
@@ -797,7 +769,7 @@ if [ ${SFC_CYC} -eq 1 ] || [ ${SFC_CYC} -eq 2 ] ; then  # cycle surface fields
           fi
           echo "cycle surface with ${checkfile}" > cycle_surface.done
           if [ "${SAVE_CYCLE_LOG}" = "TRUE" ] ; then
-            echo "${YYYYMMDDHH}(${CYCLE_TYPE}): cycle surface with ${checkfile} " >> ${EXPTDIR}/log.cycles
+            echo "${CDATE}(${CYCLE_TYPE}): cycle surface with ${checkfile} " >> ${EXPTDIR}/log.cycles
           fi
         else
           print_info_msg "WARNING: cannot find surface from previous cycle"
@@ -811,7 +783,7 @@ fi
 #
 #-----------------------------------------------------------------------
 if [ ${HH} -eq ${GVF_update_hour} ] && [ "${CYCLE_TYPE}" = "spinup" ]; then
-   latestGVF=$(ls ${GVF_ROOT}/GVF-WKL-GLB_v?r?_npp_s*_e${YYYYMMDDm1}_c${YYYYMMDD}*.grib2)
+   latestGVF=$(ls ${GVF_ROOT}/GVF-WKL-GLB_v?r?_npp_s*_e${YYYYMMDDm1}_c${PDY}*.grib2)
    latestGVF2=$(ls ${GVF_ROOT}/GVF-WKL-GLB_v?r?_npp_s*_e${YYYYMMDDm2}_c${YYYYMMDDm1}*.grib2)
    if [ ! -r "${latestGVF}" ]; then
      if [ -r "${latestGVF2}" ]; then
@@ -856,7 +828,7 @@ if [ ${HH} -eq ${GVF_update_hour} ] && [ "${CYCLE_TYPE}" = "spinup" ]; then
       fi
 
       if [ "${SAVE_CYCLE_LOG}" = "TRUE" ] ; then
-         echo "${YYYYMMDDHH}(${CYCLE_TYPE}): update GVF with ${latestGVF} " >> ${EXPTDIR}/log.cycles
+         echo "${CDATE}(${CYCLE_TYPE}): update GVF with ${latestGVF} " >> ${EXPTDIR}/log.cycles
       fi
    fi
 fi
@@ -872,10 +844,10 @@ fi
 #
 #-----------------------------------------------------------------------
 
-if [[ "${NET}" = "RTMA"* ]]; then
+if [ "${NET}" = "RTMA"* ]; then
     #find a bdry file, make sure it exists and was written out completely.
     for i in $(seq 0 24); do #track back up to 24 cycles to find bdry files
-      lbcDIR="${lbcs_root}/$(date -d "${START_DATE} ${i} hours ago" +"%Y%m%d%H")/lbcs"
+      lbcDIR="${COMIN_BASEDIR}/$(date -d "${START_DATE} ${i} hours ago" +"%Y%m%d%H")/lbcs"
       if [[  -f ${lbcDIR}/gfs_bndy.tile7.001.nc ]]; then
         age=$(( $(date +%s) - $(date -r ${lbcDIR}/gfs_bndy.tile7.001.nc +%s) ))
         [[ age -gt 300 ]] && break
@@ -886,7 +858,7 @@ if [[ "${NET}" = "RTMA"* ]]; then
 
 else
   num_fhrs=( "${#FCST_LEN_HRS_CYCLES[@]}" )
-  ihh=$( expr ${HH} + 0 )
+  ihh=$( expr ${cyc} + 0 )
   if [ ${num_fhrs} -gt ${ihh} ]; then
      FCST_LEN_HRS_thiscycle=${FCST_LEN_HRS_CYCLES[${ihh}]}
   else
@@ -895,7 +867,7 @@ else
   if [ "${CYCLE_TYPE}" = "spinup" ]; then
      FCST_LEN_HRS_thiscycle=${FCST_LEN_HRS_SPINUP}
   fi 
-  print_info_msg "$VERBOSE" " The forecast length for cycle (\"${HH}\") is
+  print_info_msg "$VERBOSE" " The forecast length for cycle (\"${cyc}\") is
                  ( \"${FCST_LEN_HRS_thiscycle}\") "
 
 #   let us figure out which boundary file is available
@@ -903,7 +875,7 @@ else
   n=${EXTRN_MDL_LBCS_SEARCH_OFFSET_HRS}
   end_search_hr=$(( 12 + ${EXTRN_MDL_LBCS_SEARCH_OFFSET_HRS} ))
   YYYYMMDDHHmInterv=$(date +%Y%m%d%H -d "${START_DATE} ${n} hours ago")
-  lbcs_path=${lbcs_root}/${YYYYMMDDHHmInterv}${SLASH_ENSMEM_SUBDIR}/lbcs
+  lbcs_path=${COMIN_BASEDIR}/${YYYYMMDDHHmInterv}${SLASH_ENSMEM_SUBDIR}/lbcs
   while [[ $n -le ${end_search_hr} ]] ; do
     last_bdy_time=$(( n + ${FCST_LEN_HRS_thiscycle} ))
     last_bdy=$(printf %3.3i $last_bdy_time)
@@ -914,7 +886,7 @@ else
     else
       n=$((n + 1))
       YYYYMMDDHHmInterv=$(date +%Y%m%d%H -d "${START_DATE} ${n} hours ago")
-      lbcs_path=${lbcs_root}/${YYYYMMDDHHmInterv}${SLASH_ENSMEM_SUBDIR}/lbcs
+      lbcs_path=${COMIN_BASEDIR}/${YYYYMMDDHHmInterv}${SLASH_ENSMEM_SUBDIR}/lbcs
     fi
   done
 #
@@ -948,7 +920,7 @@ fi
 # conduct surface surgery to get new vtype and stype
 # 
 #-----------------------------------------------------------------------
-if [ ${YYYYMMDDHH} -eq 2100010100 ] ; then
+if [ ${CDATE} -eq 2100010100 ] ; then
   if [ "${CYCLE_TYPE}" = "spinup" ]; then
     cp sfc_data.tile7.halo0.nc sfc_data.tile7.halo0.nc_old
     if [ -r ${FIXLAM}/stypdom_double.nc ]; then
@@ -958,7 +930,7 @@ if [ ${YYYYMMDDHH} -eq 2100010100 ] ; then
       ncks -A -v vtype ${FIXLAM}/vtypdom_double.nc sfc_data.tile7.halo0.nc
     fi
     if [ "${SAVE_CYCLE_LOG}" = "TRUE" ] ; then
-      echo "${YYYYMMDDHH}(${CYCLE_TYPE}): replace stype and vtype " >> ${EXPTDIR}/log.cycles
+      echo "${CDATE}(${CYCLE_TYPE}): replace stype and vtype " >> ${EXPTDIR}/log.cycles
     fi
   fi
 fi
@@ -982,31 +954,31 @@ if [ ${SFC_CYC} -eq 3 ] ; then
    rapfile='missing'
    hrrrfile='missing'
    hrrr_akfile='missing'
-   if [ -r ${raphrrr_com}/${YYYYMMDD}/rap.t${HH}z.wrf_inout_smoke ]; then
-     ln -s ${raphrrr_com}/${YYYYMMDD}/rap.t${HH}z.wrf_inout_smoke    sfc_rap
+   if [ -r ${raphrrr_com}/${PDY}/rap.${cycle}.wrf_inout_smoke ]; then
+     ln -s ${raphrrr_com}/${PDY}/rap.${cycle}.wrf_inout_smoke    sfc_rap
      rapfile='sfc_rap'
-   elif [ -r ${raphrrr_com}/rap/prod/rap.${YYYYMMDD}/rap.t${HH}z.wrf_inout_smoke ]; then
-     ln -s ${raphrrr_com}/rap/prod/rap.${YYYYMMDD}/rap.t${HH}z.wrf_inout_smoke  sfc_rap
+   elif [ -r ${raphrrr_com}/rap/prod/rap.${PDY}/rap.${cycle}.wrf_inout_smoke ]; then
+     ln -s ${raphrrr_com}/rap/prod/rap.${PDY}/rap.${cycle}.wrf_inout_smoke  sfc_rap
      rapfile='sfc_rap'
-   elif [ -r ${raphrrr_com}/rap/v5.1/rap.${YYYYMMDD}/rap.t${HH}z.wrf_inout_smoke ]; then
-     ln -s ${raphrrr_com}/rap/v5.1/rap.${YYYYMMDD}/rap.t${HH}z.wrf_inout_smoke  sfc_rap
+   elif [ -r ${raphrrr_com}/rap/v5.1/rap.${PDY}/rap.${cycle}.wrf_inout_smoke ]; then
+     ln -s ${raphrrr_com}/rap/v5.1/rap.${PDY}/rap.${cycle}.wrf_inout_smoke  sfc_rap
      rapfile='sfc_rap'
    fi
-   if [ -r ${raphrrr_com}/${YYYYMMDD}/hrrr.t${HH}z.wrf_inout ]; then
-     ln -s ${raphrrr_com}/${YYYYMMDD}/hrrr.t${HH}z.wrf_inout sfc_hrrr
+   if [ -r ${raphrrr_com}/${PDY}/hrrr.${cycle}.wrf_inout ]; then
+     ln -s ${raphrrr_com}/${PDY}/hrrr.${cycle}.wrf_inout sfc_hrrr
      hrrrfile='sfc_hrrr'
-   elif [ -r ${raphrrr_com}/hrrr/prod/hrrr.${YYYYMMDD}/conus/hrrr.t${HH}z.wrf_inout ]; then
-     ln -s ${raphrrr_com}/hrrr/prod/hrrr.${YYYYMMDD}/conus/hrrr.t${HH}z.wrf_inout sfc_hrrr
+   elif [ -r ${raphrrr_com}/hrrr/prod/hrrr.${PDY}/conus/hrrr.${cycle}.wrf_inout ]; then
+     ln -s ${raphrrr_com}/hrrr/prod/hrrr.${PDY}/conus/hrrr.${cycle}.wrf_inout sfc_hrrr
      hrrrfile='sfc_hrrr'
-   elif [ -r ${raphrrr_com}/hrrr/v4.1/hrrr.${YYYYMMDD}/conus/hrrr.t${HH}z.wrfhistory00 ]; then
-     ln -s ${raphrrr_com}/hrrr/v4.1/hrrr.${YYYYMMDD}/conus/hrrr.t${HH}z.wrfhistory00 sfc_hrrr
+   elif [ -r ${raphrrr_com}/hrrr/v4.1/hrrr.${PDY}/conus/hrrr.${cycle}.wrfhistory00 ]; then
+     ln -s ${raphrrr_com}/hrrr/v4.1/hrrr.${PDY}/conus/hrrr.${cycle}.wrfhistory00 sfc_hrrr
      hrrrfile='sfc_hrrr'
    fi
-   if [ -r ${raphrrr_com}/${YYYYMMDD}/hrrrak.t${HH}z.wrf_inout ]; then
-     ln -s ${raphrrr_com}/${YYYYMMDD}/hrrr.t${HH}z.wrf_inout sfc_hrrrak
+   if [ -r ${raphrrr_com}/${PDY}/hrrrak.${cycle}.wrf_inout ]; then
+     ln -s ${raphrrr_com}/${PDY}/hrrr.${cycle}.wrf_inout sfc_hrrrak
      hrrr_akfile='sfc_hrrrak'
-   elif [ -r ${raphrrr_com}/hrrr/prod/hrrr.${YYYYMMDD}/alaska/hrrrak.t${HH}z.wrf_inout ]; then
-     ln -s ${raphrrr_com}/hrrr/prod/hrrr.${YYYYMMDD}/alaska/hrrrak.t${HH}z.wrf_inout sfc_hrrrak
+   elif [ -r ${raphrrr_com}/hrrr/prod/hrrr.${PDY}/alaska/hrrrak.${cycle}.wrf_inout ]; then
+     ln -s ${raphrrr_com}/hrrr/prod/hrrr.${PDY}/alaska/hrrrak.${cycle}.wrf_inout sfc_hrrrak
      hrrr_akfile='sfc_hrrrak'
    fi
  
@@ -1017,7 +989,7 @@ if [ ${SFC_CYC} -eq 3 ] ; then
      for ii in ${list_iolayout}
      do
        iii=$(printf %4.4i $ii)
-       ln -sf ${gridspec_dir}/fv3_grid_spec.${iii}  fv3_grid_spec
+       ln -sf ${COMOUT_gridspec}/fv3_grid_spec.${iii}  fv3_grid_spec
      done
    fi
 
@@ -1090,7 +1062,7 @@ EOF
      done
 
      if [ "${SAVE_CYCLE_LOG}" = "TRUE" ] ; then
-       echo "${YYYYMMDDHH}(${CYCLE_TYPE}): run surface surgery" >> ${EXPTDIR}/log.cycles
+       echo "${CDATE}(${CYCLE_TYPE}): run surface surgery" >> ${EXPTDIR}/log.cycles
      fi
   fi
 #
@@ -1105,24 +1077,24 @@ if [ "${USE_FVCOM}" = "TRUE" ] && [ ${SFC_CYC} -eq 2 ] ; then
   # Remap the FVCOM output from the 5 lakes onto the RRFS grid
   if [ "${PREP_FVCOM}" = "TRUE" ]; then
     ${SCRIPTSrrfs}/exrrfs_prep_fvcom.sh \
-                  modelinputdir="${modelinputdir}" \
+                  modelinputdir="${DATA}" \
                   FIXLAM="${FIXLAM}" \
                   FVCOM_DIR="${FVCOM_DIR}" \
 	          YYYYJJJHH="${YYYYJJJHH}" \
-                  YYYYMMDD="${YYYYMMDD}" \
+                  YYYYMMDD="${PDY}" \
                   YYYYMMDDm1="${YYYYMMDDm1}" \
-                  HH="${HH}"
+                  HH="${cyc}"
     export err=$?; err_chk
 
-    cd ${modelinputdir}
+    cd ${DATA}
     # FVCOM_DIR needs to be redefined here to find 
-    FVCOM_DIR=${modelinputdir}/fvcom_remap
+    FVCOM_DIR=${DATA}/fvcom_remap
     latest_fvcom_file="${FVCOM_DIR}/${FVCOM_FILE}"
     fvcomtime=${YYYYJJJHH}
     fvcom_data_fp="${latest_fvcom_file}_${fvcomtime}.nc"
   else
     latest_fvcom_file="${FVCOM_DIR}/${FVCOM_FILE}"
-    if [ ${HH} -gt 12 ]; then 
+    if [ ${cyc} -gt 12 ]; then 
       starttime_fvcom="$(date +%Y%m%d -d "${START_DATE}") 12"
     else
       starttime_fvcom="$(date +%Y%m%d -d "${START_DATE}") 00"
@@ -1150,7 +1122,7 @@ Please check the following user defined variables:
     cp ${fvcom_data_fp} fvcom.nc
 
     #Format for fvcom_time: YYYY-MM-DDTHH:00:00.000000
-    fvcom_time="${YYYY}-${MM}-${DD}T${HH}:00:00.000000"
+    fvcom_time="${YYYY}-${MM}-${DD}T${cyc}:00:00.000000"
 
     pgm="fvcom_to_FV3"
 

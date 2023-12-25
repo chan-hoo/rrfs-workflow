@@ -128,6 +128,22 @@ mkdir -p $DATA/bufrpost
 #
 #-----------------------------------------------------------------------
 #
+# Set other environment variables.
+#
+#-----------------------------------------------------------------------
+#
+# CYCLE_TYPE is to indicate which type of cycle this job for:
+#   spinup: this job is for spin-up cycles
+#   others(prod): this job is for product cycle
+#
+export CYCLE_TYPE="${CYCLE_TYPE:-prod}"
+export CYCLE_SUBTYPE="${CYCLE_SUBTYPE:-empty}"
+
+export CDATE="${CDATE:-${PDY}${cyc}}"
+export fhr="01"
+#
+#-----------------------------------------------------------------------
+#
 # Set COM type definitions.
 #
 #-----------------------------------------------------------------------
@@ -146,22 +162,6 @@ mkdir -p "${COMOUT}/bufr.${cyc}"
 export cycle="${cycle:-t${cyc}z}"
 setpdy.sh
 . ./PDY
-#
-#-----------------------------------------------------------------------
-#
-# Set other environment variables.
-#
-#-----------------------------------------------------------------------
-#
-# CYCLE_TYPE is to indicate which type of cycle this job for:
-#   spinup: this job is for spin-up cycles
-#   others(prod): this job is for product cycle
-#
-export CYCLE_TYPE="${CYCLE_TYPE:-prod}"
-export CYCLE_SUBTYPE="${CYCLE_SUBTYPE:-empty}"
-
-export CDATE="${CDATE:-${PDY}${cyc}}"
-export fhr="01"
 #
 #-----------------------------------------------------------------------
 #

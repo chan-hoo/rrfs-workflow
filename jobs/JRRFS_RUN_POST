@@ -108,23 +108,6 @@ cd $DATA
 #
 #-----------------------------------------------------------------------
 #
-# Set COM type definitions.
-#
-#-----------------------------------------------------------------------
-#
-[[ "$WORKFLOW_MANAGER" = "rocoto" ]] && export COMROOT=$COMROOT
-export COMIN="${COMIN:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})}"
-export COMOUT="${COMOUT:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})}"
-
-mkdir -p ${COMOUT}
-
-# Run setpdy to initialize PDYm and PDYp variables
-export cycle="${cycle:-t${cyc}z}"
-setpdy.sh
-. ./PDY
-#
-#-----------------------------------------------------------------------
-#
 # Set other environment variables.
 #
 #-----------------------------------------------------------------------
@@ -139,6 +122,23 @@ export CYCLE_SUBTYPE="${CYCLE_SUBTYPE:-empty}"
 export CDATE="${CDATE:-${PDY}${cyc}}"
 export SLASH_ENSMEM_SUBDIR="${SLASH_ENSMEM_SUBDIR:-}"
 export fhr="${fhr:-000}"
+#
+#-----------------------------------------------------------------------
+#
+# Set COM type definitions.
+#
+#-----------------------------------------------------------------------
+#
+[[ "$WORKFLOW_MANAGER" = "rocoto" ]] && export COMROOT=$COMROOT
+export COMIN="${COMIN:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})}"
+export COMOUT="${COMOUT:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc})}"
+
+mkdir -p ${COMOUT}
+
+# Run setpdy to initialize PDYm and PDYp variables
+export cycle="${cycle:-t${cyc}z}"
+setpdy.sh
+. ./PDY
 #
 #-----------------------------------------------------------------------
 #

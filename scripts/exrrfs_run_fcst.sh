@@ -338,12 +338,11 @@ fi
 if [ "${DO_SMOKE_DUST}" = "TRUE" ]; then
   ln -snf  ${FIX_SMOKE_DUST}/${PREDEF_GRID_NAME}/dust12m_data.nc ${DATA}/INPUT/dust12m_data.nc
   ln -snf  ${FIX_SMOKE_DUST}/${PREDEF_GRID_NAME}/emi_data.nc ${DATA}/INPUT/emi_data.nc
-  yyyymmddhh=${CDATE:0:10}
-  echo ${yyyymmddhh}
+  echo ${CDATE}
   if [ "${CYCLE_TYPE}" = "spinup" ]; then
-    smokefile=${COMOUT_BASEDIR}/RAVE_INTP/SMOKE_RRFS_data_${yyyymmddhh}00_spinup.nc
+    smokefile=${COMOUT_BASEDIR}/RAVE_INTP/SMOKE_RRFS_data_${CDATE}00_spinup.nc
   else
-    smokefile=${COMOUT_BASEDIR}/RAVE_INTP/SMOKE_RRFS_data_${yyyymmddhh}00.nc
+    smokefile=${COMOUT_BASEDIR}/RAVE_INTP/SMOKE_RRFS_data_${CDATE}00.nc
   fi
   echo "try to use smoke file=",${smokefile}
   if [ -f ${smokefile} ]; then

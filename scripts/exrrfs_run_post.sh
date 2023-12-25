@@ -100,13 +100,13 @@ esac
 #
 #-----------------------------------------------------------------------
 #
-# Get the cycle date and hour (in formats of yyyymmdd and hh, respectively)
+# Get the cycle date and hour (in formats of YYYYMMDD and HH, respectively)
 # from CDATE.
 #
 #-----------------------------------------------------------------------
 #
-yyyymmdd=${CDATE:0:8}
-hh=${CDATE:8:2}
+YYYYMMDD=${CDATE:0:8}
+HH=${CDATE:8:2}
 #
 #-----------------------------------------------------------------------
 #
@@ -143,7 +143,7 @@ else
   post_min=00
 fi
 
-post_time=$( date --utc --date "${yyyymmdd} ${hh} UTC + ${post_fhr} hours" "+%Y%m%d%H" )
+post_time=$( date --utc --date "${YYYYMMDD} ${HH} UTC + ${post_fhr} hours" "+%Y%m%d%H" )
 post_yyyy=${post_time:0:4}
 post_mm=${post_time:4:2}
 post_dd=${post_time:6:2}

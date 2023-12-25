@@ -11,8 +11,6 @@
 
 function ncvarlst_noaxis_time { ncks --trd -m ${1} | grep -E ': type' | cut -f 1 -d ' ' | sed 's/://' | sort |grep -v -i -E "axis|time" ;  }
 function ncvarlst_noaxis_time_new { ncks -m  ${1} | grep -E 'float' | cut -d "(" -f 1 | cut -c 10- ;  }
-export HDF5_USE_FILE_LOCKING=FALSE #clt to avoild recenter's error "NetCDF: HDF error"
-export MPICH_COLL_OPT_OFF=1  # to fix non-physical EnKF analysis increments
 #
 #-----------------------------------------------------------------------
 #
@@ -52,15 +50,12 @@ specified cycle.
 #
 #-----------------------------------------------------------------------
 #
-# Specify the set of valid argument names for this script/function.  
-# Then process the arguments provided to this script/function (which 
-# should consist of a set of name-value pairs of the form arg1="value1",
-# etc).
+# Set environment variables.
 #
 #-----------------------------------------------------------------------
 #
-valid_args=( "cycle_dir" "NWGES_DIR" "ob_type" )
-process_args valid_args "$@"
+export HDF5_USE_FILE_LOCKING=FALSE #clt to avoild recenter's error "NetCDF: HDF error"
+export MPICH_COLL_OPT_OFF=1  # to fix non-physical EnKF analysis increments
 
 ulimit -s unlimited
 ulimit -a
@@ -105,16 +100,11 @@ esac
 #
 #-----------------------------------------------------------------------
 #
-# Extract from CDATE the starting year, month, day, and hour of the
-# forecast.  These are needed below for various operations.
+# Extract from CDATE the starting year, month, day, and hour of forecast.
 #
 #-----------------------------------------------------------------------
 #
 START_DATE=$(echo "${CDATE}" | sed 's/\([[:digit:]]\{2\}\)$/ \1/')
-
-YYYYMMDDHH=$(date +%Y%m%d%H -d "${START_DATE}")
-
-vlddate=$CDATE
 l_fv3reg_filecombined=.false.
 #
 #-----------------------------------------------------------------------
@@ -153,18 +143,12 @@ for imem in  $(seq 1 $nens) ensmean; do
     memcharv0="mem"$(printf %03i $imem)
   fi
   slash_ensmem_subdir=$memchar
-  if [ "${CYCLE_TYPE}" = "spinup" ]; then
-    bkpath=${cycle_dir}/${slash_ensmem_subdir}/fcst_fv3lam_spinup/INPUT
-    observer_nwges_dir="${NWGES_DIR}/${slash_ensmem_subdir}/observer_gsi_spinup"
-  else
-    bkpath=${cycle_dir}/${slash_ensmem_subdir}/fcst_fv3lam/INPUT
-    observer_nwges_dir="${NWGES_DIR}/${slash_ensmem_subdir}/observer_gsi"
-  fi
+  bkpath=${COMIN}/${slash_ensmem_subdir}/INPUT
 
-  ln -snf  ${bkpath}/fv_core.res.tile1.nc      fv3sar_tile1_${memcharv0}_dynvars
-  ln -snf  ${bkpath}/fv_tracer.res.tile1.nc    fv3sar_tile1_${memcharv0}_tracer
-  ln -snf  ${bkpath}/sfc_data.nc               fv3sar_tile1_${memcharv0}_sfcdata
-  ln -snf  ${bkpath}/phy_data.nc               fv3sar_tile1_${memcharv0}_phyvar
+  ln -snf  ${bkpath}/fv_core.res.tile1.nc     fv3sar_tile1_${memcharv0}_dynvars
+  ln -snf  ${bkpath}/fv_tracer.res.tile1.nc   fv3sar_tile1_${memcharv0}_tracer
+  ln -snf  ${bkpath}/sfc_data.nc              fv3sar_tile1_${memcharv0}_sfcdata
+  ln -snf  ${bkpath}/phy_data.nc              fv3sar_tile1_${memcharv0}_phyvar
 #
 #-----------------------------------------------------------------------
 #
@@ -176,7 +160,7 @@ for imem in  $(seq 1 $nens) ensmean; do
     # Note, listall_rad is copied from exrrfs_run_analysis.sh
     listall_rad="hirs2_n14 msu_n14 sndr_g08 sndr_g11 sndr_g11 sndr_g12 sndr_g13 sndr_g08_prep sndr_g11_prep sndr_g12_prep sndr_g13_prep sndrd1_g11 sndrd2_g11 sndrd3_g11 sndrd4_g11 sndrd1_g15 sndrd2_g15 sndrd3_g15 sndrd4_g15 sndrd1_g13 sndrd2_g13 sndrd3_g13 sndrd4_g13 hirs3_n15 hirs3_n16 hirs3_n17 amsua_n15 amsua_n16 amsua_n17 amsua_n18 amsua_n19 amsua_metop-a amsua_metop-b amsua_metop-c amsub_n15 amsub_n16 amsub_n17 hsb_aqua airs_aqua amsua_aqua imgr_g08 imgr_g11 imgr_g12 pcp_ssmi_dmsp pcp_tmi_trmm conv sbuv2_n16 sbuv2_n17 sbuv2_n18 omi_aura ssmi_f13 ssmi_f14 ssmi_f15 hirs4_n18 hirs4_metop-a mhs_n18 mhs_n19 mhs_metop-a mhs_metop-b mhs_metop-c amsre_low_aqua amsre_mid_aqua amsre_hig_aqua ssmis_las_f16 ssmis_uas_f16 ssmis_img_f16 ssmis_env_f16 iasi_metop-a iasi_metop-b iasi_metop-c seviri_m08 seviri_m09 seviri_m10 seviri_m11 cris_npp atms_npp ssmis_f17 cris-fsr_npp cris-fsr_n20 atms_n20 abi_g16"
     
-    if [ "${ob_type}" = "conv" ]; then
+    if [ "${OB_TYPE}" = "conv" ]; then
       list_ob_type="conv_ps conv_q conv_t conv_uv conv_pw conv_rw conv_sst"	
 
       if [ "${DO_ENS_RADDA}" = "TRUE" ]; then
@@ -184,11 +168,11 @@ for imem in  $(seq 1 $nens) ensmean; do
       fi	
     fi
 	
-    if [ "${ob_type}" = "radardbz" ]; then
+    if [ "${OB_TYPE}" = "radardbz" ]; then
       list_ob_type="conv_dbz"
     fi
     for sub_ob_type in ${list_ob_type} ; do
-      diagfile0=${observer_nwges_dir}/diag_${sub_ob_type}_ges.${YYYYMMDDHH}.nc4
+      diagfile0=${COMOUT}/diag_${sub_ob_type}_ges.${CDATE}.nc4
       if [ -s $diagfile0 ]; then
         diagfile=$(basename  $diagfile0)
         cp  $diagfile0  $diagfile
@@ -197,7 +181,7 @@ for imem in  $(seq 1 $nens) ensmean; do
       fi
     done
   else
-    for diagfile0 in $(ls  ${observer_nwges_dir}/diag*${ob_type}*ges* ) ; do
+    for diagfile0 in $(ls  ${observer_nwges_dir}/diag*${OB_TYPE}*ges* ) ; do
       if [ -s $diagfile0 ]; then
          diagfile=$(basename  $diagfile0)
          cp  $diagfile0   diag_conv_ges.$memcharv0
@@ -216,21 +200,21 @@ found_ob_type=0
 
 CONVINFO=${FIX_GSI}/convinfo.rrfs
 
-if [ "${ob_type}" = "conv" ]; then
+if [ "${OB_TYPE}" = "conv" ]; then
   ANAVINFO=${FIX_GSI}/${ENKF_ANAVINFO_FN}
   found_ob_type=1
 fi
-if [ "${ob_type}" = "radardbz" ]; then
+if [ "${OB_TYPE}" = "radardbz" ]; then
   ANAVINFO=${FIX_GSI}/${ENKF_ANAVINFO_DBZ_FN}
   CORRLENGTH=${CORRLENGTH_radardbz}
   LNSIGCUTOFF=${LNSIGCUTOFF_radardbz}
   found_ob_type=1
 fi
 if [ ${found_ob_type} == 0 ]; then
-  err_exit "Unknown observation type: ${ob_type}"
+  err_exit "Unknown observation type: ${OB_TYPE}"
 fi
-stdout_name=stdout.${ob_type}
-stderr_name=stderr.${ob_type}
+stdout_name=stdout.${OB_TYPE}
+stderr_name=stderr.${OB_TYPE}
 
 SATINFO=${FIX_GSI}/global_satinfo.txt
 OZINFO=${FIX_GSI}/global_ozinfo.txt
@@ -246,8 +230,6 @@ if [ "${DO_ENS_RADDA}" = "TRUE" ]; then
   #   - The file check is back in time for up to 72 hours only.  EnVar checks up to 240 hours back.
   #   - No $satbias_dir is defined in EnKF.  Thus, it is defined as below.
   #   - No use of radstat file in EnKF
-
-  satbias_dir=$NWGES_DIR/../satbias_ensmean
   
   # Searching the satbias files from ${satbias_dir}
   satcounter=1
@@ -256,11 +238,11 @@ if [ "${DO_ENS_RADDA}" = "TRUE" ]; then
     SAT_TIME=`date +"%Y%m%d%H" -d "${START_DATE}  ${satcounter} hours ago"`
     echo $SAT_TIME
   
-    if [ -r ${satbias_dir}/rrfs.prod.${SAT_TIME}_satbias ]; then
+    if [ -r ${COMIN}/rrfs.prod.${SAT_TIME}_satbias ]; then
       echo " using satellite bias files from ${SAT_TIME}"
       
-      cp ${satbias_dir}/rrfs.prod.${SAT_TIME}_satbias ./satbias_in
-      cp ${satbias_dir}/rrfs.prod.${SAT_TIME}_satbias_pc ./satbias_pc
+      cp ${COMIN}/rrfs.prod.${SAT_TIME}_satbias ./satbias_in
+      cp ${COMIN}/rrfs.prod.${SAT_TIME}_satbias_pc ./satbias_pc
     
       break
     fi
@@ -318,7 +300,7 @@ use_gfs_nemsio=.true.,
 #
 	cat > enkf.nml << EOFnml
 	&nam_enkf
-	datestring="$vlddate",datapath="$enkfworkdir/",
+	datestring="$CDATE",datapath="$DATA/",
 	analpertwtnh=1.10,analpertwtsh=1.10,analpertwttr=1.10,
 	covinflatemax=1.e2,covinflatemin=1,pseudo_rh=.true.,iassim_order=0,
         corrlengthnh=$CORRLENGTH,corrlengthsh=$CORRLENGTH,corrlengthtr=$CORRLENGTH,
@@ -448,14 +430,8 @@ countdiag=$(ls diag*conv* | wc -l)
 if [ $countdiag -gt $nens ]; then
   ${APRUN} ${EXECrrfs}/$pgm < enkf.nml >>$pgmout 2>errfile
   export err=$?; err_chk
-
-  cp ${pgmout} ${enkfanal_nwges_dir}/.
-  if [ ! -d ${NWGES_DIR}/../enkf_diag ]; then
-    mkdir -p ${NWGES_DIR}/../enkf_diag
-  fi
-  cp ${pgmout} ${NWGES_DIR}/../enkf_diag/${stdout_name}.$vlddate
 else
-  echo "WARNING: EnKF not running due to lack of ${ob_type} obs for cycle $vlddate !!!"
+  echo "WARNING: EnKF not running due to lack of ${OB_TYPE} obs for cycle $CDATE !!!"
 fi
 
 print_info_msg "

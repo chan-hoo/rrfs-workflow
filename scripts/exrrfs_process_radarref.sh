@@ -89,9 +89,9 @@ esac
 #
 START_DATE=$(echo "${CDATE}" | sed 's/\([[:digit:]]\{2\}\)$/ \1/')
 
-yyyy=${CDATE:0:4}
-mm=${CDATE:4:2}
-dd=${CDATE:6:2}
+YYYY=${CDATE:0:4}
+MM=${CDATE:4:2}
+DD=${CDATE:6:2}
 #
 #-----------------------------------------------------------------------
 #
@@ -200,20 +200,20 @@ for bigmin in ${RADARREFL_TIMELEVEL[@]}; do
   for min in ${RADARREFL_MINS[@]}
   do
     min=$( printf %2.2i $((bigmin+min)) )
-    echo "Looking for data valid:"${yyyy}"-"${mm}"-"${dd}" "${cyc}":"${min}
+    echo "Looking for data valid:"${YYYY}"-"${MM}"-"${DD}" "${cyc}":"${min}
     s=0
     while [[ $s -le 59 ]]; do
       ss=$(printf %2.2i ${s})
-      nsslfile=${NSSL}/*${mrms}_00.50_${yyyy}${mm}${dd}-${cyc}${min}${ss}.${obs_appendix}
+      nsslfile=${NSSL}/*${mrms}_00.50_${YYYY}${MM}${DD}-${cyc}${min}${ss}.${obs_appendix}
       if [ -s $nsslfile ]; then
         echo 'Found '${nsslfile}
-        nsslfile1=*${mrms}_*_${yyyy}${mm}${dd}-${cyc}${min}*.${obs_appendix}
+        nsslfile1=*${mrms}_*_${YYYY}${MM}${DD}-${cyc}${min}*.${obs_appendix}
         numgrib2=$(ls ${NSSL}/${nsslfile1} | wc -l)
         echo 'Number of GRIB-2 files: '${numgrib2}
         if [ ${numgrib2} -ge 10 ] && [ ! -e filelist_mrms ]; then
           cp ${NSSL}/${nsslfile1} . 
           ls ${nsslfile1} > filelist_mrms 
-          echo 'Creating links for ${yyyy}${mm}${dd}-${cyc}${min}'
+          echo 'Creating links for ${YYYY}${MM}${DD}-${cyc}${min}'
         fi
       fi
       ((s+=1))
@@ -234,7 +234,7 @@ for bigmin in ${RADARREFL_TIMELEVEL[@]}; do
      if [ "${obs_appendix}" = "grib2.gz" ]; then
         gzip -d *.gz
         mv filelist_mrms filelist_mrms_org
-        ls MergedReflectivityQC_*_${yyyy}${mm}${dd}-${cyc}????.grib2 > filelist_mrms
+        ls MergedReflectivityQC_*_${YYYY}${MM}${DD}-${cyc}????.grib2 > filelist_mrms
      fi
 
      numgrib2=$(more filelist_mrms | wc -l)

@@ -93,17 +93,6 @@ esac
 #
 #-----------------------------------------------------------------------
 #
-# Get the cycle date and hour (in formats of yyyymmdd and hh, respectively)
-# from cdate.
-#
-#-----------------------------------------------------------------------
-#
-yyyymmdd=${CDATE:0:8}
-hh=${CDATE:8:2}
-cyc=$hh
-#
-#-----------------------------------------------------------------------
-#
 # Create a text file (itag) containing arguments to pass to the post-
 # processing executable.
 #
@@ -123,15 +112,15 @@ FHRLIM=60
 let NFILE=1
 
 START_DATE=$(echo "${CDATE}" | sed 's/\([[:digit:]]\{2\}\)$/ \1/')
-yyyy=${CDATE:0:4}
-mm=${CDATE:4:2}
-dd=${CDATE:6:2}
-STARTDATE=${yyyy}-${mm}-${dd}_${cyc}:00:00
+YYYY=${CDATE:0:4}
+MM=${CDATE:4:2}
+DD=${CDATE:6:2}
+STARTDATE=${YYYY}-${MM}-${DD}_${cyc}:00:00
 endtime=$(date +%Y%m%d%H -d "${START_DATE} +60 hours")
-yyyy=`echo $endtime | cut -c1-4`
-mm=`echo $endtime | cut -c5-6`
-dd=`echo $endtime | cut -c7-8`
-FINALDATE=${yyyy}-${mm}-${dd}_${cyc}:00:00
+YYYY=`echo $endtime | cut -c1-4`
+MM=`echo $endtime | cut -c5-6`
+DD=`echo $endtime | cut -c7-8`
+FINALDATE=${YYYY}-${MM}-${DD}_${cyc}:00:00
 
 if [ -e sndpostdone00.tm00 ]; then
   lasthour=`ls -1rt sndpostdone??.tm00 | tail -1 | cut -c 12-13`

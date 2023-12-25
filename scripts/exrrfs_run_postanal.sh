@@ -48,31 +48,7 @@ specified cycle.
 #
 #-----------------------------------------------------------------------
 #
-# Specify the set of valid argument names for this script/function.
-# Then process the arguments provided to this script/function (which 
-# should consist of a set of name-value pairs of the form arg1="value1",
-# etc).
-#
-#-----------------------------------------------------------------------
-#
-valid_args=( "cycle_dir" "gsi_type" "mem_type" "analworkdir" \
-             "slash_ensmem_subdir" \
-             "satbias_dir" "ob_type" )
-process_args valid_args "$@"
-#
-#-----------------------------------------------------------------------
-#
-# For debugging purposes, print out values of arguments passed to this
-# script.  Note that these will be printed out only if VERBOSE is set to
-# TRUE.
-#
-#-----------------------------------------------------------------------
-#
-print_input_args valid_args
-#
-#-----------------------------------------------------------------------
-#
-# Set environment
+# Set environment variables.
 #
 #-----------------------------------------------------------------------
 #
@@ -117,21 +93,13 @@ esac
 #
 #-----------------------------------------------------------------------
 #
-# Extract from CDATE the starting year, month, day, and hour of the
-# forecast.  These are needed below for various operations.
+# Extract from CDATE the starting year, month, day, and hour of forecast.
 #
 #-----------------------------------------------------------------------
 #
-START_DATE=$(echo "${CDATE}" | sed 's/\([[:digit:]]\{2\}\)$/ \1/')
-
-YYYYMMDDHH=$(date +%Y%m%d%H -d "${START_DATE}")
-JJJ=$(date +%j -d "${START_DATE}")
-
-YYYY=${YYYYMMDDHH:0:4}
-MM=${YYYYMMDDHH:4:2}
-DD=${YYYYMMDDHH:6:2}
-HH=${YYYYMMDDHH:8:2}
-YYYYMMDD=${YYYYMMDDHH:0:8}
+YYYY=${CDATE:0:4}
+MM=${CDATE:4:2}
+DD=${CDATE:6:2}
 #
 #-----------------------------------------------------------------------
 #
@@ -140,17 +108,18 @@ YYYYMMDD=${YYYYMMDDHH:0:8}
 #-----------------------------------------------------------------------
 #
 fixgriddir=$FIX_GSI/${PREDEF_GRID_NAME}
-if [ "${CYCLE_TYPE}" = "spinup" ]; then
-  if [ "${mem_type}" = "MEAN" ]; then
-    bkpath=${cycle_dir}/ensmean/fcst_fv3lam_spinup/INPUT
-  else
-    bkpath=${cycle_dir}${slash_ensmem_subdir}/fcst_fv3lam_spinup/INPUT
-  fi
+
+if [ "${MEM_TYPE}" = "MEAN" ]; then
+  bkpath="${COMIN}/ensmean/INPUT"
 else
-  if [ "${mem_type}" = "MEAN" ]; then
-    bkpath=${cycle_dir}/ensmean/fcst_fv3lam/INPUT
+  if [ "${CYCLE_TYPE}" = "spinup" ]; then
+    if [ "${CYCLE_SUBTYPE}" = "ensinit" ]; then
+      bkpath="${DATAROOT}/${TAG}_${RUN_FCST_TN}_ensinit${USCORE_ENSMEM_NAME}.${CDATE}/INPUT"
+    else
+      bkpath="${DATAROOT}/${TAG}_${RUN_FCST_TN}_spinup${USCORE_ENSMEM_NAME}.${CDATE}/INPUT"
+    fi
   else
-    bkpath=${cycle_dir}${slash_ensmem_subdir}/fcst_fv3lam/INPUT
+    bkpath="${DATAROOT}/${TAG}_${RUN_FCST_TN}_prod${USCORE_ENSMEM_NAME}.${CDATE}/INPUT"
   fi
 fi
 # decide background type
@@ -166,14 +135,8 @@ fi
 #
 #-----------------------------------------------------------------------
 #
-if [ "${CYCLE_TYPE}" = "spinup" ]; then
-  analworkname="_gsi_spinup"
-else
-  analworkname="_gsi"
-fi
-
 if [[ ${BKTYPE} -eq 0 ]] && [[ "${DO_PM_DA}" = "TRUE" ]]; then  # warm start
-  analworkdir_aero="${cycle_dir}/anal_AERO_${analworkname}"
+  analworkdir_aero="${COMIN}/anal_AERO
   # Assume the GSI analysis files are in current dir
   if [ "${IO_LAYOUT_Y}" = "1" ]; then
     ln -snf ${analworkdir_aero}/fv3_tracer  fv3_tracer_sdp
@@ -199,12 +162,12 @@ fi
 if [[ ${BKTYPE} -eq 0 ]] && [[ ${ob_type} =~ "conv" ]] && [[ "${DO_SOIL_ADJUST}" = "TRUE" ]]; then  # warm start
   cd ${bkpath}
   if [ "${IO_LAYOUT_Y}" = "1" ]; then
-    ln -snf ${fixgriddir}/fv3_grid_spec                fv3_grid_spec
+    ln -snf ${fixgriddir}/fv3_grid_spec fv3_grid_spec
   else
     for ii in ${list_iolayout}
     do
       iii=`printf %4.4i $ii`
-      ln  -snf ${gridspec_dir}/fv3_grid_spec.${iii}    fv3_grid_spec.${iii}
+      ln -snf ${gridspec_dir}/fv3_grid_spec.${iii} fv3_grid_spec.${iii}
     done
   fi
 
@@ -214,7 +177,7 @@ cat << EOF > namelist.soiltq
   iyear=${YYYY},
   imonth=${MM},
   iday=${DD},
-  ihour=${HH},
+  ihour=${cyc},
   iminute=0,
  /
 EOF
