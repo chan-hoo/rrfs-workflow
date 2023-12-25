@@ -86,24 +86,6 @@ case $MACHINE in
 #
 esac
 #
-#-----------------------------------------------------------------------
-#
-# Extract from CDATE the starting year, month, day, and hour of the
-# forecast.  These are needed below for various operations.
-#
-#-----------------------------------------------------------------------
-#
-START_DATE=$(echo "${CDATE}" | sed 's/\([[:digit:]]\{2\}\)$/ \1/')
-
-YYYYMMDDHH=$(date +%Y%m%d%H -d "${START_DATE}")
-JJJ=$(date +%j -d "${START_DATE}")
-
-YYYY=${YYYYMMDDHH:0:4}
-MM=${YYYYMMDDHH:4:2}
-DD=${YYYYMMDDHH:6:2}
-HH=${YYYYMMDDHH:8:2}
-YYYYMMDD=${YYYYMMDDHH:0:8}
-#
 #--------------------------------------------------------------------
 #
 # loop through ensemble members to link all the member files
@@ -122,7 +104,7 @@ for imem in  $(seq 1 $nens)
   ensmem=$( printf "%04d" $imem ) 
   memberstring=$( printf "%03d" $imem )
 
-  bkpath=${CYCLE_DIR}/mem${ensmem}/${fg_restart_dirname}/INPUT  # cycling, use background from RESTART
+  bkpath=${COMIN}/mem${ensmem}/${fg_restart_dirname}/INPUT  # cycling, use background from RESTART
 
   dynvarfile=${bkpath}/fv_core.res.tile1.nc
   tracerfile=${bkpath}/fv_tracer.res.tile1.nc
@@ -162,18 +144,18 @@ cp -f ./fv3sar_tile1_mem001_sfcvar fv3sar_tile1_sfcvar
 #
 #-----------------------------------------------------------------------
 #
-dynvarfile_control=${ctrlpath}/fcst_fv3lam/INPUT/fv_core.res.tile1.nc
-tracerfile_control=${ctrlpath}/fcst_fv3lam/INPUT/fv_tracer.res.tile1.nc
-dynvarfile_control_spinup=${ctrlpath}/fcst_fv3lam_spinup/INPUT/fv_core.res.tile1.nc
-tracerfile_control_spinup=${ctrlpath}/fcst_fv3lam_spinup/INPUT/fv_tracer.res.tile1.nc
+dynvarfile_control=${COMIN}/INPUT/fv_core.res.tile1.nc
+tracerfile_control=${COMIN}/INPUT/fv_tracer.res.tile1.nc
+dynvarfile_control_spinup=${COMIN}/fcst_fv3lam_spinup/INPUT/fv_core.res.tile1.nc
+tracerfile_control_spinup=${COMIN}/fcst_fv3lam_spinup/INPUT/fv_tracer.res.tile1.nc
 if [ -r "${dynvarfile_control_spinup}" ] && [ -r "${tracerfile_control_spinup}" ] && [[ ${DO_ENSFCST} != "TRUE" ]] ; then
-  ln -sf ${ctrlpath}/fcst_fv3lam_spinup/INPUT/fv_core.res.tile1.nc  ./control_dynvar
-  ln -sf ${ctrlpath}/fcst_fv3lam_spinup/INPUT/fv_tracer.res.tile1.nc   ./control_tracer
-  ln -sf ${ctrlpath}/fcst_fv3lam_spinup/INPUT/sfc_data.nc  ./control_sfcvar
+  ln -sf ${COMIN}/fcst_fv3lam_spinup/INPUT/fv_core.res.tile1.nc  ./control_dynvar
+  ln -sf ${COMIN}/fcst_fv3lam_spinup/INPUT/fv_tracer.res.tile1.nc   ./control_tracer
+  ln -sf ${COMIN}/fcst_fv3lam_spinup/INPUT/sfc_data.nc  ./control_sfcvar
 elif [ -r "${dynvarfile_control}" ] && [ -r "${tracerfile_control}" ] ; then
-  ln -sf ${ctrlpath}/fcst_fv3lam/INPUT/fv_core.res.tile1.nc  ./control_dynvar
-  ln -sf ${ctrlpath}/fcst_fv3lam/INPUT/fv_tracer.res.tile1.nc   ./control_tracer
-  ln -sf ${ctrlpath}/fcst_fv3lam/INPUT/sfc_data.nc  ./control_sfcvar
+  ln -sf ${COMIN}/fcst_fv3lam/INPUT/fv_core.res.tile1.nc  ./control_dynvar
+  ln -sf ${COMIN}/fcst_fv3lam/INPUT/fv_tracer.res.tile1.nc   ./control_tracer
+  ln -sf ${COMIN}/fcst_fv3lam/INPUT/sfc_data.nc  ./control_sfcvar
 else
   err_exit "Cannot find background: ${dynvarfile_control} or ${dynvarfile_control_spinup}"
 fi
@@ -209,7 +191,6 @@ EOF
 #
 #-----------------------------------------------------------------------
 #
-echo pwd is `pwd`
 export pgm="ens_mean_recenter_P2DIO.exe"
 
 ${APRUN} ${EXECrrfs}/$pgm < namelist.ens >>$pgmout 2>errfile
@@ -229,7 +210,7 @@ done
 #
 # touch a file to show completion of the task
 #
-touch ${COMOUT}/recenter_complete.txt
+touch ${LOGDIR}/recenter_complete.txt
 #
 #-----------------------------------------------------------------------
 #

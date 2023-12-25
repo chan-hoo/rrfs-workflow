@@ -48,40 +48,12 @@ the output files corresponding to a specified forecast hour.
 #
 #-----------------------------------------------------------------------
 #
-# Specify the set of valid argument names for this script/function.  
-# Then process the arguments provided to this script/function (which 
-# should consist of a set of name-value pairs of the form arg1="value1",
-# etc).
-#
-#-----------------------------------------------------------------------
-#
-valid_args=( \
-"cdate" \
-)
-process_args valid_args "$@"
-#
-#-----------------------------------------------------------------------
-#
-# For debugging purposes, print out values of arguments passed to this
-# script.  Note that these will be printed out only if VERBOSE is set to
-# TRUE.
-#
-#-----------------------------------------------------------------------
-#
-print_input_args valid_args
-#
-#-----------------------------------------------------------------------
-#
 # Get the cycle date and hour (in formats of yyyymmdd and hh, respectively)
 # from cdate.
 #
 #-----------------------------------------------------------------------
 #
-yyyymmdd=${cdate:0:8}
-hh=${cdate:8:2}
-cyc=$hh
-
-save_time=$( date --utc --date "${yyyymmdd} ${hh} UTC + ${fhr} hours" "+%Y%m%d%H" )
+save_time=$( date --utc --date "${PDY} ${cyc} UTC + ${fhr} hours" "+%Y%m%d%H" )
 save_yyyy=${save_time:0:4}
 save_mm=${save_time:4:2}
 save_dd=${save_time:6:2}
@@ -95,6 +67,15 @@ save_hh=${save_time:8:2}
 # stage the restart files for a long time. 
 #-----------------------------------------------------------------------
 #
+if [ "${CYCLE_TYPE}" = "spinup" ]; then
+  if [ "${CYCLE_SUBTYPE}" = "ensinit" ]; then
+    DATAFCST="${DATAROOT}/${TAG}_${RUN_FCST_TN}_ensinit${USCORE_ENSMEM_NAME}.${CDATE}"
+  else
+    DATAFCST="${DATAROOT}/${TAG}_${RUN_FCST_TN}_spinup${USCORE_ENSMEM_NAME}.${CDATE}"
+  fi
+else
+  DATAFCST="${DATAROOT}/${TAG}_${RUN_FCST_TN}_prod${USCORE_ENSMEM_NAME}.${CDATE}"
+fi
 filelist="fv_core.res.nc coupler.res"
 filelistn="fv_core.res.tile1.nc fv_srf_wnd.res.tile1.nc fv_tracer.res.tile1.nc phy_data.nc sfc_data.nc"
 filelistcold="gfs_data.tile7.halo0.nc sfc_data.tile7.halo0.nc"
@@ -109,27 +90,27 @@ fi
 
 if_save_input=FALSE
 
-if [ ! -r ${nwges_dir}/INPUT/gfs_ctrl.nc ]; then
-  cp $run_dir/INPUT/gfs_ctrl.nc ${nwges_dir}/INPUT/gfs_ctrl.nc
+if [ ! -r ${COMOUT}/INPUT/gfs_ctrl.nc ]; then
+  cp $DATAFCST/INPUT/gfs_ctrl.nc ${COMOUT}/INPUT/gfs_ctrl.nc
   if_save_input=TRUE
 fi
 
-if [ -r "$run_dir/RESTART/${restart_prefix}.coupler.res" ]; then
+if [ -r "$DATAFCST/RESTART/${restart_prefix}.coupler.res" ]; then
   if [ "${IO_LAYOUT_Y}" = "1" ]; then
     for file in ${filelistn}; do
-      mv $run_dir/RESTART/${restart_prefix}.${file} ${nwges_dir}/RESTART/${restart_prefix}.${file}
+      mv $DATAFCST/RESTART/${restart_prefix}.${file} ${COMOUT}/RESTART/${restart_prefix}.${file}
     done
   else
     for file in ${filelistn}; do
       for ii in ${list_iolayout}
       do
         iii=$(printf %4.4i $ii)
-        mv $run_dir/RESTART/${restart_prefix}.${file}.${iii} ${nwges_dir}/RESTART/${restart_prefix}.${file}.${iii}
+        mv $DATAFCST/RESTART/${restart_prefix}.${file}.${iii} ${COMOUT}/RESTART/${restart_prefix}.${file}.${iii}
       done
     done
   fi
   for file in ${filelist}; do
-    mv $run_dir/RESTART/${restart_prefix}.${file} ${nwges_dir}/RESTART/${restart_prefix}.${file}
+    mv $DATAFCST/RESTART/${restart_prefix}.${file} ${COMOUT}/RESTART/${restart_prefix}.${file}
   done
   echo " ${fhr} forecast from ${yyyymmdd}${hh} is ready " #> ${nwges_dir}/RESTART/restart_done_f${fhr}
 else
@@ -146,26 +127,26 @@ else
   fi
   print_info_msg "The forecast length for cycle (\"${hh}\") is (\"${FCST_LEN_HRS_thiscycle}\")."
 
-  if [ -r "$run_dir/RESTART/${restart_prefix}.coupler.res" ] && ([ ${fhr} -eq ${FCST_LEN_HRS_thiscycle} ] || [ "${CYCLE_SUBTYPE}" = "ensinit" ]); then
+  if [ -r "$DATAFCST/RESTART/${restart_prefix}.coupler.res" ] && ([ ${fhr} -eq ${FCST_LEN_HRS_thiscycle} ] || [ "${CYCLE_SUBTYPE}" = "ensinit" ]); then
     if [ "${IO_LAYOUT_Y}" = "1" ]; then
       for file in ${filelistn}; do
-        mv $run_dir/RESTART/${file} ${nwges_dir}/RESTART/${restart_prefix}.${file}
+        mv $DATAFCST/RESTART/${file} ${COMOUT}/RESTART/${restart_prefix}.${file}
       done
     else
       for file in ${filelistn}; do
         for ii in ${list_iolayout}
         do
           iii=$(printf %4.4i $ii)
-          mv $run_dir/RESTART/${file}.${iii} ${nwges_dir}/RESTART/${restart_prefix}.${file}.${iii}
+          mv $DATAFCST/RESTART/${file}.${iii} ${COMOUT}/RESTART/${restart_prefix}.${file}.${iii}
         done
       done
     fi
     for file in ${filelist}; do
-       mv $run_dir/RESTART/${file} ${nwges_dir}/RESTART/${restart_prefix}.${file}
+       mv $DATAFCST/RESTART/${file} ${COMOUT}/RESTART/${restart_prefix}.${file}
     done
-    echo " ${fhr} forecast from ${yyyymmdd}${hh} is ready " #> ${nwges_dir}/RESTART/restart_done_f${fhr}
+    echo " ${fhr} forecast from ${yyyymmdd}${hh} is ready " #> ${COMOUT}/RESTART/restart_done_f${fhr}
   else
-    echo "This forecast hour does not need to save restart: ${yyyymmdd}${hh}f${fhr}"
+    echo "This forecast hour does not need to save restart: ${PDY}${cyc}f${fhr}"
   fi
 fi
 #
@@ -175,12 +156,12 @@ fi
 #
 if [ "${CYCLE_TYPE}" = "prod" ] && [ "${CYCLE_SUBTYPE}" = "control" ]; then
   if [ "${IO_LAYOUT_Y}" = "1" ]; then
-    cp ${nwges_dir}/RESTART/${restart_prefix}.sfc_data.nc ${SURFACE_DIR}/${restart_prefix}.sfc_data.nc.${cdate}
+    cp ${COMOUT}/RESTART/${restart_prefix}.sfc_data.nc ${DATA}/${restart_prefix}.sfc_data.nc.${cdate}
   else
     for ii in ${list_iolayout}
     do
       iii=$(printf %4.4i $ii)
-      cp ${nwges_dir}/RESTART/${restart_prefix}.sfc_data.nc.${iii} ${SURFACE_DIR}/${restart_prefix}.sfc_data.nc.${cdate}.${iii}
+      cp ${COMOUT}/RESTART/${restart_prefix}.sfc_data.nc.${iii} ${DATA}/${restart_prefix}.sfc_data.nc.${cdate}.${iii}
     done
   fi
 fi
@@ -191,26 +172,26 @@ fi
 #
 if [ "${if_save_input}" = TRUE ]; then
   if [ "${DO_SAVE_INPUT}" = TRUE ]; then
-    if [ -r ${run_dir}/INPUT/coupler.res ]; then  # warm start
+    if [ -r ${DATAFCST}/INPUT/coupler.res ]; then  # warm start
       if [ "${IO_LAYOUT_Y}" = "1" ]; then
         for file in ${filelistn}; do
-          cp $run_dir/INPUT/${file} ${nwges_dir}/INPUT/${file}
+          cp $DATAFCST/INPUT/${file} ${COMOUT}/INPUT/${file}
         done
       else
         for file in ${filelistn}; do
           for ii in ${list_iolayout}
           do
             iii=$(printf %4.4i $ii)
-           cp $run_dir/INPUT/${file}.${iii} ${nwges_dir}/INPUT/${file}.${iii}
+           cp $DATAFCST/INPUT/${file}.${iii} ${COMOUT}/INPUT/${file}.${iii}
           done
         done
       fi
       for file in ${filelist}; do
-        cp $run_dir/INPUT/${file} ${nwges_dir}/INPUT/${file}
+        cp $DATAFCST/INPUT/${file} ${COMOUT}/INPUT/${file}
       done
     else  # cold start
       for file in ${filelistcold}; do
-        cp $run_dir/INPUT/${file} ${nwges_dir}/INPUT/${file}
+        cp $DATAFCST/INPUT/${file} ${COMOUT}/INPUT/${file}
       done
     fi
   fi

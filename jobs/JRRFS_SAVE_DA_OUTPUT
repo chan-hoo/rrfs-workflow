@@ -60,11 +60,12 @@ on the output files corresponding to a specified forecast hour.
 #
 #-----------------------------------------------------------------------
 #
+# Flag for shared working directory
+flag_shared_working_dir="FALSE"
+
 # Define job and jobid by default for rocoto
 WORKFLOW_MANAGER="${WORKFLOW_MANAGER:-rocoto}"
 if [ "${WORKFLOW_MANAGER}" = "rocoto" ]; then
-  # Flag for shared working directory
-  flag_shared_working_dir="FALSE"
   if [ "${SCHED}" = "slurm" ]; then
     job_default=${SLURM_JOB_NAME}
     pid_default=${SLURM_JOB_ID}
@@ -106,6 +107,20 @@ cd $DATA
 #
 #-----------------------------------------------------------------------
 #
+# Set other environment variables.
+#
+#-----------------------------------------------------------------------
+#
+# CYCLE_TYPE is to indicate which type of cycle this job for:
+#   spinup: this job is for spin-up cycles
+#   others(prod): this job is for product cycle
+#
+export CYCLE_TYPE="${CYCLE_TYPE:-prod}"
+
+export CDATE="${CDATE:-${PDY}${cyc}}"
+#
+#-----------------------------------------------------------------------
+#
 # Set COM type definitions.
 #
 #-----------------------------------------------------------------------
@@ -123,52 +138,14 @@ setpdy.sh
 #
 #-----------------------------------------------------------------------
 #
-# Set other environment variables.
-#
-#-----------------------------------------------------------------------
-#
-
-
-
-
-
-
-
-
-#
-#-----------------------------------------------------------------------
-#
-# Set the run directory.
-#
-#-----------------------------------------------------------------------
-# CYCLE_TYPE is to indicate which type of cycle this job for:
-#   spinup: this job is for spin-up cycles
-#   others(prod): this job is for product cycle
-#
-# NWGES_DIR is the directory in which the model IC file (DA analysis) will be saved
-#
-export CYCLE_TYPE=${CYCLE_TYPE:-prod}
-if [ "${CYCLE_TYPE}" = "prod" ]; then
-  export run_dir="${CYCLE_DIR}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam"
-  export nwges_dir="${NWGES_DIR}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam"
-fi
-
-mkdir -p "${nwges_dir}/DA_OUTPUT"
-cd "${nwges_dir}/DA_OUTPUT"
-#
-#-----------------------------------------------------------------------
-#
 # Call the ex-script for this J-job.
 #
 #-----------------------------------------------------------------------
 #
-export pgmout="${nwges_dir}/DA_OUTPUT/OUTPUT.$$"
+export pgmout="${DATA}/OUTPUT.$$"
 env
 
-$SCRIPTSrrfs/exrrfs_save_da_output.sh \
-  cdate="${CDATE}" \
-  run_dir="${run_dir}" \
-  nwges_dir="${nwges_dir}"
+$SCRIPTSrrfs/exrrfs_save_da_output.sh
 export err=$?; err_chk
 
 if [ -e "$pgmout" ]; then
@@ -181,7 +158,7 @@ fi
 #
 #-----------------------------------------------------------------------
 #
-if [ "${KEEPDATA}" = "NO" ]; then
+if [ "${KEEPDATA}" = "NO" ] && [ "${flag_shared_working_dir}" = "FALSE" ]; then
   rm -rf ${DATA}
 fi
 #

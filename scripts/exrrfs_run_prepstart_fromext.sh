@@ -48,29 +48,7 @@ specified cycle.
 #
 #-----------------------------------------------------------------------
 #
-# Specify the set of valid argument names for this script/function.  
-# Then process the arguments provided to this script/function (which 
-# should consist of a set of name-value pairs of the form arg1="value1",
-# etc).
-#
-#-----------------------------------------------------------------------
-#
-valid_args=( "cycle_dir" "lbcs_root" "fg_root")
-process_args valid_args "$@"
-#
-#-----------------------------------------------------------------------
-#
-# For debugging purposes, print out values of arguments passed to this
-# script.  Note that these will be printed out only if VERBOSE is set to
-# TRUE.
-#
-#-----------------------------------------------------------------------
-#
-print_input_args valid_args
-#
-#-----------------------------------------------------------------------
-#
-# Set environment
+# Set environment variables
 #
 #-----------------------------------------------------------------------
 #
@@ -104,7 +82,6 @@ Run command has not been specified for this machine:
     ;;
 
 esac
-
 #
 #-----------------------------------------------------------------------
 #
@@ -115,17 +92,7 @@ esac
 #
 START_DATE=$(echo "${CDATE}" | sed 's/\([[:digit:]]\{2\}\)$/ \1/')
 
-YYYYMMDDHH=$(date +%Y%m%d%H -d "${START_DATE}")
-JJJ=$(date +%j -d "${START_DATE}")
-
-YYYY=${YYYYMMDDHH:0:4}
-MM=${YYYYMMDDHH:4:2}
-DD=${YYYYMMDDHH:6:2}
-HH=${YYYYMMDDHH:8:2}
-YYYYMMDD=${YYYYMMDDHH:0:8}
-
 current_time=$(date "+%T")
-
 YYYYMMDDm1=$(date +%Y%m%d -d "${START_DATE} 1 days ago")
 YYYYMMDDm2=$(date +%Y%m%d -d "${START_DATE} 2 days ago")
 #
@@ -140,7 +107,7 @@ YYYYMMDDm2=$(date +%Y%m%d -d "${START_DATE} 2 days ago")
 #
 #-----------------------------------------------------------------------
 #
-bkpath=${fg_root}/${YYYYMMDDHH}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/INPUT  # cycling, use background from INPUT
+bkpath=${FG_ROOT}/${CDATE}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/INPUT  # cycling, use background from INPUT
 
 checkfile=${bkpath}/coupler.res
 #
@@ -164,9 +131,9 @@ if [ -r "${checkfile}" ] ; then
       done
     done
   fi
-  cp ${fg_root}/${YYYYMMDDHH}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/INPUT/gfs_ctrl.nc  gfs_ctrl.nc
+  cp ${FG_ROOT}/${CDATE}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam/INPUT/gfs_ctrl.nc  gfs_ctrl.nc
   if [ "${SAVE_CYCLE_LOG}" = "TRUE" ]; then
-    echo "${YYYYMMDDHH}(${CYCLE_TYPE}): warm start at ${current_time} from ${checkfile} " >> ${EXPTDIR}/log.cycles
+    echo "${CDATE}(${CYCLE_TYPE}): warm start at ${current_time} from ${checkfile} " >> ${EXPTDIR}/log.cycles
   fi
 #
 # remove checksum from restart files. Checksum will cause trouble if model initializes from analysis
@@ -206,7 +173,7 @@ fi
 if [[ "${NET}" = "RTMA"* ]]; then
     #find a bdry file, make sure it exists and was written out completely.
     for i in $(seq 0 24); do #track back up to 24 cycles to find bdry files
-      lbcDIR="${lbcs_root}/$(date -d "${START_DATE} ${i} hours ago" +"%Y%m%d%H")/lbcs"
+      lbcDIR="${COMIN_BASEDIR}/$(date -d "${START_DATE} ${i} hours ago" +"%Y%m%d%H")/lbcs"
       if [[  -f ${lbcDIR}/gfs_bndy.tile7.001.nc ]]; then
         age=$(( $(date +%s) - $(date -r ${lbcDIR}/gfs_bndy.tile7.001.nc +%s) ))
         [[ age -gt 300 ]] && break
@@ -217,7 +184,7 @@ if [[ "${NET}" = "RTMA"* ]]; then
 
 else
   num_fhrs=( "${#FCST_LEN_HRS_CYCLES[@]}" )
-  ihh=$( expr ${HH} + 0 )
+  ihh=$( expr ${cyc} + 0 )
   if [ ${num_fhrs} -gt ${ihh} ]; then
      FCST_LEN_HRS_thiscycle=${FCST_LEN_HRS_CYCLES[${ihh}]}
   else
@@ -226,7 +193,7 @@ else
   if [ "${CYCLE_TYPE}" = "spinup" ]; then
      FCST_LEN_HRS_thiscycle=${FCST_LEN_HRS_SPINUP}
   fi 
-  print_info_msg "$VERBOSE" " The forecast length for cycle (\"${HH}\") is
+  print_info_msg "$VERBOSE" " The forecast length for cycle (\"${cyc}\") is
                  ( \"${FCST_LEN_HRS_thiscycle}\") "
 
   # let us figure out which boundary file is available
@@ -234,7 +201,7 @@ else
   n=${EXTRN_MDL_LBCS_SEARCH_OFFSET_HRS}
   end_search_hr=$(( 12 + ${EXTRN_MDL_LBCS_SEARCH_OFFSET_HRS} ))
   YYYYMMDDHHmInterv=$(date +%Y%m%d%H -d "${START_DATE} ${n} hours ago")
-  lbcs_path=${lbcs_root}/${YYYYMMDDHHmInterv}${SLASH_ENSMEM_SUBDIR}/lbcs
+  lbcs_path=${COMIN_BASEDIR}/${YYYYMMDDHHmInterv}${SLASH_ENSMEM_SUBDIR}/lbcs
   while [[ $n -le ${end_search_hr} ]] ; do
     last_bdy_time=$(( n + ${FCST_LEN_HRS_thiscycle} ))
     last_bdy=$(printf %3.3i $last_bdy_time)
@@ -258,7 +225,7 @@ else
       this_bdy=$(printf %3.3i $bdy_time)
       local_bdy=$(printf %3.3i $nb)
 
-      if [ -f "${lbcs_path}/${bndy_prefix}.${this_bdy}.nc" ]; then
+      if [ -f "${COMIN_BASEDIR}/${bndy_prefix}.${this_bdy}.nc" ]; then
         ln -sf ${relative_or_null} ${lbcs_path}/${bndy_prefix}.${this_bdy}.nc ${bndy_prefix}.${local_bdy}.nc
       fi
 

@@ -54,15 +54,6 @@ specified cycle.
 #-----------------------------------------------------------------------
 #
 START_DATE=$(echo "${CDATE}" | sed 's/\([[:digit:]]\{2\}\)$/ \1/')
-
-YYYYMMDDHH=$(date +%Y%m%d%H -d "${START_DATE}")
-JJJ=$(date +%j -d "${START_DATE}")
-
-YYYY=${YYYYMMDDHH:0:4}
-MM=${YYYYMMDDHH:4:2}
-DD=${YYYYMMDDHH:6:2}
-HH=${YYYYMMDDHH:8:2}
-YYYYMMDD=${YYYYMMDDHH:0:8}
 #
 #--------------------------------------------------------------------
 #
@@ -75,12 +66,12 @@ fg_restart_dirname=fcst_fv3lam
 fg_restart_dirname_spinup=fcst_fv3lam_spinup
 
 YYYYMMDDHHmInterv=$( date +%Y%m%d%H -d "${START_DATE} ${DA_CYCLE_INTERV} hours ago" )
-bkpath=${ENSCTRL_NWGES_BASEDIR}/${YYYYMMDDHHmInterv}/${fg_restart_dirname}/RESTART  # cycling, use background from RESTART
-bkpath_spinup=${ENSCTRL_NWGES_BASEDIR}/${YYYYMMDDHHmInterv}/${fg_restart_dirname_spinup}/RESTART  # cycling, use background from RESTART
+bkpath=${COMIN_BASEDIR}/${YYYYMMDDHHmInterv}/${fg_restart_dirname}/RESTART  # cycling, use background from RESTART
+bkpath_spinup=${COMIN_BASEDIR}/${YYYYMMDDHHmInterv}/${fg_restart_dirname_spinup}/RESTART  # cycling, use background from RESTART
 #
 #   the restart file from FV3 has a name like: ${YYYYMMDD}.${HH}0000.fv_core.res.tile1.nc
 #
-restart_prefix="${YYYYMMDD}.${HH}0000."
+restart_prefix="${PDY}.${cyc}0000."
 checkfile=${bkpath}/${restart_prefix}coupler.res
 checkfile_spinup=${bkpath_spinup}/${restart_prefix}coupler.res
 if [ -r "${checkfile}" ] ; then

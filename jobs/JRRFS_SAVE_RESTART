@@ -106,6 +106,23 @@ cd $DATA
 #
 #-----------------------------------------------------------------------
 #
+# Set other environment variables.
+#
+#-----------------------------------------------------------------------
+#
+# CYCLE_TYPE is to indicate which type of cycle this job for:
+#   spinup: this job is for spin-up cycles
+#   others(prod): this job is for product cycle
+#
+export CYCLE_TYPE="${CYCLE_TYPE:-prod}"
+export CYCLE_SUBTYPE="${CYCLE_SUBTYPE:-empty}"
+
+export CDATE="${CDATE:-${PDY}${cyc}}"
+export SLASH_ENSMEM_SUBDIR="${SLASH_ENSMEM_SUBDIR:-}"
+export fhr=$( printf "%s" "${fhr}" | sed -n -r -e "s/^([0-9]+)$/\1/p" )
+#
+#-----------------------------------------------------------------------
+#
 # Set COM type definitions.
 #
 #-----------------------------------------------------------------------
@@ -123,80 +140,14 @@ setpdy.sh
 #
 #-----------------------------------------------------------------------
 #
-# Set other environment variables.
-#
-#-----------------------------------------------------------------------
-#
-
-
-
-
-
-
-#
-#-----------------------------------------------------------------------
-#
-# Set the run directory.
-#
-#-----------------------------------------------------------------------
-# CYCLE_TYPE is to indicate which type of cycle this job for:
-#   spinup: this job is for spin-up cycles
-#   others(prod): this job is for product cycle
-#
-# NWGES_DIR is the directory in which the model restart file will be saved
-#
-export CYCLE_TYPE=${CYCLE_TYPE:-prod}
-export CYCLE_SUBTYPE=${CYCLE_SUBTYPE:-empty}
-export SURFACE_DIR=${SURFACE_DIR:-empty}
-if [ "${CYCLE_TYPE}" = "spinup" ]; then
-  export run_dir="${CYCLE_DIR}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam_spinup"
-  export nwges_dir="${NWGES_DIR}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam_spinup"
-  if [ "${CYCLE_SUBTYPE}" = "ensinit" ]; then
-    run_dir="${CYCLE_DIR}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam_ensinit"
-    nwges_dir="${NWGES_DIR}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam_ensinit"
-  fi
-else
-  export run_dir="${CYCLE_DIR}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam"
-  export nwges_dir="${NWGES_DIR}${SLASH_ENSMEM_SUBDIR}/fcst_fv3lam"
-fi
-
-mkdir -p "${nwges_dir}/RESTART"
-mkdir -p "${nwges_dir}/INPUT"
-if [ "${SURFACE_DIR}" != "empty" ]; then
-  mkdir -p "${SURFACE_DIR}"
-fi
-
-len_ensmem=${#SLASH_ENSMEM_SUBDIR}
-if [ ${len_ensmem} -eq 0 ]; then
-  CYCLE_SUBTYPE="control"
-fi
-cd ${SURFACE_DIR}
-#
-#-----------------------------------------------------------------------
-#
-# Make sure that fhr is a non-empty string consisting of only digits.  
-#
-#-----------------------------------------------------------------------
-#
-export fhr=$( printf "%s" "${fhr}" | sed -n -r -e "s/^([0-9]+)$/\1/p" )
-if [ -z "$fhr" ]; then
-  err_exit "\
-The forecast hour (fhr) must be a non-empty string consisting of only 
-digits:
-  fhr = \"${fhr}\""
-fi
-#
-#-----------------------------------------------------------------------
-#
 # Call the ex-script for this J-job.
 #
 #-----------------------------------------------------------------------
 #
-export pgmout="${SURFACE_DIR}/OUTPUT.$$"
+export pgmout="${DATA}/OUTPUT.$$"
 env
 
-$SCRIPTSrrfs/exrrfs_save_restart.sh \
-  cdate="${CDATE}"
+$SCRIPTSrrfs/exrrfs_save_restart.sh
 export err=$?; err_chk
 
 if [ -e "$pgmout" ]; then
@@ -209,7 +160,7 @@ fi
 #
 #-----------------------------------------------------------------------
 #
-if [ "${KEEPDATA}" = "NO" ]; then
+if [ "${KEEPDATA}" = "NO" ] && [ "${flag_shared_working_dir}" = "FALSE" ]; then
   rm -rf ${DATA}
 fi
 #

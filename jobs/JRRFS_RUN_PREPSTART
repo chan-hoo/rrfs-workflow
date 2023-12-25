@@ -158,7 +158,7 @@ setpdy.sh
 #
 #-----------------------------------------------------------------------
 #
-export pgmout="${modelinputdir}/OUTPUT.$$"
+export pgmout="${DATA}/OUTPUT.$$"
 env
 
 $SCRIPTSrrfs/exrrfs_run_prepstart.sh
