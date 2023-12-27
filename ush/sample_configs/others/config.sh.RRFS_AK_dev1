@@ -121,16 +121,12 @@ DT_ATMOS=40
 EXTRN_MDL_NAME_ICS="RAP"
 EXTRN_MDL_NAME_LBCS="RAP"
 
-envir="para"
-
-NET="RRFS_AK"
+envir_default="para"
+NET_default="RRFS_AK"
 TAG="RRFS_dev1_AK"
 
 ARCHIVEDIR="/5year/BMC/wrfruc/rrfs_ak_dev1"
 NCARG_ROOT="/apps/ncl/6.5.0-CentOS6.10_64bit_nodap_gnu447"
-NCL_HOME="/home/rtrr/RRFS/graphics"
-NCL_REGION="alaska"
-MODEL="RRFS_AK (dev1)"
 
 #
 # In NCO mode, the following don't need to be explicitly set to "FALSE" 
@@ -142,11 +138,8 @@ MODEL="RRFS_AK (dev1)"
 #RUN_TASK_MAKE_SFC_CLIMO="FALSE"
 
 RUN="RRFS_AK"
-COMINgfs=""
 
-STMP="/lfs4/BMC/nrtrr/NCO_dirs/stmp"  # Path to directory STMP that mostly contains input files.
-PTMP="/lfs4/BMC/nrtrr/NCO_dirs/ptmp"  # Path to directory STMP that mostly contains input files.
-NWGES="/lfs4/BMC/nrtrr/NCO_dirs/nwges"  # Path to directory NWGES that save boundary, cold initial, restart files
+PTMP="/lfs4/BMC/nrtrr/NCO_dirs/ptmp"
 
 if [[ $DO_RETRO == "TRUE" ]] ; then
   CLEAN_OLDPROD_HRS="240"
@@ -159,18 +152,4 @@ if [[ $DO_RETRO == "TRUE" ]] ; then
     CLEAN_OLDFCST_HRS="7777"
   fi
 fi
-#
-# In NCO mode, the user must manually (e.g. after doing the build step)
-# create the symlink "${FIXrrfs}/fix_sar" that points to EMC's FIXLAM
-# directory on the machine.  For example, on hera, the symlink's target
-# needs to be
-#
-#   /scratch2/NCEPDEV/fv3-cam/emc.campara/fix_fv3cam/fix_sar
-#
-# The experiment generation script will then set FIXLAM to 
-#
-#   FIXLAM="${FIXrrfs}/fix_lam/${EMC_GRID_NAME}"
-#
-# where EMC_GRID_NAME has the value set above.
-#
 

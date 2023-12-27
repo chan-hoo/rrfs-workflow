@@ -124,10 +124,8 @@ WTIME_MAKE_LBCS="02:00:00"
 
 EXTRN_MDL_NAME_ICS="GEFS"
 EXTRN_MDL_NAME_LBCS="GEFS"
-envir="para"
+envir_default="para"
 ARCHIVEDIR="/1year/BMC/wrfruc/rrfs_b"
-NCL_REGION="conus"
-MODEL="RRFS_conus_3km"
 
 if [[ ${DO_ENSEMBLE}  == "TRUE" ]]; then
    NUM_ENS_MEMBERS=30
@@ -178,21 +176,13 @@ if [[ ${DO_ENSEMBLE}  == "TRUE" ]]; then
 fi
 
 RUN_ensctrl="rrfs"
-RUN="enkfrrfs"
+RUN_default="enkfrrfs"
 TAG="c3enkf79"
 if [[ ${DO_ENSFCST} == "TRUE" ]] ; then
-  RUN="refs"
+  RUN_default="refs"
   TAG="c3enfcst79"
 fi
 
 . set_rrfs_config.sh
 
-STMP="YourOwnSpace/${version}/stmp_ensda"  # Path to directory STMP that mostly contains input files.
-if [[ ${DO_ENSFCST} == "TRUE" ]] ; then
-  STMP="YourOwnSpace/${version}/stmp_ensfcst"  # Path to directory STMP that mostly contains input files.
-fi
-PTMP="YourOwnSpace/${version}"  # Path to directory STMP that mostly contains input files.
-NWGES="YourOwnSpace/${version}/nwges"  # Path to directory NWGES that save boundary, cold initial, restart files
-ENSCTRL_STMP="YourOwnSpace/${version}/stmp"  # Path to directory STMP that mostly contains control input files for ensemble recentering.
-ENSCTRL_PTMP="YourOwnSpace/${version}"  # Path to directory STMP that mostly contains control input files for ensemble recentering.
-ENSCTRL_NWGES="YourOwnSpace/${version}/nwges"  # Path to directory STMP that mostly contains control input files for ensemble recentering.
+PTMP="YourOwnSpace/${version}"

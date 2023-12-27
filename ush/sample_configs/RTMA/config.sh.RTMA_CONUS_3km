@@ -55,7 +55,7 @@ binary_diag=.true.
 HYBENSMEM_NMIN=66
 HALO_BLEND=20
 #PRINT_DIFF_PGR="TRUE"
-envir="para"
+envir_default="para"
 USE_CUSTOM_POST_CONFIG_FILE="TRUE"
 TESTBED_FIELDS_FN="testbed_fields_rtma.txt"
 TESTBED_FIELDS_FN2="testbed_fields_bgrd3d.txt"
@@ -63,7 +63,6 @@ CUSTOM_POST_CONFIG_FP="$(cd "$( dirname "${BASH_SOURCE[0]}" )/.." &>/dev/null&&p
 CUSTOM_POST_PARAMS_FP="$(cd "$( dirname "${BASH_SOURCE[0]}" )/.." &>/dev/null&&pwd)/fix/upp/params_grib2_tbl_new"
 NCARG_ROOT="/apps/ncl/6.5.0-CentOS6.10_64bit_nodap_gnu447"
 NCL_HOME="/home/role.rtrr/RTMA/graphics"
-COMINgfs=""
 
 FV3GFS_FILE_FMT_ICS="grib2"
 FV3GFS_FILE_FMT_LBCS="grib2"
@@ -221,7 +220,7 @@ TILE_SETS="full NE,NC,NW,SE,SC,SW"
 CCPP_PHYS_SUITE="FV3_HRRR_gf"
 PPN_RUN_POSTANAL="5"
 
-NET="RTMA_CONUS" ##must start with "RTMA". ${NET}.t${cyc}z.bgdawpf${fhr}.${tmmark}.grib2
+NET_default="RTMA_CONUS" ##must start with "RTMA". ${NET}.t${cyc}z.bgdawpf${fhr}.${tmmark}.grib2
 TAG="RTMA_CONUS" ## used by job names
 IS_RTMA="TRUE"
 NCORES_PER_NODE=40 #kjet
@@ -230,14 +229,11 @@ PYTHON_GRAPHICS_YML_FN="rtma.yml"
 POST_FULL_MODEL_NAME="FV3R"
 POST_SUB_MODEL_NAME="RTMA"
 ARCHIVEDIR="/5year/BMC/wrfruc/rtma_b"
-MODEL="RTMA_B" #used by NCL
-RUN="RTMA_CONUS"
+RUN_default="RTMA_CONUS"
 #RTMA_OBS_FEED="NCO"
 #OBSPATH="/lfs4/BMC/wrfruc/gge/rtma/wcoss_obs"
 
-STMP="/lfs4/BMC/nrtrr/NCO_dirs/rtma.${version}/stmp"
 PTMP="/lfs4/BMC/nrtrr/NCO_dirs/rtma.${version}/com" 
-NWGES="/lfs4/BMC/nrtrr/NCO_dirs/rtma.${version}/nwges"
 
 # change settings if it is wcoss_dell_p3
 if [[ "$MACHINE" == "wcoss2" ]]; then
@@ -296,14 +292,11 @@ if [[ "$MACHINE" == "wcoss2" ]]; then
   WRTCMP_write_groups="1"
   WRTCMP_write_tasks_per_group="40"
 
-
   FG_ROOTDIR="/lfs/h2/emc/ptmp/emc.lam/rrfs/conus/nwges"
   OBSPATH="/lfs/h1/ops/prod/com/obsproc/v1.1"
   ENKF_FCST="/lfs/h1/ops/prod/com/gfs/v16.3"
   LIGHTNING_ROOT="/lfs/h1/ops/prod/com/obsproc/v1.1"
 
-  STMP="/lfs/h2/emc/ptmp/${USER}/3drtma/rtma.${version}/stmp"
   PTMP="/lfs/h2/emc/ptmp/${USER}/3drtma/rtma.${version}"
-  NWGES="/lfs/h2/emc/ptmp/${USER}/3drtma/rtma.${version}/nwges"
 fi
 

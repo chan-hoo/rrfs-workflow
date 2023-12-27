@@ -103,23 +103,17 @@ regional_ensemble_option=5
 EXTRN_MDL_NAME_ICS="FV3GFS"
 EXTRN_MDL_NAME_LBCS="FV3GFS"
 
-envir="para"
-
-NET="rrfs_a"
+envir_default="para"
+NET_default="rrfs_a"
+RUN_default="rrfs"
 TAG="n3v79"
 
 ARCHIVEDIR="/NCEPDEV/emc-meso/1year/emc.lam/${TAG}"
-NCL_REGION="conus"
-MODEL="rrfs_a"
-RUN="rrfs"
 
 . set_rrfs_config.sh
 
-STMP="/lfs/f2/t2o/ptmp/emc/stmp/emc.lam/rrfs/${version}"  # Path to directory STMP that mostly contains input files.
-PTMP="/lfs/h2/emc/ptmp/emc.lam/rrfs/${version}"  # Path to directory STMP that mostly contains input files.
-NWGES="/lfs/f2/t2o/ptmp/emc/ptmp/emc.lam/rrfs/${version}/nwges"  # Path to directory NWGES that save boundary, cold initial, restart files
+PTMP="/lfs/h2/emc/ptmp/emc.lam/rrfs/${version}"
 if [[ ${regional_ensemble_option} == "5" ]]; then
-  RRFSE_NWGES="/lfs/f2/t2o/ptmp/emc/ptmp/emc.lam/rrfs/${version}/nwges"  # Path to RRFSE directory NWGES that mostly contains ensemble restart files for GSI hybrid.
   NUM_ENS_MEMBERS=30     # FV3LAM ensemble size for GSI hybrid analysis
   CYCL_HRS_PRODSTART_ENS=( "08" "20" )
   DO_ENVAR_RADAR_REF="TRUE"

@@ -152,9 +152,8 @@ EXTRN_MDL_NAME_LBCS="FV3GFS"
 FV3GFS_FILE_FMT_ICS="grib2"
 FV3GFS_FILE_FMT_LBCS="grib2"
 
-envir="para"
-
-NET="RRFS_CONUS"
+envir_default="para"
+NET_default="RRFS_CONUS"
 TAG="RRFS_CONUS_3km"
 
 USE_CUSTOM_POST_CONFIG_FILE="TRUE"
@@ -164,9 +163,6 @@ CUSTOM_POST_CONFIG_FP="$(cd "$( dirname "${BASH_SOURCE[0]}" )/.." &>/dev/null&&p
 CUSTOM_POST_PARAMS_FP="$(cd "$( dirname "${BASH_SOURCE[0]}" )/.." &>/dev/null&&pwd)/fix/upp/params_grib2_tbl_new"
 ARCHIVEDIR="/1year/BMC/wrfruc/rrfs_dev1"
 NCARG_ROOT="/apps/ncl/6.5.0-CentOS6.10_64bit_nodap_gnu447"
-NCL_HOME="/home/rtrr/RRFS/graphics"
-NCL_REGION="conus"
-MODEL="RRFS_conus_3km"
 
 #
 # In NCO mode, the following don't need to be explicitly set to "FALSE" 
@@ -212,19 +208,14 @@ if [[ $MACHINE == "orion" ]] || [[ $MACHINE == "hercules" ]]; then
   WTIME_RUN_WGRIB2="00:20:00"
 fi
 
-RUN="RRFS_conus_3km"
-COMINgfs=""
+RUN_default="RRFS_conus_3km"
 
 . set_rrfs_config.sh
 
-STMP="/mnt/lfs1/BMC/wrfruc/hwang/base_e/RRFS-SD_T4/NCO_dirs/stmp"  # Path to directory STMP that mostly contains input files.
-PTMP="/mnt/lfs1/BMC/wrfruc/hwang/base_e/RRFS-SD_T4/NCO_dirs/ptmp"  # Path to directory STMP that mostly contains input files.
-NWGES="/mnt/lfs1/BMC/wrfruc/hwang/base_e/RRFS-SD_T4/NCO_dirs/nwges"  # Path to directory NWGES that save boundary, cold initial, restart files
+PTMP="/mnt/lfs1/BMC/wrfruc/hwang/base_e/RRFS-SD_T4/NCO_dirs/ptmp"
 if [[ ${regional_ensemble_option} == "5" ]]; then
-  RRFSE_NWGES="/mnt/lfs1/BMC/wrfruc/hwang/RRFS-SD_T4/NCO_dirs/nwges"  # Path to RRFSE directory NWGES that mostly contains ensemble restart files for GSI hybrid.
   NUM_ENS_MEMBERS=10     # FV3LAM ensemble size for GSI hybrid analysis
 fi
-
 
 if [[ ${DO_ENSEMBLE}  == "TRUE" ]]; then
    NUM_ENS_MEMBERS=9

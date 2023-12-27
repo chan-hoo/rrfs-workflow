@@ -25,12 +25,10 @@ DO_SOIL_ADJUST="TRUE"
 DO_RADDA="FALSE"
 LBCS_ICS_ONLY="FALSE"
 
-NET="RRFS_NA_13km"
+NET_default="RRFS_NA_13km"
 TAG="RRFS_dev1_NA_13km"
 ARCHIVEDIR="/5year/BMC/wrfruc/rrfs_na_13km_dev1"
-NCL_REGION="conus"
-MODEL="RRFS_NA_13km"
-RUN="RRFS_NA_13km_dev1"
+RUN_default="RRFS_NA_13km_dev1"
 
 SOIL_SURGERY_time=2023041904
 
@@ -85,7 +83,4 @@ EXTRN_MDL_NAME_LBCS="FV3GFS"
 
 . set_rrfs_config.sh
 
-STMP="YourOwnSpace/${version}/stmp"  # Path to directory STMP that mostly contains input files.
-PTMP="YourOwnSpace/${version}"  # Path to directory STMP that mostly contains input files.
-NWGES="YourOwnSpace/${version}/nwges/${envir}/${NET}"  # Path to directory NWGES that save boundary, cold initial, restart files
-
+PTMP="YourOwnSpace/${version}"

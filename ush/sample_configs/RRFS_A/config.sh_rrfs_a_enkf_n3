@@ -131,11 +131,9 @@ EXTRN_MDL_NAME_LBCS="GEFS"
 FV3GFS_FILE_FMT_ICS="netcdf"
 FV3GFS_FILE_FMT_LBCS="grib2"
 
-envir="para"
-NET="rrfs_a"
+envir_default="para"
+NET_default="rrfs_a"
 ARCHIVEDIR="/NCEPDEV/emc-meso/1year/emc.lam"
-NCL_REGION="na"
-MODEL="RRFS_A"
 
 if [[ ${DO_ENSEMBLE}  == "TRUE" ]]; then
    NUM_ENS_MEMBERS=30
@@ -187,27 +185,16 @@ if [[ ${DO_ENSEMBLE}  == "TRUE" ]]; then
 fi
 
 RUN_ensctrl="rrfs"
-RUN="enkfrrfs"
+RUN_default="enkfrrfs"
 TAG="n3enkf79"
 if [[ ${DO_ENSFCST} == "TRUE" ]] ; then
-  RUN="refs"
+  RUN_default="refs"
   TAG="n3enfcst79"
 fi
-COMINgfs=""
 
 . set_rrfs_config.sh
 
 EXTRN_MDL_SOURCE_BASEDIR_ICS=/lfs/h1/ops/prod/com/gefs/v12.3
 EXTRN_MDL_SOURCE_BASEDIR_LBCS=/lfs/h1/ops/prod/com/gefs/v12.3
 
-STMP="/lfs/f2/t2o/ptmp/emc/stmp/emc.lam/rrfs/${version}"  # Path to directory STMP that mostly contains input files.
-PTMP="/lfs/h2/emc/ptmp/emc.lam/rrfs/${version}"  # Path to directory STMP that mostly contains input files.
-NWGES="/lfs/f2/t2o/ptmp/emc/ptmp/emc.lam/rrfs/${version}/nwges"  # Path to directory NWGES that save boundary, cold initial, restart files
-if [[ ${DO_ENSFCST} == "TRUE" ]] ; then
-  STMP="/lfs/h2/emc/stmp/emc.lam/rrfs/${version}/enfcst"  # Path to directory STMP that mostly contains input files.
-  PTMP="/lfs/h2/emc/ptmp/emc.lam/rrfs/${version}"  # Path to directory STMP that mostly contains input files.
-  NWGES="/lfs/f2/t2o/ptmp/emc/ptmp/emc.lam/rrfs/${version}/nwges"  # Path to directory NWGES that save boundary, cold initial, restart files
-fi
-ENSCTRL_STMP="/lfs/f2/t2o/ptmp/emc/stmp/emc.lam/rrfs/${version}"  # Path to directory STMP that mostly contains control input files for ensemble recentering.
-ENSCTRL_PTMP="/lfs/h2/emc/ptmp/emc.lam/rrfs/${version}"  # Path to directory STMP that mostly contains control input files for ensemble recentering.
-ENSCTRL_NWGES="/lfs/f2/t2o/ptmp/emc/ptmp/emc.lam/rrfs/${version}/nwges"  # Path to directory STMP that mostly contains control input files for ensemble recentering.
+PTMP="/lfs/h2/emc/ptmp/emc.lam/rrfs/${version}"

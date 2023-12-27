@@ -3,13 +3,11 @@ ACCOUNT="RRFS-DEV"
 HPSS_ACCOUNT="RRFS-DEV"
 EXPT_SUBDIR="test_firewx"
 
-envir="test"
-NET="test"
+envir_default="test"
+NET_default="test"
 TAG="c0v00"
-MODEL="test"
-RUN="test"
+RUN_default="test"
 
-STMP=""
 PTMP=""
 
 VERBOSE="TRUE"

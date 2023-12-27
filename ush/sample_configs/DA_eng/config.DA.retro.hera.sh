@@ -6,11 +6,10 @@ version="v0.00"
 #EXPT_BASEDIR="YourOwnSpace/${version}"
 EXPT_SUBDIR="rrfs_test_da"
 
-envir="para"
-NET="rrfs_b"
+envir_default="para"
+NET_default="rrfs_b"
 TAG="c0v00"
-MODEL="rrfs_b"
-RUN="rrfs"
+RUN_default="rrfs"
 
 PTMP="/scratch2/NCEPDEV/stmp3/${USER}/test_da"
 
@@ -122,13 +121,10 @@ EXTRN_MDL_NAME_ICS="FV3GFS"
 EXTRN_MDL_NAME_LBCS="FV3GFS"
 
 ARCHIVEDIR="/1year/BMC/wrfruc/rrfs_b"
-NCL_REGION="conus"
 
 . set_rrfs_config.sh
 
-NWGES="${PTMP}/nwges"  # Path to directory NWGES that save boundary, cold initial, restart files
 if [[ ${regional_ensemble_option} == "5" ]]; then
-  RRFSE_NWGES="/lfs/h2/emc/ptmp/emc.lam/rrfs/${version}/nwges"  # Path to RRFSE directory NWGES that mostly contains ensemble restart files for GSI hybrid.
   NUM_ENS_MEMBERS=30     # FV3LAM ensemble size for GSI hybrid analysis
   CYCL_HRS_PRODSTART_ENS=( "07" "19" )
   DO_ENVAR_RADAR_REF="TRUE"

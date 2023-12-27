@@ -116,14 +116,12 @@ EXTRN_MDL_SOURCE_BASEDIR_LBCS="/mnt/lfs4/BMC/wrfruc/RRFSE/data/gens"
 FV3GFS_FILE_FMT_ICS="grib2"
 FV3GFS_FILE_FMT_LBCS="grib2"
 
-RUN="rrfs_conus_13km_ensda"
+RUN_default="rrfs_conus_13km_ensda"
 if [[ ${DO_ENSFCST} == "TRUE" ]]; then
-  RUN="rrfs_conus_13km_ensfcst"
+  RUN_default="rrfs_conus_13km_ensfcst"
 fi
-envir="para"
-NCL_REGION="conus"
-MODEL="rrfs_b"
-NET="rrfs_a"
+envir_default="para"
+NET_default="rrfs_a"
 TAG="c13enkf32"
 ARCHIVEDIR="/1year/BMC/wrfruc/rrfs_dev1"
 
@@ -157,22 +155,13 @@ if [[ ${DO_ENSEMBLE}  == "TRUE" ]]; then
    write_diag_2=.true.
 fi
 
-RUN="rrfs_a_c13_ensda"
+RUN_default="rrfs_a_c13_ensda"
 RUN_ensctrl="rrfs"
 if [[ ${DO_ENSFCST} == "TRUE" ]] ; then
-  RUN="rrfs_a_c13_ensfcst"
+  RUN_default="rrfs_a_c13_ensfcst"
 fi
-COMINgfs=""
 
 . set_rrfs_config.sh
 
-STMP="YourOwnSpace/${version}/stmp_ensda"  # Path to directory STMP that mostly contains input files.
-if [[ ${DO_ENSFCST} == "TRUE" ]]; then
-  STMP="YourOwnSpace/${version}/stmp_ensfcst"  # Path to directory STMP that mostly contains input files.
-fi
-PTMP="YourOwnSpace/${version}"  # Path to directory STMP that mostly contains input files.
-NWGES="YourOwnSpace/${version}/nwges/${envir}/${NET}"  # Path to directory NWGES that save boundary, cold initial, restart files
-ENSCTRL_STMP="YourOwnSpace/${version}/stmp"  # Path to directory STMP that mostly contains control input files for ensemble recentering.
-ENSCTRL_PTMP="YourOwnSpace/${version}"  # Path to directory STMP that mostly contains control input files for ensemble recentering.
-ENSCTRL_NWGES="YourOwnSpace/${version}/nwges/${envir}/${NET}"  # Path to directory STMP that mostly contains control input files for ensemble recentering.
+PTMP="YourOwnSpace/${version}"
 

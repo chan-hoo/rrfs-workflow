@@ -49,7 +49,7 @@ binary_diag=.true.
 HYBENSMEM_NMIN=66
 HALO_BLEND=20
 #PRINT_DIFF_PGR="TRUE"
-envir="para"
+envir_default="para"
 USE_CUSTOM_POST_CONFIG_FILE="TRUE"
 TESTBED_FIELDS_FN="testbed_fields_rtma.txt"
 TESTBED_FIELDS_FN2="testbed_fields_bgrd3d.txt"
@@ -214,7 +214,7 @@ TILE_LABELS="NA"
 TILE_SETS="full"
 CCPP_PHYS_SUITE="FV3_HRRR_gf"
 
-NET="RTMA_NA" ##must start with "RTMA". ${NET}.t${cyc}z.bgdawpf${fhr}.${tmmark}.grib2
+NET_default="RTMA_NA" ##must start with "RTMA". ${NET}.t${cyc}z.bgdawpf${fhr}.${tmmark}.grib2
 TAG="RTMA_NA" ## used by job names
 IS_RTMA="TRUE"
 NCORES_PER_NODE=40 #kjet
@@ -223,14 +223,11 @@ PYTHON_GRAPHICS_YML_FN="rtma.yml"
 POST_FULL_MODEL_NAME="FV3R"
 POST_SUB_MODEL_NAME="RTMA"
 ARCHIVEDIR="/5year/BMC/wrfruc/rtma_b"
-MODEL="RTMA_B" #used by NCL
-RUN="RTMA_NA"
+RUN_default="RTMA_NA"
 #RTMA_OBS_FEED="NCO"
 #OBSPATH="/lfs4/BMC/wrfruc/gge/rtma/wcoss_obs"
 
-STMP="/lfs4/BMC/nrtrr/NCO_dirs/rtma.${version}/stmp"
 PTMP="/lfs4/BMC/nrtrr/NCO_dirs/rtma.${version}/com" 
-NWGES="/lfs4/BMC/nrtrr/NCO_dirs/rtma.${version}/nwges"
 
 # change settings if it is wcoss_dell_p3
 if [[ "$MACHINE" == "wcoss2" ]]; then
@@ -302,8 +299,6 @@ if [[ "$MACHINE" == "wcoss2" ]]; then
   ENKF_FCST="/lfs/h1/ops/prod/com/gfs/v16.3"
   LIGHTNING_ROOT="/lfs/h1/ops/prod/com/obsproc/v1.1"
 
-  STMP="/lfs/h2/emc/ptmp/${USER}/3D-RTMA/rtma.${version}/stmp"
   PTMP="/lfs/h2/emc/ptmp/${USER}/3D-RTMA/rtma.${version}"
-  NWGES="/lfs/h2/emc/ptmp/${USER}/3D-RTMA/rtma.${version}/nwges"
 fi
 

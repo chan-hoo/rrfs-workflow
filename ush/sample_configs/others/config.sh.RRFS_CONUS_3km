@@ -102,23 +102,18 @@ EXTRN_MDL_NAME_ICS="FV3GFS"
 EXTRN_MDL_NAME_LBCS="FV3GFS"
 EXTRN_MDL_DATE_JULIAN="TRUE"
 
-envir="para"
-
-NET="rrfs_b"
+envir_default="para"
+NET_default="rrfs_b"
 TAG="c3v79"
 
 ARCHIVEDIR="/1year/BMC/wrfruc/rrfs_b"
-NCL_REGION="conus"
-MODEL="rrfs_b"
-RUN="rrfs"
+RUN_default="rrfs"
 
 . set_rrfs_config.sh
 
-STMP="YourOwnSpace/${version}/stmp"  # Path to directory STMP that mostly contains input files.
-PTMP="YourOwnSpace/${version}"  # Path to directory STMP that mostly contains input files.
-NWGES="YourOwnSpace/${version}/nwges"  # Path to directory NWGES that save boundary, cold initial, restart files
+PTMP="YourOwnSpace/${version}"
+
 if [[ ${regional_ensemble_option} == "5" ]]; then
-  RRFSE_NWGES="YourOwnSpace/${version}/nwges"  # Path to RRFSE directory NWGES that mostly contains ensemble restart files for GSI hybrid.
   NUM_ENS_MEMBERS=30     # FV3LAM ensemble size for GSI hybrid analysis
   CYCL_HRS_PRODSTART_ENS=( "07" "19" )
   DO_ENVAR_RADAR_REF="TRUE"
