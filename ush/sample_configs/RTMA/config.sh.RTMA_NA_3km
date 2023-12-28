@@ -1,10 +1,10 @@
 #!/bin/bash
 source fix_rrfs_locations.sh #determine current platform
 MACHINE=${PLATFORM}
-version="v0.7.3" # odd for NA; even for CONUS
+model_ver_default="v0.7.3" # odd for NA; even for CONUS
 ACCOUNT="nrtrr"
 RESERVATION="rrfsdet"
-EXPT_BASEDIR="/home/role.rtrr/RTMA/rtma.${version}"
+EXPT_BASEDIR="/home/role.rtrr/RTMA/rtma.${model_ver_default}"
 EXPT_SUBDIR="RTMA_NA"
 
 if [[ -n $RESERVATION ]] ; then
@@ -56,8 +56,6 @@ TESTBED_FIELDS_FN2="testbed_fields_bgrd3d.txt"
 CUSTOM_POST_CONFIG_FP="$(cd "$( dirname "${BASH_SOURCE[0]}" )/.." &>/dev/null&&pwd)/fix/upp/postxconfig-NT-fv3lam_rrfs.txt"
 CUSTOM_POST_PARAMS_FP="$(cd "$( dirname "${BASH_SOURCE[0]}" )/.." &>/dev/null&&pwd)/fix/upp/params_grib2_tbl_new"
 NCARG_ROOT="/apps/ncl/6.5.0-CentOS6.10_64bit_nodap_gnu447"
-NCL_HOME="/home/role.rtrr/RTMA/graphics"
-COMINgfs=""
 
 FV3GFS_FILE_FMT_ICS="grib2"
 FV3GFS_FILE_FMT_LBCS="grib2"
@@ -227,7 +225,7 @@ RUN_default="RTMA_NA"
 #RTMA_OBS_FEED="NCO"
 #OBSPATH="/lfs4/BMC/wrfruc/gge/rtma/wcoss_obs"
 
-PTMP="/lfs4/BMC/nrtrr/NCO_dirs/rtma.${version}/com" 
+PTMP="/lfs4/BMC/nrtrr/NCO_dirs/rtma.${model_ver_default}/com" 
 
 # change settings if it is wcoss_dell_p3
 if [[ "$MACHINE" == "wcoss2" ]]; then
@@ -242,7 +240,7 @@ if [[ "$MACHINE" == "wcoss2" ]]; then
 
   RESERVATION=""
   RESERVATION_POST=""
-  EXPT_BASEDIR="/lfs/h2/emc/da/noscrub/${USER}/3D-RTMA/rtma.${version}"
+  EXPT_BASEDIR="/lfs/h2/emc/da/noscrub/${USER}/3D-RTMA/rtma.${model_ver_default}"
   SERVICE_ACCOUNT=""
   HPSS_ACCOUNT="RTMA-DEV"
   PARTITION_DEFAULT=""
@@ -299,6 +297,6 @@ if [[ "$MACHINE" == "wcoss2" ]]; then
   ENKF_FCST="/lfs/h1/ops/prod/com/gfs/v16.3"
   LIGHTNING_ROOT="/lfs/h1/ops/prod/com/obsproc/v1.1"
 
-  PTMP="/lfs/h2/emc/ptmp/${USER}/3D-RTMA/rtma.${version}"
+  PTMP="/lfs/h2/emc/ptmp/${USER}/3D-RTMA/rtma.${model_ver_default}"
 fi
 

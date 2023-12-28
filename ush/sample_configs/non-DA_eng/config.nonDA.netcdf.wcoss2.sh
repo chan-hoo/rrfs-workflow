@@ -5,6 +5,7 @@ EXPT_SUBDIR="test_nonDA_netcdf"
 
 envir_default="test"
 NET_default="test"
+model_ver_default="v0.0.0"
 TAG="c0v00"
 RUN_default="test"
 

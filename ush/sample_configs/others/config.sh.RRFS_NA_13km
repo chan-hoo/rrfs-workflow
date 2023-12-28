@@ -1,7 +1,7 @@
 MACHINE="jet"
 ACCOUNT="nrtrr"
 #RESERVATION="rrfsdet"
-EXPT_BASEDIR="YourOwnSpacei/rrfs.${version}"
+EXPT_BASEDIR="YourOwnSpace"
 EXPT_SUBDIR="RRFS_NA_13km_dev1"
 
 PREDEF_GRID_NAME=GSD_RAP13km
@@ -27,6 +27,7 @@ LBCS_ICS_ONLY="FALSE"
 
 NET_default="RRFS_NA_13km"
 TAG="RRFS_dev1_NA_13km"
+model_ver_default="v0.0.0"
 ARCHIVEDIR="/5year/BMC/wrfruc/rrfs_na_13km_dev1"
 RUN_default="RRFS_NA_13km_dev1"
 
@@ -83,4 +84,4 @@ EXTRN_MDL_NAME_LBCS="FV3GFS"
 
 . set_rrfs_config.sh
 
-PTMP="YourOwnSpace/${version}"
+PTMP="YourOwnSpace"

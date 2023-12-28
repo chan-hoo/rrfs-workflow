@@ -1,7 +1,7 @@
 MACHINE="jet"
-version="v0.7.9"
+model_ver_default="v0.7.9"
 #RESERVATION="rrfsdet"
-EXPT_BASEDIR="YourOwnSpace/${version}"
+EXPT_BASEDIR="YourOwnSpace"
 EXPT_SUBDIR="RRFS_CONUS_3km"
 
 PREDEF_GRID_NAME=RRFS_CONUS_3km
@@ -111,7 +111,7 @@ RUN_default="rrfs"
 
 . set_rrfs_config.sh
 
-PTMP="YourOwnSpace/${version}"
+PTMP="YourOwnSpace"
 
 if [[ ${regional_ensemble_option} == "5" ]]; then
   NUM_ENS_MEMBERS=30     # FV3LAM ensemble size for GSI hybrid analysis

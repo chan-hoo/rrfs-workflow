@@ -1,7 +1,7 @@
 MACHINE="jet"
-version="v0.7.9"
+model_ver_default="v0.7.9"
 RESERVATION="rrfsdet"
-EXPT_BASEDIR="/home/role.rtrr/RRFS/rrfs.${version}"
+EXPT_BASEDIR="/home/role.rtrr/RRFS/rrfs.${model_ver_default}"
 EXPT_SUBDIR="RRFS_CONUS_3km"
 
 PREDEF_GRID_NAME=RRFS_CONUS_3km
@@ -108,7 +108,7 @@ ARCHIVEDIR="/1year/BMC/wrfruc/rrfs_b"
 
 . set_rrfs_config.sh
 
-PTMP="/lfs4/BMC/nrtrr/NCO_dirs/${version}/com"
+PTMP="/lfs4/BMC/nrtrr/NCO_dirs/${model_ver_default}/com"
 if [[ ${regional_ensemble_option} == "5" ]]; then
   NUM_ENS_MEMBERS=30     # FV3LAM ensemble size for GSI hybrid analysis
   CYCL_HRS_PRODSTART_ENS=( "07" "19" )

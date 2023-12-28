@@ -1,9 +1,8 @@
 MACHINE="hera"
-version="v0.3.2"
 ACCOUNT="wrfruc"
 #RESERVATION="rrfsens"
 #RESERVATION_POST="rrfsdet"
-EXPT_BASEDIR="YourOwnSpace/rrfs.${version}"
+EXPT_BASEDIR="YourOwnSpace"
 EXPT_SUBDIR="RRFS_CONUS_13km_ens"
 
 PREDEF_GRID_NAME=RRFS_CONUS_13km
@@ -122,6 +121,7 @@ if [[ ${DO_ENSFCST} == "TRUE" ]]; then
 fi
 envir_default="para"
 NET_default="rrfs_a"
+model_ver_default="v0.3.2"
 TAG="c13enkf32"
 ARCHIVEDIR="/1year/BMC/wrfruc/rrfs_dev1"
 
@@ -163,5 +163,5 @@ fi
 
 . set_rrfs_config.sh
 
-PTMP="YourOwnSpace/${version}"
+PTMP="YourOwnSpace"
 

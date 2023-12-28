@@ -1,9 +1,9 @@
 MACHINE="wcoss2"
-version="v0.3.2"
+model_ver_default="v0.3.2"
 ACCOUNT="nrtrr"
 #RESERVATION="rrfsdet"
 #RESERVATION_POST="rrfsdet"
-EXPT_BASEDIR="/lfs/h2/emc/lam/noscrub/emc.lam/rrfsx/${version}"
+EXPT_BASEDIR="/lfs/h2/emc/lam/noscrub/emc.lam/rrfsx/${model_ver_default}"
 EXPT_SUBDIR="rrfs_conus_13km"
 
 PREDEF_GRID_NAME=RRFS_CONUS_13km
@@ -96,7 +96,7 @@ ARCHIVEDIR="/1year/BMC/wrfruc/rrfs_dev1"
 
 . set_rrfs_config.sh
 
-PTMP="/lfs/h2/emc/ptmp/emc.lam/rrfsx/${version}"
+PTMP="/lfs/h2/emc/ptmp/emc.lam/rrfsx/${model_ver_default}"
 if [[ ${regional_ensemble_option} == "5" ]]; then
   NUM_ENS_MEMBERS=30     # FV3LAM ensemble size for GSI hybrid analysis
   CYCL_HRS_PRODSTART_ENS=( "19" )

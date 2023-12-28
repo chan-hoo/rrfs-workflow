@@ -1,10 +1,10 @@
 MACHINE="wcoss2"
 MACHINETYPE="backup"
-version="v0.6.4"
+model_ver_default="v0.6.4"
 ACCOUNT="RRFS_DEV"
 #RESERVATION="rrfsens"
 #RESERVATION_POST="rrfsdet"
-EXPT_BASEDIR="/lfs/h2/emc/lam/noscrub/emc.lam/rrfs/${version}/"
+EXPT_BASEDIR="/lfs/h2/emc/lam/noscrub/emc.lam/rrfs/${model_ver_default}/"
 EXPT_SUBDIR="rrfs_conus_enkf"
 
 PREDEF_GRID_NAME=RRFS_CONUS_3km
@@ -200,4 +200,4 @@ fi
 
 . set_rrfs_config.sh
 
-PTMP="/lfs/h2/emc/ptmp/emc.lam/rrfs/${version}"
+PTMP="/lfs/h2/emc/ptmp/emc.lam/rrfs/${model_ver_default}"

@@ -1,8 +1,8 @@
 MACHINE="jet"
-version="v0.7.9"
+model_ver_default="v0.7.9"
 #RESERVATION="rrfsens"
 #RESERVATION_POST="rrfsdet"
-EXPT_BASEDIR="YourOwnSpace/${version}"
+EXPT_BASEDIR="YourOwnSpace"
 EXPT_SUBDIR="RRFS_CONUS_3km_ens"
 
 PREDEF_GRID_NAME=RRFS_CONUS_3km
@@ -185,4 +185,4 @@ fi
 
 . set_rrfs_config.sh
 
-PTMP="YourOwnSpace/${version}"
+PTMP="YourOwnSpace"

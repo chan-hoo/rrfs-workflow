@@ -1,5 +1,4 @@
 MACHINE="hera"
-version="v0.00"
 #RESERVATION="rrfsdet"
 
 ################################################################
@@ -8,6 +7,7 @@ EXPT_SUBDIR="rrfs_test_da"
 
 envir_default="para"
 NET_default="rrfs_b"
+model_ver_default="v0.0.0"
 TAG="c0v00"
 RUN_default="rrfs"
 

@@ -1,9 +1,9 @@
 MACHINE="wcoss2"
 MACHINETYPE="primary"
-version="v0.7.9"
+model_ver_default="v0.7.9"
 ACCOUNT="RRFS_DEV"
 #RESERVATION="rrfsdet"
-EXPT_BASEDIR="/lfs/h2/emc/lam/noscrub/emc.lam/rrfs/${version}"
+EXPT_BASEDIR="/lfs/h2/emc/lam/noscrub/emc.lam/rrfs/${model_ver_default}"
 EXPT_SUBDIR="rrfs_na_enkf"
 
 PREDEF_GRID_NAME="RRFS_NA_3km"
@@ -197,4 +197,4 @@ fi
 EXTRN_MDL_SOURCE_BASEDIR_ICS=/lfs/h1/ops/prod/com/gefs/v12.3
 EXTRN_MDL_SOURCE_BASEDIR_LBCS=/lfs/h1/ops/prod/com/gefs/v12.3
 
-PTMP="/lfs/h2/emc/ptmp/emc.lam/rrfs/${version}"
+PTMP="/lfs/h2/emc/ptmp/emc.lam/rrfs/$model_ver_default}"

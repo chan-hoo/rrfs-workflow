@@ -1,8 +1,8 @@
 MACHINE="wcoss2"
-version="v0.5.2"
+model_ver_default="v0.5.2"
 ACCOUNT="RRFS_DEV"
 #RESERVATION="rrfsdet"
-EXPT_BASEDIR="/lfs/h2/emc/lam/noscrub/emc.lam/rrfs/$version/"
+EXPT_BASEDIR="/lfs/h2/emc/lam/noscrub/emc.lam/rrfs/$model_ver_default/"
 EXPT_SUBDIR="rrfs_conus"
 
 PREDEF_GRID_NAME=RRFS_CONUS_3km
@@ -110,7 +110,7 @@ ARCHIVEDIR="/NCEPDEV/emc-meso/1year/emc.lam/${TAG}"
 
 . set_rrfs_config.sh
 
-PTMP="/lfs/h2/emc/ptmp/emc.lam/rrfs/${version}"
+PTMP="/lfs/h2/emc/ptmp/emc.lam/rrfs/${model_ver_default}"
 
 if [[ ${regional_ensemble_option} == "5" ]]; then
   NUM_ENS_MEMBERS=30     # FV3LAM ensemble size for GSI hybrid analysis
