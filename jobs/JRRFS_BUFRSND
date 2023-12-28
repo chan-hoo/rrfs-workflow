@@ -97,7 +97,7 @@ if [ "${WORKFLOW_MANAGER}" = "rocoto" ]; then
   if [ "${flag_shared_working_dir}" = "TRUE" ]; then
     jobid_default="${job_default}.${PDY}${cyc}"
   else
-    jobid_default="${job_default}.${pid_default}"
+    jobid_default="${job_default}.${PDY}${cyc}.${pid_default}"
   fi
 fi
 export job="${job:-${job_default}}"
