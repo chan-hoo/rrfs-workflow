@@ -125,8 +125,13 @@ export CDATE="${CDATE:-${PDY}${cyc}}"
 #-----------------------------------------------------------------------
 #
 [[ "$WORKFLOW_MANAGER" = "rocoto" ]] && export COMROOT=$COMROOT
-export COMIN="${COMIN:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc}${SLASH_ENSMEM_SUBDIR})}"
-export COMOUT_BASEDIR="${COMOUT_BASEDIR:-$(compath.py -o ${NET}/${model_ver})}"
+if [ "${MACHINE}" = "WCOSS2" ]; then
+  export COMIN="${COMIN:-$(compath.py -o ${NET}/${model_ver}/${RUN}.${PDY}/${cyc}${SLASH_ENSMEM_SUBDIR})}"
+  export COMOUT_BASEDIR="${COMOUT_BASEDIR:-$(compath.py -o ${NET}/${model_ver})}"
+else
+  export COMIN="${COMIN:-${COMROOT}/${NET}/${model_ver}/${RUN}.${PDY}/${cyc}${SLASH_ENSMEM_SUBDIR}}"
+  export COMOUT_BASEDIR="${COMOUT_BASEDIR:-${COMROOT}/${NET}/${model_ver}}"
+fi
 export COMOUT="${COMOUT_BASEDIR}/${RUN}.${PDY}/${cyc}${SLASH_ENSMEM_SUBDIR}"
 export COMOUT_gridspec="${COMOUT_BASEDIR}/grid_spec"
 

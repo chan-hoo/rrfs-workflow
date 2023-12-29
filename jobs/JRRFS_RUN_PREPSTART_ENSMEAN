@@ -123,9 +123,15 @@ export CDATE="${CDATE:-${PDY}${cyc}}"
 #-----------------------------------------------------------------------
 #
 [[ "$WORKFLOW_MANAGER" = "rocoto" ]] && export COMROOT=$COMROOT
-export COMIN_BASEDIR="${COMIN_BASEDIR:-$(compath.py -o ${NET}/${model_ver})}"
+if [ "${MACHINE}" = "WCOSS2" ]; then
+  export COMIN_BASEDIR="${COMIN_BASEDIR:-$(compath.py -o ${NET}/${model_ver})}"
+  export COMOUT_BASEDIR="${COMOUT_BASEDIR:-$(compath.py -o ${NET}/${model_ver})}"
+else
+  export COMIN_BASEDIR="${COMIN_BASEDIR:-${COMROOT}/${NET}/${model_ver}}"
+  export COMOUT_BASEDIR="${COMOUT_BASEDIR:-${COMROOT}/${NET}/${model_ver}}"
+fi
 export COMIN="${COMIN_BASEDIR}/${RUN}.${PDY}/${cyc}"
-export COMOUT_BASEDIR="${COMOUT_BASEDIR:-$(compath.py -o ${NET}/${model_ver})}"
+
 if [ "${MEM_TYPE}" = "MEAN" ]; then
   export COMOUT="${COMOUT_BASEDIR}/${RUN}.${PDY}/${cyc}/ensmean"
 else
