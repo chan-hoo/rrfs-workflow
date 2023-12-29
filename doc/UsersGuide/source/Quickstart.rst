@@ -18,19 +18,23 @@ Building RRFS workflow
 
          git clone -b dev-sci https://github.com/NOAA-EMC/rrfs-workflow.git
 
-   #. Check out the external components and build the executables:
-
-      .. code-block:: console
-
-         cd rrfs-workflow/sorc
-         ./app_build.sh --extrn
-
-      This is equal to the following two commands:
+   #. Check out the external components:
 
       .. code-block:: console
 
          cd rrfs-workflow/sorc
          ./manage_externals/checkout_externals
+
+   #. Set up the build environment and build the executables:
+
+      .. code-block:: console
+            
+         ./app_build.sh
+
+      Alternatively, the above command can be followed by the platform (machine) name as follows:
+
+      .. code-block:: console
+            
          ./app_build.sh --platform=<machine>
 
       where ``<machine>`` is ``wcoss2``, ``hera``, ``jet``, ``orion``, or ``hercules``.
@@ -94,8 +98,6 @@ Engineering Test: Non-DA
          USE_CRON_TO_RELAUNCH="TRUE"
          CRON_RELAUNCH_INTVL_MNTS="03"
 
-      .. note::         
-         On Orion, the crontab is available only on ``orion-login-1``.
 
 Engineering Test: DA
 ===============================================
@@ -143,7 +145,7 @@ Engineering Test: DA
       .. code-block:: console
 
          cd ../../expt_dirs/rrfs_test_da
-         ./launch_FV3LAM_wflow.sh
+         ./run_rocoto.sh
 
    #. Launch the following tasks as needed:
 
@@ -164,13 +166,13 @@ Engineering Test: DA
 
          rocotoboot -w FV3LAM_wflow.xml -d FV3LAM_wflow.db -v 10 -c 202307260400 -t prep_cyc_spinup
 
-      * On Hera: ``config.DA.retro.hera.sh``
+      * On Hera: ``config.DA.retro.hera.sh`` (in case of ``DATE_FIRST_CYCL``=20230611)
 
       Once the ``make_ics`` task for ``15z`` and ``make_lbcs`` tasks for ``06z``, ``12z``, and ``18z`` are complete, launch the ``prep_cyc_spinup`` task for ``03z`` manually:
 
       .. code-block:: console
 
-         rocotoboot -w FV3LAM_wflow.xml -d FV3LAM_wflow.db -v 10 -c 202207200300 -t prep_cyc_spinup
+         rocotoboot -w FV3LAM_wflow.xml -d FV3LAM_wflow.db -v 10 -c 202306110300 -t prep_cyc_spinup
 
    #. Check the status of your run with ``rocotostat``:
 
@@ -178,6 +180,4 @@ Engineering Test: DA
 
          rocotostat -w FV3LAM_wflow.xml -d FV3LAM_wflow.db -v 10 > test.log
 
-      .. note::
-         You can open the log file ``log.launch_FV3LAM_wflow`` for the entire history, but it is sometimes too long.
 
