@@ -166,7 +166,7 @@ Engineering Test: DA
 
          rocotoboot -w FV3LAM_wflow.xml -d FV3LAM_wflow.db -v 10 -c 202307260400 -t prep_cyc_spinup
 
-      * On Hera: ``config.DA.retro.hera.sh`` (in case of ``DATE_FIRST_CYCL``=20230611)
+      * On Hera: ``config.DA.retro.hera.sh`` (in case of cycle_date=20230611)
 
       Once the ``make_ics`` task for ``15z`` and ``make_lbcs`` tasks for ``06z``, ``12z``, and ``18z`` are complete, launch the ``prep_cyc_spinup`` task for ``03z`` manually:
 
