@@ -171,8 +171,6 @@ fi
 #
 #-----------------------------------------------------------------------
 #
-process_bufr_path=${COMIN}
-
 obs_files_source[0]=${COMIN}/rrfs.${cycle}.NASALaRC_cloud4fv3.bin
 obs_files_target[0]=NASALaRC_cloud4fv3.bin
 

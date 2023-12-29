@@ -59,8 +59,8 @@ NCO environment variables.
 -->
 <!ENTITY envir          "{{ envir_default }}">
 <!ENTITY model_ver      "{{ model_ver_default }}">
-<!ENTITY NET_default    "{{ net_default }}">
-<!ENTITY RUN_default    "{{ run_default }}">
+<!ENTITY NET            "{{ net_default }}">
+<!ENTITY RUN            "{{ run_default }}">
 <!ENTITY HOMErrfs       "{{ homerrfs_default }}">
 <!ENTITY JOBSrrfs       "&HOMErrfs;/jobs">
 <!ENTITY OPSROOT        "{{ ptmp }}/&envir;">
@@ -221,11 +221,12 @@ MODULES_RUN_TASK_FP script.
     <envar><name>HOMErrfs</name><value>&HOMErrfs;</value></envar>
     <envar><name>envir</name><value>&envir;</value></envar>
     <envar><name>model_ver</name><value>&model_ver;</value></envar>
-    <envar><name>NET_default</name><value>&NET_default;</value></envar>
-    <envar><name>RUN_default</name><value>&RUN_default;</value></envar>
+    <envar><name>NET</name><value>&NET;</value></envar>
+    <envar><name>RUN</name><value>&RUN;</value></envar>
     <envar><name>COMROOT</name><value>&COMROOT;</value></envar>
     <envar><name>DATAROOT</name><value>&DATAROOT;</value></envar>
     <envar><name>KEEPDATA</name><value>&KEEPDATA;</value></envar>
+    <envar><name>SENDCOM</name><value>&SENDCOM;</value></envar>
     <envar><name>WORKFLOW_MANAGER</name><value>&WORKFLOW_MANAGER;</value></envar>
     <envar><name>MACHINE</name><value>&MACHINE;</value></envar>
     <envar><name>SCHED</name><value>&SCHED;</value></envar>
@@ -255,11 +256,12 @@ MODULES_RUN_TASK_FP script.
     <envar><name>HOMErrfs</name><value>&HOMErrfs;</value></envar>
     <envar><name>envir</name><value>&envir;</value></envar>
     <envar><name>model_ver</name><value>&model_ver;</value></envar>
-    <envar><name>NET_default</name><value>&NET_default;</value></envar>
-    <envar><name>RUN_default</name><value>&RUN_default;</value></envar>    
+    <envar><name>NET</name><value>&NET;</value></envar>
+    <envar><name>RUN</name><value>&RUN;</value></envar>    
     <envar><name>COMROOT</name><value>&COMROOT;</value></envar>
     <envar><name>DATAROOT</name><value>&DATAROOT;</value></envar>
     <envar><name>KEEPDATA</name><value>&KEEPDATA;</value></envar>
+    <envar><name>SENDCOM</name><value>&SENDCOM;</value></envar>
     <envar><name>WORKFLOW_MANAGER</name><value>&WORKFLOW_MANAGER;</value></envar>
     <envar><name>MACHINE</name><value>&MACHINE;</value></envar>
     <envar><name>SCHED</name><value>&SCHED;</value></envar>
@@ -298,11 +300,12 @@ MODULES_RUN_TASK_FP script.
     <envar><name>HOMErrfs</name><value>&HOMErrfs;</value></envar>
     <envar><name>envir</name><value>&envir;</value></envar>
     <envar><name>model_ver</name><value>&model_ver;</value></envar>
-    <envar><name>NET_default</name><value>&NET_default;</value></envar>
-    <envar><name>RUN_default</name><value>&RUN_default;</value></envar>
+    <envar><name>NET</name><value>&NET;</value></envar>
+    <envar><name>RUN</name><value>&RUN;</value></envar>
     <envar><name>COMROOT</name><value>&COMROOT;</value></envar>
     <envar><name>DATAROOT</name><value>&DATAROOT;</value></envar>
     <envar><name>KEEPDATA</name><value>&KEEPDATA;</value></envar>
+    <envar><name>SENDCOM</name><value>&SENDCOM;</value></envar>
     <envar><name>WORKFLOW_MANAGER</name><value>&WORKFLOW_MANAGER;</value></envar>
     <envar><name>MACHINE</name><value>&MACHINE;</value></envar>
     <envar><name>SCHED</name><value>&SCHED;</value></envar>
@@ -347,11 +350,12 @@ MODULES_RUN_TASK_FP script.
     <envar><name>HOMErrfs</name><value>&HOMErrfs;</value></envar>
     <envar><name>envir</name><value>&envir;</value></envar>
     <envar><name>model_ver</name><value>&model_ver;</value></envar>
-    <envar><name>NET_default</name><value>&NET_default;</value></envar>
-    <envar><name>RUN_default</name><value>&RUN_default;</value></envar>
+    <envar><name>NET</name><value>&NET;</value></envar>
+    <envar><name>RUN</name><value>&RUN;</value></envar>
     <envar><name>COMROOT</name><value>&COMROOT;</value></envar>
     <envar><name>DATAROOT</name><value>&DATAROOT;</value></envar>
     <envar><name>KEEPDATA</name><value>&KEEPDATA;</value></envar>
+    <envar><name>SENDCOM</name><value>&SENDCOM;</value></envar>
     <envar><name>PDY</name><value><cyclestr>@Y@m@d</cyclestr></value></envar>
     <envar><name>cyc</name><value><cyclestr>@H</cyclestr></value></envar>
     <envar><name>CDATE</name><value><cyclestr>@Y@m@d@H</cyclestr></value></envar>
@@ -381,11 +385,12 @@ MODULES_RUN_TASK_FP script.
     <envar><name>HOMErrfs</name><value>&HOMErrfs;</value></envar>
     <envar><name>envir</name><value>&envir;</value></envar>
     <envar><name>model_ver</name><value>&model_ver;</value></envar>
-    <envar><name>NET_default</name><value>&NET_default;</value></envar>
-    <envar><name>RUN_default</name><value>&RUN_default;</value></envar>
+    <envar><name>NET</name><value>&NET;</value></envar>
+    <envar><name>RUN</name><value>&RUN;</value></envar>
     <envar><name>COMROOT</name><value>&COMROOT;</value></envar>
     <envar><name>DATAROOT</name><value>&DATAROOT;</value></envar>
     <envar><name>KEEPDATA</name><value>&KEEPDATA;</value></envar>
+    <envar><name>SENDCOM</name><value>&SENDCOM;</value></envar>
     <envar><name>PDY</name><value><cyclestr>@Y@m@d</cyclestr></value></envar>
     <envar><name>cyc</name><value><cyclestr>@H</cyclestr></value></envar>
     <envar><name>CDATE</name><value><cyclestr>@Y@m@d@H</cyclestr></value></envar>
@@ -416,11 +421,12 @@ MODULES_RUN_TASK_FP script.
     <envar><name>HOMErrfs</name><value>&HOMErrfs;</value></envar>
     <envar><name>envir</name><value>&envir;</value></envar>
     <envar><name>model_ver</name><value>&model_ver;</value></envar>
-    <envar><name>NET_default</name><value>&NET_default;</value></envar>
-    <envar><name>RUN_default</name><value>&RUN_default;</value></envar>
+    <envar><name>NET</name><value>&NET;</value></envar>
+    <envar><name>RUN</name><value>&RUN;</value></envar>
     <envar><name>COMROOT</name><value>&COMROOT;</value></envar>
     <envar><name>DATAROOT</name><value>&DATAROOT;</value></envar>
     <envar><name>KEEPDATA</name><value>&KEEPDATA;</value></envar>
+    <envar><name>SENDCOM</name><value>&SENDCOM;</value></envar>
     <envar><name>PDY</name><value><cyclestr>@Y@m@d</cyclestr></value></envar>
     <envar><name>cyc</name><value><cyclestr>@H</cyclestr></value></envar>
     <envar><name>CDATE</name><value><cyclestr>@Y@m@d@H</cyclestr></value></envar>
@@ -473,11 +479,12 @@ MODULES_RUN_TASK_FP script.
       <envar><name>HOMErrfs</name><value>&HOMErrfs;</value></envar>
       <envar><name>envir</name><value>&envir;</value></envar>
       <envar><name>model_ver</name><value>&model_ver;</value></envar>
-      <envar><name>NET_default</name><value>&NET_default;</value></envar>
-      <envar><name>RUN_default</name><value>&RUN_default;</value></envar>
+      <envar><name>NET</name><value>&NET;</value></envar>
+      <envar><name>RUN</name><value>&RUN;</value></envar>
       <envar><name>COMROOT</name><value>&COMROOT;</value></envar>
       <envar><name>DATAROOT</name><value>&DATAROOT;</value></envar>
       <envar><name>KEEPDATA</name><value>&KEEPDATA;</value></envar>
+      <envar><name>SENDCOM</name><value>&SENDCOM;</value></envar>
       <envar><name>PDY</name><value><cyclestr>@Y@m@d</cyclestr></value></envar>
       <envar><name>cyc</name><value><cyclestr>@H</cyclestr></value></envar>
       <envar><name>CDATE</name><value><cyclestr>@Y@m@d@H</cyclestr></value></envar>
@@ -530,11 +537,12 @@ MODULES_RUN_TASK_FP script.
     <envar><name>HOMErrfs</name><value>&HOMErrfs;</value></envar>
     <envar><name>envir</name><value>&envir;</value></envar>
     <envar><name>model_ver</name><value>&model_ver;</value></envar>
-    <envar><name>NET_default</name><value>&NET_default;</value></envar>
-    <envar><name>RUN_default</name><value>&RUN_default;</value></envar>
+    <envar><name>NET</name><value>&NET;</value></envar>
+    <envar><name>RUN</name><value>&RUN;</value></envar>
     <envar><name>COMROOT</name><value>&COMROOT;</value></envar>
     <envar><name>DATAROOT</name><value>&DATAROOT;</value></envar>
     <envar><name>KEEPDATA</name><value>&KEEPDATA;</value></envar>
+    <envar><name>SENDCOM</name><value>&SENDCOM;</value></envar>
     <envar><name>PDY</name><value><cyclestr>@Y@m@d</cyclestr></value></envar>
     <envar><name>cyc</name><value><cyclestr>@H</cyclestr></value></envar>
     <envar><name>CDATE</name><value><cyclestr>@Y@m@d@H</cyclestr></value></envar>
@@ -574,11 +582,12 @@ MODULES_RUN_TASK_FP script.
         <envar><name>HOMErrfs</name><value>&HOMErrfs;</value></envar>
         <envar><name>envir</name><value>&envir;</value></envar>
         <envar><name>model_ver</name><value>&model_ver;</value></envar>
-        <envar><name>NET_default</name><value>&NET_default;</value></envar>
-        <envar><name>RUN_default</name><value>&RUN_default;</value></envar>
+        <envar><name>NET</name><value>&NET;</value></envar>
+        <envar><name>RUN</name><value>&RUN;</value></envar>
         <envar><name>COMROOT</name><value>&COMROOT;</value></envar>
         <envar><name>DATAROOT</name><value>&DATAROOT;</value></envar>
         <envar><name>KEEPDATA</name><value>&KEEPDATA;</value></envar>
+        <envar><name>SENDCOM</name><value>&SENDCOM;</value></envar>
         <envar><name>PDY</name><value><cyclestr>@Y@m@d</cyclestr></value></envar>
         <envar><name>cyc</name><value><cyclestr>@H</cyclestr></value></envar>
 	<envar><name>CDATE</name><value><cyclestr>@Y@m@d@H</cyclestr></value></envar>

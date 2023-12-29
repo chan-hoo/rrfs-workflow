@@ -326,7 +326,9 @@ if [[ "$run_metar" == true ]]; then
   export err=$?; err_chk
   mv errfile errfile_metarcld
 
-  cp fv3_metarcloud.bin $COMOUT/rrfs.t${HH}z.fv3_metarcloud.bin
+  if [ "${SENDCOM}" = "YES" ]; then
+    cp fv3_metarcloud.bin $COMOUT/rrfs.${cycle}.fv3_metarcloud.bin
+  fi
 fi
 #
 #-----------------------------------------------------------------------

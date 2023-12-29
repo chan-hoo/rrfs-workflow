@@ -70,28 +70,31 @@ flag_shared_working_dir="FALSE"
 WORKFLOW_MANAGER="${WORKFLOW_MANAGER:-rocoto}"
 if [ "${WORKFLOW_MANAGER}" = "rocoto" ]; then
   if [ "${SCHED}" = "slurm" ]; then
-    job_default=${SLURM_JOB_NAME}
-    pid_default=${SLURM_JOB_ID}
+    job=${SLURM_JOB_NAME}
+    pid=${SLURM_JOB_ID}
   elif [ "${SCHED}" = "pbspro" ]; then
-    job_default=${PBS_JOBNAME}
-    pid_default=${PBS_JOBID}
+    job=${PBS_JOBNAME}
+    pid=${PBS_JOBID}
   else
-    job_default="task"
-    pid_default=$$
+    job="task"
+    pid=$$
   fi
   if [ "${flag_shared_working_dir}" = "TRUE" ]; then
-    jobid_default="${job_default}.${PDY}${cyc}"
+    jobid="${job}.${PDY}${cyc}"
   else
-    jobid_default="${job_default}.${PDY}${cyc}.${pid_default}"
+    jobid="${job}.${PDY}${cyc}.${pid}"
   fi
 fi
-export job="${job:-${job_default}}"
-export jobid="${jobid:-${jobid_default}}"
 
-# Set environment variables
-export NET="${NET:-${NET_default}}"
-export RUN="${RUN:-${RUN_default}}"
+# Set environment variables: job card (or rocoto xml)
+export envir="${envir:-para}"
+export model_ver="${model_ver:-v0.0.0}"
+export KEEPDATA="${KEEPDATA:-YES}"
+export SENDCOM="${SENDCOM:-YES}"
 
+# Set environment variables: j-job
+export NET="${NET:-rrfs}"
+export RUN="${RUN:-rrfs}"
 export USHrrfs="${HOMErrfs}/ush"
 export EXECrrfs="${HOMErrfs}/exec"
 export PARMrrfs="${HOMErrfs}/parm"
@@ -181,6 +184,7 @@ fi
 if [ "${KEEPDATA}" = "NO" ]; then
   rm -rf ${DATA}
 fi
+date
 #
 #-----------------------------------------------------------------------
 #

@@ -166,8 +166,8 @@ elif [[ -e "$erie2" && -e "$mh2" && -e "$sup2" && -e "$ont2" ]]; then
 else
   message_txt="WARNING: No FVCOM data is available."
   print_info_msg "${message_txt}"
-  if [ ! -z "${maillist}" ]; then
-    echo "${message_txt}" | mail.py $maillist
+  if [ ! -z "${MAILTO}" ] && [ "${MACHINE}" = "WCOSS2" ]; then
+    echo "${message_txt}" | mail.py ${MAILTO}
   fi
 fi
 

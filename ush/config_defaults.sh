@@ -218,6 +218,7 @@ PTMP="/temporary/path/to/parent/dir/of/OPSROOT/for/development"
 #-----------------------------------------------------------------------
 #
 # NCO standard environment variables: 
+#
 # The following variables have the suffix [_default] in config_default.sh
 # and config.sh because some of them are defined in the job cards for ecFlow
 # and updated in the scripts.
@@ -260,7 +261,7 @@ model_ver_default="v0.0.0"
 
 DBNROOT_default=""
 KEEPDATA_default="YES"
-SENDCOM_default="NO"
+SENDCOM_default="YES"
 SENDECF_default="NO"
 SENDDBN_default="NO"
 SENDDBN_NTC_default=""
