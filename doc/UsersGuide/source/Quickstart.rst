@@ -186,7 +186,6 @@ Engineering Test: DA
 
       .. code-block:: console
 
-         cd ../../expt_dirs/rrfs_test_da
          ./run_rocoto.sh
 
    #. Check the status of your run with ``rocotostat``:
