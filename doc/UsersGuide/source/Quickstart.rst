@@ -172,6 +172,9 @@ Engineering Test: DA
 
       .. code-block:: console
 
+         rocotoboot -w FV3LAM_wflow.xml -d FV3LAM_wflow.db -v 10 -c 202306111200 -t get_extrn_lbcs
+         rocotoboot -w FV3LAM_wflow.xml -d FV3LAM_wflow.db -v 10 -c 202306111800 -t get_extrn_lbcs
+         rocotoboot -w FV3LAM_wflow.xml -d FV3LAM_wflow.db -v 10 -c 202306111500 -t get_extrn_ics
          rocotoboot -w FV3LAM_wflow.xml -d FV3LAM_wflow.db -v 10 -c 202306110300 -t prep_cyc_spinup
 
    #. Check the status of your run with ``rocotostat``:
