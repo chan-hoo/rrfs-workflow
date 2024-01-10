@@ -190,7 +190,7 @@ Engineering Test: DA
 
       * On Hera: with ``config.DA.ens.hera.sh`` (in case of cycle_date=20230610)
 
-      Once the ``save_restart_ensinit_mem000X`` are complete, launch the following tasks for ``06z`` manually:
+      Once the ``save_restart_ensinit_mem000X`` tasks are complete, launch the following tasks for ``06z`` manually:
 
       .. code-block:: console
 
@@ -202,7 +202,7 @@ Engineering Test: DA
 
       .. code-block:: console
 
-         rocotoboot -w FV3LAM_wflow.xml -d FV3LAM_wflow.db -v 10 -c 202306100600 -t prep_cyc_spinup
+         rocotoboot -w FV3LAM_wflow.xml -d FV3LAM_wflow.db -v 10 -c 202306100600 -t run_recenter_spinup
 
       Keep monitoring and launching the workflow if ``USE_CRON_TO_RELAUNCH`` was NOT set to ``TRUE`` in ``config.sh``. If ``USE_CRON_TO_RELAUNCH`` was set to ``TRUE``, you should remove the crontab line manually once all tasks are complete.
 
