@@ -3,13 +3,12 @@ ACCOUNT="fv3-cam"
 HPSS_ACCOUNT="fv3-cam"
 EXPT_SUBDIR="test_firewx"
 
-envir="rrfsfw"
-NET="rrfsfw"
+envir_default="rrfsfw"
+NET_default="rrfsfw"
+model_ver_default="v0.0.0"
 TAG="c0v00"
-MODEL="rrfsfw"
-RUN="rrfsfw"
+RUN_default="rrfsfw"
 
-STMP=""
 PTMP=""
 
 VERBOSE="TRUE"
