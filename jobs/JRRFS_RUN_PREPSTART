@@ -160,6 +160,8 @@ mkdir -p ${COMOUT_gridspec}
 export cycle="${cycle:-t${cyc}z}"
 setpdy.sh
 . ./PDY
+
+export MAILTO="${MAILTO:-}"
 #
 #-----------------------------------------------------------------------
 #

@@ -168,8 +168,12 @@ for imem in  $(seq 1 $nens) ensmean; do
       fi	
     fi
 	
-    if [ "${OB_TYPE}" = "radardbz" ]; then
-      list_ob_type="conv_dbz"
+    if [ "${ob_type}" = "radardbz" ]; then
+      if [ ${DO_GLM_FED_DA} == "TRUE" ]; then
+        list_ob_type="conv_dbz conv_fed"
+      else
+        list_ob_type="conv_dbz"
+      fi
     fi
     for sub_ob_type in ${list_ob_type} ; do
       diagfile0=${COMOUT}/diag_${sub_ob_type}_ges.${CDATE}.nc4

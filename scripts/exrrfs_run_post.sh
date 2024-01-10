@@ -316,6 +316,28 @@ wgrib2 NATLEV.GrbF${post_fhr} -set center 7 -grib ${bgrd3d} >>$pgmout 2>>errfile
 if [ -f IFIFIP.GrbF${post_fhr} ]; then
   wgrib2 IFIFIP.GrbF${post_fhr} -set center 7 -grib ${bgifi} >>$pgmout 2>>errfile
 fi
+
+# Keep latlons_corners.txt file for RRFS fire weather grid
+if [ ${PREDEF_GRID_NAME} = "RRFS_FIREWX_1.5km" ]; then
+  cp ${postprd_dir}/${fhr}/latlons_corners.txt.f${fhr} ${postprd_dir}
+fi
+#
+#-----------------------------------------------------------------------
+#   clean forecast netcdf files for saving space
+#-----------------------------------------------------------------------
+#
+if [ ${PREDEF_GRID_NAME} = "RRFS_NA_3km" ]; then
+  indx="00 06 12 18"
+  for i in $indx
+  do
+    if [ "$cyc" == $i ]; then
+      echo "long forecast cycle, keep .nc for bufrsnd" 
+    else
+      rm -f ${dyn_file}
+      rm -f ${phy_file}
+    fi
+  done
+fi
 #
 #-----------------------------------------------------------------------
 #
