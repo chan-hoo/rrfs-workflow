@@ -211,7 +211,7 @@ Engineering Test: DA
          ./run_rocoto.sh
 
       .. note::
-         You should manually launch the above tasks for ``18z`` as well (due to wrong address to ``nonvarcldana_complete.txt``).
+         You should manually launch the above tasks for ``18z`` as well (due to wrong address to the dependency ``nonvarcldana_complete.txt``).
 
    #. Check the status of your run with ``rocotostat``:
 
